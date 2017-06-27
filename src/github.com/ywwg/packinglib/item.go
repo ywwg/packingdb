@@ -40,17 +40,23 @@ func NewBasicItem(name string, p PropertySet) *BasicItem {
 	}
 }
 
+// Satisfies returns true if the context satisfies the item's requirements.
 func (i *BasicItem) Satisfies(c *Context) bool {
 	// Any property satisfies (OR)
 	if len(i.Prerequisites) == 0 {
 		return true
 	}
+	found := false
 	for p := range i.Prerequisites {
-		if _, ok := c.Properties[p]; ok {
-			return true
+		// Any item that has a disallowing prerequisite immediately dissatisfies.
+		if allow, ok := c.Properties[p]; ok {
+			if !allow {
+				return false
+			}
+			found = true
 		}
 	}
-	return false
+	return found
 }
 
 func (i *BasicItem) Pack(t *Trip) Item {

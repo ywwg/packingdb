@@ -1,6 +1,6 @@
 package packinglib
 
-var CampStuff = []Item{
+var campStuff = []Item{
 	NewBasicItem("tent", PropertySet{Camping: true}),
 	NewBasicItem("sleeping bag", PropertySet{Camping: true}),
 	NewBasicItem("sleeping pad", PropertySet{Camping: true}),
@@ -17,5 +17,10 @@ var CampStuff = []Item{
 	NewConsumableItem("drinking water", 0.5, "gallons", PropertySet{Burn: true}),
 	NewConsumableItem("cooking water", 0.25, "gallons", PropertySet{Burn: true}),
 	NewBasicItem("camelbak", PropertySet{Burn: true, Camping: true}),
+	NewBasicItem("cart", PropertySet{Burn: true}),
 	NewBasicItem("TASK: permetherin", PropertySet{Burn: true, Camping: true}),
+}
+
+func init() {
+	RegisterItems("Camping Stuff", campStuff)
 }

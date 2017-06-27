@@ -11,7 +11,10 @@ func main() {
 		C:    &packinglib.FireflyContext,
 	}
 
-	for _, p := range t.MakeList() {
-		fmt.Println(p.String())
+	for category, items := range t.MakeList() {
+		fmt.Printf("%s:\n", category)
+		for _, i := range items {
+			fmt.Println("\t" + i.String())
+		}
 	}
 }

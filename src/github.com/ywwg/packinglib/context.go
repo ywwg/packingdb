@@ -20,6 +20,11 @@ const (
 	Fancy
 )
 
+// PropertySet is a map holding a list of Properties.  A value of true
+// indicates that the Property is allowed.  A value of false indicates
+// that the presence of that property is not allowed.  Properties are
+// ORed together:  Any allowed Property satisfies the item, but any
+// disallowed Property causes the item to reject.
 type PropertySet map[Property]bool
 
 // Context is struct that holds data about the context of the trip

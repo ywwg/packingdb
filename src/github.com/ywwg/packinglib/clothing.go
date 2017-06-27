@@ -1,6 +1,6 @@
 package packinglib
 
-var Clothing = []Item{
+var clothing = []Item{
 	NewBasicItem("boots", PropertySet{Dirt: true}),
 	NewConsumableItem("underwear", 1.0, "pair", nil),
 	NewConsumableItem("crew socks", 1.0, "pair", nil),
@@ -24,4 +24,8 @@ var Clothing = []Item{
 	NewConsumableTemperatureItem("thick socks", 0.5, "pair", 0, 150, PropertySet{Dirt: true}),
 	NewBasicItem("nice dinner clothes", PropertySet{Fancy: true}),
 	NewTemperatureItem("sunscreen", 65, 120, nil),
+}
+
+func init() {
+	RegisterItems("Clothing", clothing)
 }
