@@ -24,7 +24,7 @@ I created a little shell script that does this, hopefully it works!
 You may also want Guru and Godef if you want to set up Eclipse:
 
 ```shell
-go build golang.org/x/tools/cmd/guru
+go install golang.org/x/tools/cmd/guru
 go install github.com/npat-efault/godef
 ```
 
