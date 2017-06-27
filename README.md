@@ -18,3 +18,14 @@ go install github.com/ywwg/packingdb && ./bin/packingdb
 ```
 
 I created a little shell script that does this, hopefully it works!
+
+## Other helpful go utils
+
+You may also want Guru and Godef if you want to set up Eclipse:
+
+```shell
+go build golang.org/x/tools/cmd/guru
+go install github.com/npat-efault/godef
+```
+
+Then you can point your eclipse project to those binaries.
