@@ -1,7 +1,5 @@
 package packinglib
 
-//var Clothing []Item
-
 var Clothing = []Item{
 	NewBasicItem("boots", PropertySet{Dirt: true}),
 	NewConsumableItem("underwear", 1.0, "pair", nil),
