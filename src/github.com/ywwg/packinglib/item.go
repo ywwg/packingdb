@@ -160,6 +160,29 @@ func (i *ConsumableItem) String() string {
 	}
 }
 
+type CustomConsumableItem struct {
+	ConsumableItem
+
+	// DailyRate is how much the thing gets used per day.
+	RateFunc func(days int) float64
+}
+
+func NewCustomConsumableItem(name string, rateFunc func(days int) float64, units string, allow, disallow []string) *CustomConsumableItem {
+	return &CustomConsumableItem{
+		ConsumableItem: *NewConsumableItem(name, 0, units, allow, disallow),
+		RateFunc:       rateFunc,
+	}
+}
+
+func (i *CustomConsumableItem) Pack(t *Trip) Item {
+	p := &CustomConsumableItem{}
+	*p = *i
+	if p.Satisfies(t.C) {
+		p.count = i.RateFunc(t.Days)
+	}
+	return p
+}
+
 type ConsumableTemperatureItem struct {
 	ConsumableItem
 	TemperatureItem

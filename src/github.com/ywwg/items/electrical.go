@@ -6,9 +6,12 @@ import (
 
 var electrical = []plib.Item{
 	plib.NewBasicItem("Generator", []string{"Burn"}, nil),
-	plib.NewConsumableItem("Gas", 1.0, "gallon", []string{"Burn"}, nil),
+	plib.NewCustomConsumableItem("Gas", func(days int) float64 {
+		return float64(days - 1)
+	}, "gallons", []string{"Burn"}, nil),
 	plib.NewBasicItem("Extension Cords", []string{"Burn"}, nil),
 	plib.NewBasicItem("Cell Phone Charger", nil, nil),
+	plib.NewBasicItem("Batteries for headlamp", nil, nil),
 }
 
 func init() {
