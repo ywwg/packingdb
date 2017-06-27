@@ -13,9 +13,10 @@ type Trip struct {
 // MakeList returns a slice of PackedItems for the given trip
 func (t *Trip) MakeList() []Item {
 	AllItems := Clothing
-	//	AllItems = append(AllItems, CampStuff...)
-	//	AllItems = append(AllItems, WaterStuff...)
-	//	AllItems = append(AllItems, Nevermore...)
+	AllItems = append(AllItems, CampStuff...)
+	AllItems = append(AllItems, WaterStuff...)
+	AllItems = append(AllItems, Nevermore...)
+	AllItems = append(AllItems, Electrical...)
 
 	var packed []Item
 	for _, i := range AllItems {
