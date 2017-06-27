@@ -1,25 +1,11 @@
 package packinglib
 
-import ()
+import (
+	"fmt"
+)
 
 // Property is a value describing a property the context has.  Sort of like boolean flags.
-type Property int
-
-const (
-	None = iota
-	Swimming
-	Dirt
-	Loud
-	Bright
-	Dark
-	Sweat
-	Camping
-	Performing
-	Burn
-	Fancy
-	Partying
-	NoCheckedLuggage
-)
+type Property string
 
 // PropertySet is a map holding a list of Properties.  A value of true
 // indicates that the Property is allowed.  A value of false indicates
@@ -27,6 +13,41 @@ const (
 // ORed together:  Any allowed Property satisfies the item, but any
 // disallowed Property causes the item to reject.
 type PropertySet map[Property]bool
+
+var allProperties = PropertySet{
+	"Swimming":         true,
+	"Dirt":             true,
+	"Loud":             true,
+	"Bright":           true,
+	"Dark":             true,
+	"Sweat":            true,
+	"Camping":          true,
+	"Performing":       true,
+	"Burn":             true,
+	"Fancy":            true,
+	"Partying":         true,
+	"NoCheckedLuggage": true,
+}
+
+func buildPropertySet(allow, disallow []string) PropertySet {
+	propSet := make(PropertySet)
+	for _, a := range allow {
+		if _, ok := allProperties[Property(a)]; !ok {
+			panic(fmt.Sprintf("Property not found in allProperties: %s", a))
+		}
+		propSet[Property(a)] = true
+	}
+	for _, d := range disallow {
+		if _, ok := allProperties[Property(d)]; !ok {
+			panic(fmt.Sprintf("Property not found in allProperties: %s", d))
+		}
+		if _, ok := propSet[Property(d)]; ok {
+			panic(fmt.Sprintf("Contradiction: Property already registered in allowed side: %s", d))
+		}
+		propSet[Property(d)] = false
+	}
+	return propSet
+}
 
 // Context is struct that holds data about the context of the trip
 type Context struct {
@@ -47,16 +68,16 @@ var fireflyContext = Context{
 	TemperatureMin: 52,
 	TemperatureMax: 80,
 	Properties: PropertySet{
-		Swimming:   true,
-		Dirt:       true,
-		Loud:       true,
-		Bright:     true,
-		Sweat:      true,
-		Camping:    true,
-		Dark:       true,
-		Burn:       true,
-		Performing: true,
-		Partying:   true,
+		"Swimming":   true,
+		"Dirt":       true,
+		"Loud":       true,
+		"Bright":     true,
+		"Sweat":      true,
+		"Camping":    true,
+		"Dark":       true,
+		"Burn":       true,
+		"Performing": true,
+		"Partying":   true,
 	},
 }
 

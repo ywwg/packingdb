@@ -33,10 +33,10 @@ type BasicItem struct {
 	Prerequisites PropertySet
 }
 
-func NewBasicItem(name string, p PropertySet) *BasicItem {
+func NewBasicItem(name string, allow, disallow []string) *BasicItem {
 	return &BasicItem{
 		Name:          name,
-		Prerequisites: p,
+		Prerequisites: buildPropertySet(allow, disallow),
 	}
 }
 
@@ -86,9 +86,9 @@ type TemperatureItem struct {
 	TemperatureMax int
 }
 
-func NewTemperatureItem(name string, min, max int, p PropertySet) *TemperatureItem {
+func NewTemperatureItem(name string, min, max int, allow, disallow []string) *TemperatureItem {
 	return &TemperatureItem{
-		BasicItem:      *NewBasicItem(name, p),
+		BasicItem:      *NewBasicItem(name, allow, disallow),
 		TemperatureMin: min,
 		TemperatureMax: max,
 	}
@@ -127,9 +127,9 @@ type ConsumableItem struct {
 	Prerequisites map[Property]bool
 }
 
-func NewConsumableItem(name string, rate float64, units string, p PropertySet) *ConsumableItem {
+func NewConsumableItem(name string, rate float64, units string, allow, disallow []string) *ConsumableItem {
 	return &ConsumableItem{
-		BasicItem: *NewBasicItem(name, p),
+		BasicItem: *NewBasicItem(name, allow, disallow),
 		DailyRate: rate,
 		Units:     units,
 	}
@@ -165,10 +165,10 @@ type ConsumableTemperatureItem struct {
 	TemperatureItem
 }
 
-func NewConsumableTemperatureItem(name string, rate float64, units string, min, max int, p PropertySet) *ConsumableTemperatureItem {
+func NewConsumableTemperatureItem(name string, rate float64, units string, min, max int, allow, disallow []string) *ConsumableTemperatureItem {
 	return &ConsumableTemperatureItem{
-		ConsumableItem:  *NewConsumableItem(name, rate, units, p),
-		TemperatureItem: *NewTemperatureItem(name, min, max, p),
+		ConsumableItem:  *NewConsumableItem(name, rate, units, allow, disallow),
+		TemperatureItem: *NewTemperatureItem(name, min, max, allow, disallow),
 	}
 }
 

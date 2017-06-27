@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/ywwg/packinglib"
+
+	_ "github.com/ywwg/items"
 )
 
 func main() {
