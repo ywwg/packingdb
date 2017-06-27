@@ -21,5 +21,6 @@ var Clothing = []Item {
   { "boots", 0.0, NoUnits, 0, 120, PropertyList{Dirt:true}},
   { "thick socks", 0.5, "pair", 0, 50, PropertyList{Dirt:true}},
   { "nice dinner clothes", 0.0, NoUnits, 0, 120, PropertyList{Fancy:true}},
-
+  //
+  { "sunscreen", 0.0, NoUnits, 65, 120, nil},
 }

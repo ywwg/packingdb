@@ -8,8 +8,6 @@ type Property int
 
 const (
   None = iota
-  Electricity
-  RunningWater
   Swimming
   Dirt
   Loud
@@ -50,14 +48,14 @@ func (c *Context) Satisfies(i *Item) bool {
     return false
   }
 
-  // All properties must be satisfied
+  // Any property satisfies (OR)
   for p := range i.Prerequisites {
-    if _, ok := c.Properties[p]; !ok {
-      return false
+    if _, ok := c.Properties[p]; ok {
+      return true
     }
   }
 
-  return true
+  return false
 }
 
 var FireflyContext = Context{
