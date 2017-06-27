@@ -139,10 +139,18 @@ func (i *ConsumableItem) Pack(t *Trip) Item {
 }
 
 func (i *ConsumableItem) String() string {
-	if i.count == float64(int(i.count)) {
-		return fmt.Sprintf("%d %s\n", int(i.count), i.Name)
+	if i.Units == NoUnits {
+		if i.count == float64(int(i.count)) {
+			return fmt.Sprintf("%d %s", int(i.count), i.Name)
+		} else {
+			return fmt.Sprintf("%.1f %s", i.count, i.Name)
+		}
 	} else {
-		return fmt.Sprintf("%.1f %s\n", i.Count, i.Name)
+		if i.count == float64(int(i.count)) {
+			return fmt.Sprintf("%d %s of %s", int(i.count), i.Units, i.Name)
+		} else {
+			return fmt.Sprintf("%.1f %s of %s", i.count, i.Units, i.Name)
+		}
 	}
 }
 
@@ -151,7 +159,7 @@ type ConsumableTemperatureItem struct {
 	TemperatureItem
 }
 
-func NewConsumableTemperatureItem(name string, rate float64, min, max int, units string, p PropertySet) *ConsumableTemperatureItem {
+func NewConsumableTemperatureItem(name string, rate float64, units string, min, max int, p PropertySet) *ConsumableTemperatureItem {
 	return &ConsumableTemperatureItem{
 		ConsumableItem:  *NewConsumableItem(name, rate, units, p),
 		TemperatureItem: *NewTemperatureItem(name, min, max, p),

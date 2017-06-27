@@ -1,7 +1,7 @@
 package packinglib
 
 import (
-	"fmt"
+//	"fmt"
 )
 
 // Trip describes a trip, which includes a length and a context

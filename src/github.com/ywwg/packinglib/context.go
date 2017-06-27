@@ -36,27 +36,6 @@ type Context struct {
 	Properties PropertySet
 }
 
-// Satisfies returns true if the given item is satisfied by the context.
-//func (c *Context) Satisfies(i *Item) bool {
-//	// Temperatures don't satisfy if the temps are completely unaligned, which only happens
-//	// in these two cases.
-//	if i.TemperatureMax < c.TemperatureMin {
-//		return false
-//	}
-//	if i.TemperatureMin > c.TemperatureMax {
-//		return false
-//	}
-//
-//	// Any property satisfies (OR)
-//	for p := range i.Prerequisites {
-//		if _, ok := c.Properties[p]; ok {
-//			return true
-//		}
-//	}
-//
-//	return false
-//}
-
 var FireflyContext = Context{
 	Name:           "Firefly",
 	TemperatureMin: 52,
