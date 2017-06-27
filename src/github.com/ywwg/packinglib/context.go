@@ -14,10 +14,11 @@ const (
 	Dark
 	Sweat
 	Camping
-	GrumpCamping
 	Performing
 	Burn
 	Fancy
+	Partying
+	NoCheckedLuggage
 )
 
 // PropertySet is a map holding a list of Properties.  A value of true
@@ -41,7 +42,7 @@ type Context struct {
 	Properties PropertySet
 }
 
-var FireflyContext = Context{
+var fireflyContext = Context{
 	Name:           "Firefly",
 	TemperatureMin: 52,
 	TemperatureMax: 80,
@@ -55,5 +56,10 @@ var FireflyContext = Context{
 		Dark:       true,
 		Burn:       true,
 		Performing: true,
+		Partying:   true,
 	},
+}
+
+func init() {
+	RegisterContext("firefly", fireflyContext)
 }

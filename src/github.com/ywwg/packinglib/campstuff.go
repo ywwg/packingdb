@@ -18,7 +18,7 @@ var campStuff = []Item{
 	NewConsumableItem("cooking water", 0.25, "gallons", PropertySet{Burn: true}),
 	NewBasicItem("camelbak", PropertySet{Burn: true, Camping: true}),
 	NewBasicItem("cart", PropertySet{Burn: true}),
-	NewBasicItem("TASK: permetherin", PropertySet{Burn: true, Camping: true}),
+	NewBasicItem("TASK: permetherin", PropertySet{Camping: true}),
 }
 
 func init() {

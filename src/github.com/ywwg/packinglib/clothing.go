@@ -10,6 +10,8 @@ var clothing = []Item{
 	NewConsumableItem("convertapants", 0.5, "pair", PropertySet{Dirt: true}),
 	NewConsumableTemperatureItem("long underwear", 0.25, "pair", 0, 45, PropertySet{Camping: true}),
 	NewConsumableTemperatureItem("tshirts", 0.75, NoUnits, 65, 120, nil),
+	NewConsumableTemperatureItem("non-cotton tops", 0.333, NoUnits, 45, 65, PropertySet{Camping: true}),
+	NewConsumableItem("fun outfits", 0.75, NoUnits, nil),
 	NewConsumableTemperatureItem("sweaty shirts", 0.5, NoUnits, 65, 120, PropertySet{Dirt: true}),
 	NewTemperatureItem("light jacket", 55, 65, nil),
 	NewTemperatureItem("medium jacket", 40, 55, nil),

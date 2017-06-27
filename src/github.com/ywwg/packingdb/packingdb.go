@@ -8,7 +8,7 @@ import (
 func main() {
 	t := packinglib.Trip{
 		Days: 4,
-		C:    &packinglib.FireflyContext,
+		C:    packinglib.GetContext("firefly"),
 	}
 
 	for category, items := range t.MakeList() {

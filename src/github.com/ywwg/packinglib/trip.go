@@ -1,7 +1,7 @@
 package packinglib
 
 import (
-	//	"fmt"
+	"fmt"
 	"sort"
 )
 
@@ -21,6 +21,25 @@ func RegisterItems(category string, items []Item) {
 		return
 	}
 	AllItems[category] = items
+}
+
+var contexts = make(map[string]Context)
+
+func RegisterContext(name string, c Context) {
+	if _, ok := contexts[name]; ok {
+		panic(fmt.Sprintf("Duplicate context: %s", name))
+	}
+	contexts[name] = c
+}
+
+func GetContext(name string) *Context {
+	c := &Context{}
+	found, ok := contexts[name]
+	if !ok {
+		panic(fmt.Sprintf("Unknown context: %s", name))
+	}
+	*c = found
+	return c
 }
 
 // MakeList returns a map of category to slice of PackedItems for the given trip
