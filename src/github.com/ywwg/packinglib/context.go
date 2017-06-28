@@ -29,6 +29,11 @@ var allProperties = PropertySet{
 	"NoCheckedLuggage": true,
 }
 
+func RegisterProperty(prop Property) {
+	// Don't worry if the property already exists.
+	allProperties[prop] = true
+}
+
 func buildPropertySet(allow, disallow []string) PropertySet {
 	propSet := make(PropertySet)
 	for _, a := range allow {

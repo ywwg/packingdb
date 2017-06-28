@@ -25,7 +25,9 @@ func main() {
 	sort.Strings(keys)
 
 	for _, category := range keys {
-		fmt.Printf("%s:\n", category)
+		if len(packList[category]) > 0 {
+			fmt.Printf("%s:\n", category)
+		}
 		for _, i := range packList[category] {
 			fmt.Println("\t" + i.String())
 		}
