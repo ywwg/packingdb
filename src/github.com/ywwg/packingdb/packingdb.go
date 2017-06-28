@@ -6,6 +6,7 @@ import (
 
 	"github.com/ywwg/packinglib"
 
+	_ "github.com/ywwg/contexts"
 	_ "github.com/ywwg/items"
 )
 
