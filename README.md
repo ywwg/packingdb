@@ -24,6 +24,9 @@ I created a little shell script that does this, hopefully it works!
 You may also want Guru and Godef if you want to set up Eclipse:
 
 ```shell
+export GOPATH="$(pwd)"
+go get golang.org/x/tools/cmd/guru
+go get github.com/npat-efault/godef
 go install golang.org/x/tools/cmd/guru
 go install github.com/npat-efault/godef
 ```
