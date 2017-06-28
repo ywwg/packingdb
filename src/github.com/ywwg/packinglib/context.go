@@ -62,25 +62,3 @@ type Context struct {
 
 	Properties PropertySet
 }
-
-var fireflyContext = Context{
-	Name:           "Firefly",
-	TemperatureMin: 52,
-	TemperatureMax: 80,
-	Properties: PropertySet{
-		"Swimming":   true,
-		"Dirt":       true,
-		"Loud":       true,
-		"Bright":     true,
-		"Sweat":      true,
-		"Camping":    true,
-		"Dark":       true,
-		"Burn":       true,
-		"Performing": true,
-		"Partying":   true,
-	},
-}
-
-func init() {
-	RegisterContext("firefly", fireflyContext)
-}
