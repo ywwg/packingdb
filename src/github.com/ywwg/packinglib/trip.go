@@ -3,21 +3,12 @@ package packinglib
 import (
 	"bufio"
 	"bytes"
-	"encoding/gob"
 	"fmt"
 	"io/ioutil"
 	"sort"
 	"strconv"
 	"strings"
 )
-
-func init() {
-	gob.Register(BasicItem{})
-	gob.Register(ConsumableItem{})
-	gob.Register(TemperatureItem{})
-	gob.Register(ConsumableTemperatureItem{})
-	gob.Register(CustomConsumableItem{})
-}
 
 // Trip describes a trip, which includes a length and a context
 type Trip struct {
