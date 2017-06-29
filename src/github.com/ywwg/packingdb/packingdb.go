@@ -38,7 +38,7 @@ func main() {
 		return
 	}
 
-	// File mode: load if the file already exists
+	// File mode: load if the file already exists or create new if not
 	if _, err := os.Stat(*flagPackingFile); !os.IsNotExist(err) {
 		t = &packinglib.Trip{}
 		if err2 := t.LoadFromFile(*flagPackingFile); err2 != nil {
