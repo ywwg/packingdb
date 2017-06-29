@@ -14,7 +14,6 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("Flossers", nil, nil),
 	plib.NewBasicItem("Nail Clippers", nil, nil),
 	plib.NewBasicItem("Cute Clippers", nil, nil),
-	plib.NewBasicItem("Flossers", nil, nil),
 	plib.NewBasicItem("Shaving Cream", nil, []string{"Burn"}),
 	plib.NewBasicItem("Razor", nil, []string{"Burn"}),
 	plib.NewBasicItem("Spray Sunscreen", []string{"Camping"}, []string{"NoCheckedLuggage"}),

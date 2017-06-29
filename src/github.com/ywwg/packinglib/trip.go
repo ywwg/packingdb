@@ -22,7 +22,20 @@ type PackList map[string][]Item
 
 var AllItems = make(PackList)
 
+// dupeChecker is a simple map to track all of the item names and
+// make sure we don't have any duplicates.
+var dupeChecker = make(map[string]bool)
+
+// RegisterItems appends the given slice of Items to the registry under
+// the given category.  Duplicate categories will be appended.  Items
+// with duplicate names, even across categories, cause a panic.
 func RegisterItems(category string, items []Item) {
+	for _, i := range items {
+		if _, ok := dupeChecker[i.Name()]; ok {
+			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
+		}
+		dupeChecker[i.Name()] = true
+	}
 	if existing, ok := AllItems[category]; ok {
 		AllItems[category] = append(existing, items...)
 		return
