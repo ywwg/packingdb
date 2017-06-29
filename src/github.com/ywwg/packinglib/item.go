@@ -8,26 +8,38 @@ import (
 const NoUnits = "nounits"
 
 type Item interface {
+	// Name returns the name of the item
+	Name() string
+
 	// Satisfies returns true if the item belongs in the given context
 	Satisfies(*Context) bool
 
-	// Pack tells the item to pack itself given the context and returns the packed item
-	Pack(*Trip) Item
+	// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
+	Itemize(*Trip) Item
 
 	// Count returns the number of this item that got packed
 	Count() float64
 
 	// String prints out a string representation of the packed item(s)
 	String() string
+
+	// Pack set the packed value to true
+	Pack()
+
+	// Packed returns true if the item has been packed
+	Packed() bool
 }
 
 // BasicItem is the simplest item -- just prerequisites and no count, like "tent"
 type BasicItem struct {
 	// Name of the item.
-	Name string
+	name string
 
-	// count is the number of this thing that got packed.
+	// count is the number of this thing that should get packed.
 	count float64
+
+	// packed is true if the item has been packed.
+	packed bool
 
 	// Prerequisites is a set of all properties that the context must have for this item to appear.
 	Prerequisites PropertySet
@@ -35,9 +47,13 @@ type BasicItem struct {
 
 func NewBasicItem(name string, allow, disallow []string) *BasicItem {
 	return &BasicItem{
-		Name:          name,
+		name:          name,
 		Prerequisites: buildPropertySet(allow, disallow),
 	}
+}
+
+func (i *BasicItem) Name() string {
+	return i.name
 }
 
 // Satisfies returns true if the context satisfies the item's requirements.
@@ -59,7 +75,7 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 	return found
 }
 
-func (i *BasicItem) Pack(t *Trip) Item {
+func (i *BasicItem) Itemize(t *Trip) Item {
 	p := &BasicItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
@@ -73,7 +89,19 @@ func (i *BasicItem) Count() float64 {
 }
 
 func (i *BasicItem) String() string {
-	return i.Name
+	checkbox := "☐"
+	if i.packed {
+		checkbox = "☑"
+	}
+	return fmt.Sprintf("%s %s", checkbox, i.name)
+}
+
+func (i *BasicItem) Pack() {
+	i.packed = true
+}
+
+func (i *BasicItem) Packed() bool {
+	return i.packed
 }
 
 type TemperatureItem struct {
@@ -105,7 +133,7 @@ func (i *TemperatureItem) Satisfies(c *Context) bool {
 	return i.BasicItem.Satisfies(c)
 }
 
-func (i *TemperatureItem) Pack(t *Trip) Item {
+func (i *TemperatureItem) Itemize(t *Trip) Item {
 	p := &TemperatureItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
@@ -135,7 +163,7 @@ func NewConsumableItem(name string, rate float64, units string, allow, disallow 
 	}
 }
 
-func (i *ConsumableItem) Pack(t *Trip) Item {
+func (i *ConsumableItem) Itemize(t *Trip) Item {
 	p := &ConsumableItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
@@ -145,17 +173,21 @@ func (i *ConsumableItem) Pack(t *Trip) Item {
 }
 
 func (i *ConsumableItem) String() string {
+	checkbox := "☐"
+	if i.packed {
+		checkbox = "☑"
+	}
 	if i.Units == NoUnits {
 		if i.count == float64(int(i.count)) {
-			return fmt.Sprintf("%d %s", int(i.count), i.Name)
+			return fmt.Sprintf("%s %d %s", checkbox, int(i.count), i.name)
 		} else {
-			return fmt.Sprintf("%.1f %s", i.count, i.Name)
+			return fmt.Sprintf("%s %.1f %s", checkbox, i.count, i.name)
 		}
 	} else {
 		if i.count == float64(int(i.count)) {
-			return fmt.Sprintf("%d %s of %s", int(i.count), i.Units, i.Name)
+			return fmt.Sprintf("%s %d %s of %s", checkbox, int(i.count), i.Units, i.name)
 		} else {
-			return fmt.Sprintf("%.1f %s of %s", i.count, i.Units, i.Name)
+			return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
 		}
 	}
 }
@@ -174,7 +206,7 @@ func NewCustomConsumableItem(name string, rateFunc func(days int) float64, units
 	}
 }
 
-func (i *CustomConsumableItem) Pack(t *Trip) Item {
+func (i *CustomConsumableItem) Itemize(t *Trip) Item {
 	p := &CustomConsumableItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
@@ -203,7 +235,7 @@ func (i *ConsumableTemperatureItem) Satisfies(c *Context) bool {
 	return i.ConsumableItem.Satisfies(c)
 }
 
-func (i *ConsumableTemperatureItem) Pack(t *Trip) Item {
+func (i *ConsumableTemperatureItem) Itemize(t *Trip) Item {
 	p := &ConsumableTemperatureItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
@@ -212,10 +244,22 @@ func (i *ConsumableTemperatureItem) Pack(t *Trip) Item {
 	return p
 }
 
+func (i *ConsumableTemperatureItem) Name() string {
+	return i.ConsumableItem.Name()
+}
+
 func (i *ConsumableTemperatureItem) Count() float64 {
 	return i.ConsumableItem.count
 }
 
 func (i *ConsumableTemperatureItem) String() string {
 	return i.ConsumableItem.String()
+}
+
+func (i *ConsumableTemperatureItem) Packed() bool {
+	return i.ConsumableItem.Packed()
+}
+
+func (i *ConsumableTemperatureItem) Pack() {
+	i.ConsumableItem.Pack()
 }
