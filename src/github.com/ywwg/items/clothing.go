@@ -28,7 +28,6 @@ var clothing = []plib.Item{
 	plib.NewTemperatureItem("tevas", 70, 120, nil, nil),
 	plib.NewConsumableTemperatureItem("thick socks", 0.5, "pair", 0, 150, []string{"Dirt"}, nil),
 	plib.NewBasicItem("nice dinner clothes", []string{"Fancy"}, nil),
-	plib.NewTemperatureItem("sunscreen", 65, 120, nil, nil),
 }
 
 func init() {

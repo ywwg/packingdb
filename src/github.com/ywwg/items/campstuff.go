@@ -5,6 +5,7 @@ import (
 )
 
 var campStuff = []plib.Item{
+	plib.NewBasicItem("windsheild sun shade", []string{"Camping"}, nil),
 	plib.NewBasicItem("tent", []string{"Camping"}, nil),
 	plib.NewBasicItem("sleeping bag", []string{"Camping"}, nil),
 	plib.NewBasicItem("sleeping pad", []string{"Camping"}, nil),
@@ -18,7 +19,8 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("camp chair", []string{"Camping"}, nil),
 	plib.NewBasicItem("camp table", []string{"Camping"}, nil),
 	plib.NewBasicItem("camp stove", []string{"Camping"}, nil),
-	plib.NewBasicItem("plateware", []string{"Camping"}, nil),
+	plib.NewBasicItem("1 box hot hands?", []string{"Camping"}, nil),
+	plib.NewBasicItem("camp plateware", []string{"Camping"}, nil),
 	plib.NewBasicItem("A CUP", []string{"Burn"}, nil),
 	plib.NewBasicItem("multitool", []string{"Camping"}, nil),
 	plib.NewBasicItem("lighter/matches", []string{"Camping"}, nil),
@@ -30,6 +32,7 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("cart", []string{"Burn"}, nil),
 	plib.NewBasicItem("TASK: permetherin", []string{"Camping"}, nil),
 	plib.NewBasicItem("camp towel", []string{"Camping"}, nil),
+	plib.NewBasicItem("2x configured radios", []string{"Burn"}, nil),
 }
 
 func init() {

@@ -10,7 +10,7 @@ var electrical = []plib.Item{
 		return float64(days - 1)
 	}, "gallons", []string{"Burn"}, nil),
 	plib.NewBasicItem("Kill-A-Watt", []string{"Burn"}, nil),
-	plib.NewBasicItem("Extension Cords", []string{"Burn"}, nil),
+	plib.NewBasicItem("long extension cord", []string{"Burn"}, nil),
 	plib.NewBasicItem("Cell Phone Charger", nil, nil),
 	plib.NewBasicItem("Batteries for headlamp", nil, nil),
 	plib.NewBasicItem("Sound meter", []string{"Burn"}, nil),
