@@ -40,6 +40,12 @@ func main() {
 
 	// File mode: load if the file already exists or create new if not
 	if _, err := os.Stat(*flagPackingFile); !os.IsNotExist(err) {
+		if len(*flagContext) != 0 {
+			fmt.Println("(Ignoring context when loading file)")
+		}
+		if *flagDays != 0 {
+			fmt.Println("(Ignoring days when loading file)")
+		}
 		t = &packinglib.Trip{}
 		if err2 := t.LoadFromFile(*flagPackingFile); err2 != nil {
 			panic(fmt.Sprintf("%v", err2))
