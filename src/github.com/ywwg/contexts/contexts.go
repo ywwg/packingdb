@@ -9,7 +9,6 @@ var fireflyContext = plib.Context{
 	TemperatureMin: 52,
 	TemperatureMax: 80,
 	Properties: plib.PropertySet{
-		"Swimming":    true,
 		"Dirt":        true,
 		"Loud":        true,
 		"Bright":      true,
