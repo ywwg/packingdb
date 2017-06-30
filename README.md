@@ -1,6 +1,8 @@
 # packingdb
 
-A thing that helps me figure out what to pack.
+The #1 Enterprise solution for making sure you remember all your shit.
+
+packingdb is web scale.
 
 ## Go env setup
 
