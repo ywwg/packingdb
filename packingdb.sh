@@ -3,5 +3,5 @@
 set -e
 export GOPATH="$(pwd)"
 go install github.com/ywwg/packingdb
-./bin/packingdb "$@" |less
+./bin/packingdb "$@" | less -X -F
 
