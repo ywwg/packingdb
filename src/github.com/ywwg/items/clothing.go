@@ -15,7 +15,8 @@ var clothing = []plib.Item{
 	plib.NewConsumableTemperatureItem("long underwear", 0.25, "pair", 0, 45, []string{"Camping"}, nil),
 	plib.NewConsumableTemperatureItem("tshirts", 0.75, plib.NoUnits, 65, 120, nil, nil),
 	plib.NewConsumableTemperatureItem("non-cotton tops", 0.333, plib.NoUnits, 45, 65, []string{"Camping"}, nil),
-	plib.NewConsumableItem("fun outfits", 0.75, plib.NoUnits, nil, nil),
+	plib.NewConsumableItem("fun outfits", 0.75, plib.NoUnits, []string{"Partying"}, nil),
+	plib.NewBasicItem("kigarumi", []string{"Partying"}, nil),
 	plib.NewConsumableTemperatureItem("sweaty shirts", 0.5, plib.NoUnits, 65, 120, []string{"Dirt"}, nil),
 	plib.NewTemperatureItem("light jacket", 55, 65, nil, nil),
 	plib.NewTemperatureItem("medium jacket", 40, 55, nil, nil),
@@ -28,6 +29,7 @@ var clothing = []plib.Item{
 	plib.NewTemperatureItem("tevas", 70, 120, nil, nil),
 	plib.NewConsumableTemperatureItem("thick socks", 0.5, "pair", 0, 150, []string{"Dirt"}, nil),
 	plib.NewBasicItem("nice dinner clothes", []string{"Fancy"}, nil),
+	plib.NewBasicItem("watch", nil, nil),
 }
 
 func init() {
