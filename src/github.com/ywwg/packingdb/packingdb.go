@@ -15,6 +15,7 @@ var (
 	flagContext     = flag.String("context", "", "The context you want to load (not needed if packing file exists)")
 	flagDays        = flag.Int("days", 0, "The number of days for the trip (not needed if packing file exists)")
 	flagPackingFile = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
+	flagCategory    = flag.String("category", "", "Only print out the given category.")
 	flagPackItem    = flag.String("pack", "", "The name of an item that has been packed (noop without packfile)")
 )
 
@@ -32,7 +33,7 @@ func main() {
 			panic("Need a number of days")
 		}
 		t = packinglib.NewTrip(*flagDays, *flagContext)
-		for _, l := range t.Strings() {
+		for _, l := range t.Strings(*flagCategory) {
 			fmt.Println(l)
 		}
 		return
@@ -57,7 +58,7 @@ func main() {
 	if *flagPackItem != "" {
 		t.Pack(*flagPackItem)
 	}
-	for _, l := range t.Strings() {
+	for _, l := range t.Strings(*flagCategory) {
 		fmt.Println(l)
 	}
 

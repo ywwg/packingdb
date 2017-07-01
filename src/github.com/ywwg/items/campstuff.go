@@ -5,7 +5,7 @@ import (
 )
 
 var campStuff = []plib.Item{
-	plib.NewBasicItem("windsheild sun shade", []string{"Camping"}, nil),
+	plib.NewBasicItem("windshield sun shade", []string{"Camping"}, nil),
 	plib.NewBasicItem("tent", []string{"Camping"}, nil),
 	plib.NewBasicItem("sleeping bag", []string{"Camping"}, nil),
 	plib.NewBasicItem("sleeping pad", []string{"Camping"}, nil),
@@ -34,8 +34,9 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("TASK: permetherin", []string{"Camping"}, nil),
 	plib.NewBasicItem("camp towel", []string{"Camping"}, nil),
 	plib.NewBasicItem("2x configured radios", []string{"Burn"}, nil),
+	plib.NewBasicItem("pencils", []string{"Burn"}, nil),
 }
 
 func init() {
-	plib.RegisterItems("Camping Stuff", campStuff)
+	plib.RegisterItems("Camping", campStuff)
 }

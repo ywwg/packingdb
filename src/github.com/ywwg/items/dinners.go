@@ -14,7 +14,11 @@ var burnDinner = []plib.Item{
 }
 
 var saturdayDinner = []plib.Item{
-	plib.NewBasicItem("TODO veggies??? (ask may-lee)", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("1 head broccoli", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("1 head cauliflower", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("4 carrots", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("1lb snow peas", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("2 cans kernel corn", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("owen's cooler", []string{"Firefly2017"}, nil),
 }
 

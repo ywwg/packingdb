@@ -23,7 +23,7 @@ var nevermore = []plib.Item{
 	plib.NewBasicItem("round table", []string{"Burn"}, nil),
 	plib.NewBasicItem("olpc", []string{"Burn"}, nil),
 	plib.NewBasicItem("midi fighter w/cable", []string{"Burn"}, nil),
-	plib.NewBasicItem("nevermore notebook", []string{"Burn"}, nil),
+	plib.NewBasicItem("nevermore binder", []string{"Burn"}, nil),
 	plib.NewBasicItem("solar string lights", []string{"Burn"}, nil),
 	plib.NewBasicItem("nevermore sign", []string{"Burn"}, nil),
 	plib.NewBasicItem("rope to hold sign", []string{"Burn"}, nil),
