@@ -18,7 +18,6 @@ var Performing = []plib.Item{
 	plib.NewBasicItem("long RCA cable", []string{"Performing"}, nil),
 	plib.NewBasicItem("1/8 to RCA", []string{"Performing"}, nil),
 	plib.NewBasicItem("6x 1/4in adapters", []string{"Performing"}, nil),
-	plib.NewBasicItem("DECISION: mixer?", []string{"Performing"}, nil),
 	plib.NewBasicItem("beatstep pro", []string{"Performing"}, nil),
 	plib.NewBasicItem("beatstep pro power", []string{"Performing"}, nil),
 	plib.NewBasicItem("2x beatstep midi adapter", []string{"Performing"}, nil),

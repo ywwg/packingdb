@@ -19,7 +19,6 @@ var saturdayDinner = []plib.Item{
 	plib.NewBasicItem("4 carrots", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("1lb snow peas", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("2 cans kernel corn", []string{"Firefly2017"}, nil),
-	plib.NewBasicItem("owen's cooler", []string{"Firefly2017"}, nil),
 }
 
 func init() {

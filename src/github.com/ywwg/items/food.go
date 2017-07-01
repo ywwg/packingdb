@@ -5,8 +5,8 @@ import (
 )
 
 var food = []plib.Item{
-	plib.NewConsumableItem("booze", 0.5, plib.NoUnits, []string{"Burn"}, nil),
-	plib.NewConsumableItem("good beer", 0.33, "sixpacks", []string{"Burn"}, nil),
+	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn"}, nil),
+	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn"}, nil),
 	plib.NewConsumableItem("drinking water", 0.5, "gallons", []string{"Burn"}, nil),
 	plib.NewConsumableItem("cooking water", 0.25, "gallons", []string{"Burn"}, nil),
 	plib.NewBasicItem("cooler", []string{"Camping"}, nil),

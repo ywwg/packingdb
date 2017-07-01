@@ -10,7 +10,7 @@ var nevermore = []plib.Item{
 	plib.NewBasicItem("floor tarp", []string{"Burn"}, nil),
 	plib.NewBasicItem("3way ext cord", []string{"Burn"}, nil),
 	plib.NewBasicItem("UPS", []string{"Burn"}, nil),
-	plib.NewBasicItem("airbed (fix it??)", []string{"Burn"}, nil),
+	plib.NewBasicItem("airbed", []string{"Burn"}, nil),
 	plib.NewBasicItem("2 power strips", []string{"Burn"}, nil),
 	plib.NewBasicItem("6 USB power bricks", []string{"Burn"}, nil),
 	plib.NewBasicItem("12 CHECKED pis", []string{"Burn"}, nil),
