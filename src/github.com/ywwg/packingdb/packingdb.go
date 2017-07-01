@@ -17,6 +17,7 @@ var (
 	flagPackingFile = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
 	flagCategory    = flag.String("category", "", "Only print out the given category.")
 	flagPackItem    = flag.String("pack", "", "The name of an item that has been packed (noop without packfile)")
+	flagHidePacked  = flag.Bool("hide_packed", false, "Only show unpacked items")
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 			panic("Need a number of days")
 		}
 		t = packinglib.NewTrip(*flagDays, *flagContext)
-		for _, l := range t.Strings(*flagCategory) {
+		for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 			fmt.Println(l)
 		}
 		return
@@ -58,7 +59,7 @@ func main() {
 	if *flagPackItem != "" {
 		t.Pack(*flagPackItem)
 	}
-	for _, l := range t.Strings(*flagCategory) {
+	for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 		fmt.Println(l)
 	}
 

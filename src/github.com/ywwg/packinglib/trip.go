@@ -105,7 +105,7 @@ func (t *Trip) Pack(i string) {
 	}
 }
 
-func (t *Trip) Strings(showCat string) []string {
+func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	var lines []string
 	// map iteration is nondeterministic so sort the keys.
 	var keys []string
@@ -122,6 +122,9 @@ func (t *Trip) Strings(showCat string) []string {
 			lines = append(lines, fmt.Sprintf("%s:", category))
 		}
 		for _, i := range t.Packed[category] {
+			if hideUnpacked && i.Packed() {
+				continue
+			}
 			lines = append(lines, fmt.Sprintf("\t%s", i.String()))
 		}
 	}
