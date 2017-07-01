@@ -63,9 +63,9 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 		return true
 	}
 	found := false
-	for p := range i.Prerequisites {
+	for p, allow := range i.Prerequisites {
 		// Any item that has a disallowing prerequisite immediately dissatisfies.
-		if allow, ok := c.Properties[p]; ok {
+		if _, ok := c.Properties[p]; ok {
 			if !allow {
 				return false
 			}
