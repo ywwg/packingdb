@@ -22,7 +22,19 @@ var fireflyContext = plib.Context{
 	},
 }
 
+var capeContext = plib.Context{
+	Name:           "Cape",
+	TemperatureMin: 60,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Bright":   true,
+		"Sweat":    true,
+		"Swimming": true,
+	},
+}
+
 func init() {
 	plib.RegisterProperty("Firefly2017")
 	plib.RegisterContext("firefly", fireflyContext)
+	plib.RegisterContext("Cape", capeContext)
 }

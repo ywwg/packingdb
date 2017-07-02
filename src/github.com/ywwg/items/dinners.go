@@ -8,8 +8,8 @@ var burnDinner = []plib.Item{
 	plib.NewBasicItem("8.5 lbs pulled pork", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("3.5 gallons vegan chili", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("50oz pulled jackfruit", []string{"Firefly2017"}, nil),
-	plib.NewBasicItem("2 lbs shredded cheese", []string{"Firefly2017"}, nil),
-	plib.NewBasicItem("24oz sour cream", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("giant thing shredded cheese", []string{"Firefly2017"}, nil),
+	plib.NewBasicItem("2 things sour cream", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("sarina's cooler", []string{"Firefly2017"}, nil),
 }
 

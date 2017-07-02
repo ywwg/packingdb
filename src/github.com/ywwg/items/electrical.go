@@ -10,10 +10,10 @@ var electrical = []plib.Item{
 		return float64(days - 1)
 	}, "gallons", []string{"Burn"}, nil),
 	plib.NewBasicItem("Kill-A-Watt", []string{"Burn"}, nil),
-	plib.NewBasicItem("Bluetooth speaker and cord", nil, nil),
+	plib.NewBasicItem("Bluetooth speaker and cord", []string{"Burn", "Camping"}, nil),
 	plib.NewBasicItem("long extension cord", []string{"Burn"}, nil),
 	plib.NewBasicItem("Cell Phone Charger", nil, nil),
-	plib.NewBasicItem("Batteries for headlamp", nil, nil),
+	plib.NewBasicItem("Batteries for headlamp", []string{"Burn"}, nil),
 }
 
 func init() {
