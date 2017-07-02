@@ -15,20 +15,23 @@ type Property string
 type PropertySet map[Property]bool
 
 var allProperties = PropertySet{
-	"Swimming":         true,
-	"Dirt":             true,
-	"Loud":             true,
 	"Bright":           true,
-	"Dark":             true,
-	"Sweat":            true,
-	"Camping":          true,
-	"GrumpCamping":     true,
-	"Performing":       true,
 	"Burn":             true,
+	"Camping":          true,
+	"Contacts":         true,
+	"Dark":             true,
+	"Dirt":             true,
 	"Fancy":            true,
-	"Partying":         true,
-	"NoCheckedLuggage": true,
+	"GrumpCamping":     true,
 	"HasToiletries":    true,
+	"International":    true,
+	"Loud":             true,
+	"NoCheckedLuggage": true,
+	"PaidEvent":        true,
+	"Partying":         true,
+	"Performing":       true,
+	"Sweat":            true,
+	"Swimming":         true,
 }
 
 func RegisterProperty(prop Property) {

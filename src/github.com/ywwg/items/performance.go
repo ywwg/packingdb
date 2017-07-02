@@ -21,7 +21,6 @@ var Performing = []plib.Item{
 	plib.NewBasicItem("beatstep pro", []string{"Performing"}, nil),
 	plib.NewBasicItem("beatstep pro power", []string{"Performing"}, nil),
 	plib.NewBasicItem("2x beatstep midi adapter", []string{"Performing"}, nil),
-	plib.NewBasicItem("laptop and charger", []string{"Performing"}, nil),
 	plib.NewBasicItem("laptop keyboard cover", []string{"Performing"}, nil),
 	plib.NewBasicItem("microphone", []string{"Performing"}, nil),
 	plib.NewBasicItem("XLR cable", []string{"Performing"}, nil),

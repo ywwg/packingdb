@@ -7,7 +7,9 @@ import (
 var clothing = []plib.Item{
 	plib.NewBasicItem("boots", []string{"Dirt"}, nil),
 	plib.NewConsumableItem("underwear", 1.0, "pair", nil, nil),
-	plib.NewConsumableItem("crew socks", 1.0, "pair", nil, []string{"Camping"}),
+	plib.NewConsumableTemperatureItem("crew socks", 1.0, "pair", 0, 65, nil, []string{"Camping"}),
+	plib.NewConsumableTemperatureItem("short socks", 1.0, "pair", 65, 120, nil, []string{"Camping"}),
+	plib.NewBasicItem("sneakers", nil, nil),
 	plib.NewConsumableItem("smartwool socks", 1.0, "pair", []string{"Camping"}, nil),
 	plib.NewConsumableTemperatureItem("long pj socks", 0.25, "pair", 0, 55, nil, nil),
 	plib.NewConsumableTemperatureItem("short pj socks", 0.25, "pair", 60, 120, nil, nil),
