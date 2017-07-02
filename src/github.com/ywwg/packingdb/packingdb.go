@@ -53,6 +53,12 @@ func main() {
 			panic(fmt.Sprintf("%v", err2))
 		}
 	} else {
+		if len(*flagContext) == 0 {
+			panic("Need a context")
+		}
+		if *flagDays == 0 {
+			panic("Need a number of days")
+		}
 		t = packinglib.NewTrip(*flagDays, *flagContext)
 	}
 

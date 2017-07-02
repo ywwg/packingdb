@@ -22,6 +22,7 @@ var allProperties = PropertySet{
 	"Dark":             true,
 	"Sweat":            true,
 	"Camping":          true,
+	"GrumpCamping":     true,
 	"Performing":       true,
 	"Burn":             true,
 	"Fancy":            true,

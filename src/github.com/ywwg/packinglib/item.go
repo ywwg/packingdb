@@ -63,7 +63,13 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 		return true
 	}
 	found := false
+	// If all prereqs are denies, we can return true as long as none of the
+	// denials were activated (no need for a positive requirement).
+	allDenies := true
 	for p, allow := range i.Prerequisites {
+		if allow == true {
+			allDenies = false
+		}
 		// Any item that has a disallowing prerequisite immediately dissatisfies.
 		if _, ok := c.Properties[p]; ok {
 			if !allow {
@@ -71,6 +77,9 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 			}
 			found = true
 		}
+	}
+	if allDenies {
+		return true
 	}
 	return found
 }
