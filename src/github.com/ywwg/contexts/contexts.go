@@ -27,9 +27,10 @@ var capeContext = plib.Context{
 	TemperatureMin: 60,
 	TemperatureMax: 120,
 	Properties: plib.PropertySet{
-		"Bright":   true,
-		"Sweat":    true,
-		"Swimming": true,
+		"Bright":        true,
+		"Sweat":         true,
+		"Swimming":      true,
+		"HasToiletries": true,
 	},
 }
 

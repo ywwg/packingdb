@@ -28,6 +28,7 @@ var allProperties = PropertySet{
 	"Fancy":            true,
 	"Partying":         true,
 	"NoCheckedLuggage": true,
+	"HasToiletries":    true,
 }
 
 func RegisterProperty(prop Property) {
