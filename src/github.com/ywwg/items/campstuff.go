@@ -17,6 +17,7 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("ropes", []string{"Burn"}, nil),
 	plib.NewBasicItem("bungies", []string{"Burn"}, nil),
 	plib.NewBasicItem("gaff tape", []string{"Burn"}, nil),
+	plib.NewBasicItem("2x battery string lights", []string{"Burn"}, nil),
 	plib.NewBasicItem("camp chair", []string{"Camping"}, nil),
 	plib.NewBasicItem("camp table", []string{"Camping"}, nil),
 	plib.NewBasicItem("camp stove", []string{"GrumpCamping"}, nil),

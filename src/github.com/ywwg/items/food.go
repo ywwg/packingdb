@@ -19,6 +19,7 @@ var food = []plib.Item{
 	}, plib.NoUnits, []string{"Burn"}, nil),
 	plib.NewBasicItem("mustard", []string{"Camping"}, nil),
 	plib.NewBasicItem("junk food?", []string{"Camping"}, nil),
+	plib.NewBasicItem("lamb biryani", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("salt and pepper", []string{"Camping"}, nil),
 	plib.NewBasicItem("box soup", []string{"Camping"}, nil),
 	plib.NewBasicItem("hot sauce", []string{"Camping"}, nil),
