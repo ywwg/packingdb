@@ -9,6 +9,7 @@ var Performing = []plib.Item{
 	plib.NewBasicItem("piece of wood", []string{"Performing"}, nil),
 	plib.NewBasicItem("2x modular power supplies", []string{"Performing"}, nil),
 	plib.NewBasicItem("patch cables", []string{"Performing"}, nil),
+	plib.NewBasicItem("modular 3ring", []string{"Performing"}, nil),
 	plib.NewBasicItem("volca sample", []string{"Performing"}, nil),
 	plib.NewBasicItem("retrokits midi cable", []string{"Performing"}, nil),
 	plib.NewBasicItem("regular midi cable", []string{"Performing"}, nil),
@@ -25,6 +26,10 @@ var Performing = []plib.Item{
 	plib.NewBasicItem("beatstep pro", []string{"Performing"}, nil),
 	plib.NewBasicItem("beatstep pro power", []string{"Performing"}, nil),
 	plib.NewBasicItem("2x beatstep midi adapter", []string{"Performing"}, nil),
+	plib.NewBasicItem("Zoom recorder", []string{"Performing"}, nil),
+	plib.NewBasicItem("RCA to 1/4 for zoom", []string{"Performing"}, nil),
+	// TODO: Create a cumulative item for 1/4in adapters
+	plib.NewBasicItem("2x 1/4in adapter for zoom", []string{"Performing"}, nil),
 	plib.NewBasicItem("laptop keyboard cover", []string{"Performing"}, nil),
 	plib.NewBasicItem("microphone", []string{"Performing"}, nil),
 	plib.NewBasicItem("XLR cable", []string{"Performing"}, nil),
