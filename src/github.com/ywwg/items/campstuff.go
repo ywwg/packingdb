@@ -38,6 +38,7 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("camp towel", []string{"Camping"}, nil),
 	plib.NewBasicItem("2x configured radios", []string{"Burn"}, nil),
 	plib.NewBasicItem("pencils", []string{"Burn"}, nil),
+	plib.NewBasicItem("gear ties", []string{"Burn"}, nil),
 }
 
 func init() {
