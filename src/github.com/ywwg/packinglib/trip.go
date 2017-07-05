@@ -114,9 +114,13 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	}
 	sort.Strings(keys)
 
+	foundCat := false
 	for _, category := range keys {
-		if showCat != "" && strings.ToLower(category) != strings.ToLower(showCat) {
-			continue
+		if showCat != "" {
+			if strings.ToLower(category) != strings.ToLower(showCat) {
+				continue
+			}
+			foundCat = true
 		}
 		if len(t.Packed[category]) > 0 {
 			lines = append(lines, fmt.Sprintf("%s:", category))
@@ -127,6 +131,9 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			}
 			lines = append(lines, fmt.Sprintf("\t%s", i.String()))
 		}
+	}
+	if showCat != "" && !foundCat {
+		panic(fmt.Sprintf("Didn't find category %s", showCat))
 	}
 	return lines
 }
