@@ -24,6 +24,7 @@ var food = []plib.Item{
 	plib.NewBasicItem("box soup", []string{"Camping"}, nil),
 	plib.NewBasicItem("hot sauce", []string{"Camping"}, nil),
 	plib.NewConsumableItem("frozen grillables", 0.75, "servings", []string{"Camping"}, nil),
+	plib.NewConsumableItem("buns", 0.75, "servings", []string{"Camping"}, nil),
 }
 
 func init() {

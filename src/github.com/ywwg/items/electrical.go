@@ -15,6 +15,8 @@ var electrical = []plib.Item{
 	plib.NewBasicItem("long extension cord", []string{"Burn"}, nil),
 	plib.NewBasicItem("Cell Phone Charger", nil, nil),
 	plib.NewBasicItem("Batteries for headlamp", []string{"Burn"}, nil),
+	plib.NewBasicItem("DSLR", []string{"Camping"}, nil),
+	plib.NewBasicItem("DSLR Charger", []string{"Camping"}, nil),
 }
 
 func init() {

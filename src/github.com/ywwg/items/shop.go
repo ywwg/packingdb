@@ -4,9 +4,7 @@ import (
 	plib "github.com/ywwg/packinglib"
 )
 
-var toBuy = []plib.Item{
-	plib.NewBasicItem("more rope for my own tarps?", []string{"Firefly2017"}, nil),
-}
+var toBuy = []plib.Item{}
 
 func init() {
 	plib.RegisterProperty("Firefly2017")
