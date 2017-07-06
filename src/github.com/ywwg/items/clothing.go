@@ -17,6 +17,7 @@ var clothing = []plib.Item{
 	plib.NewConsumableTemperatureItem("long pjs", 0.2, "set", 0, 55, nil, nil),
 	plib.NewConsumableItem("work jeans", 0.2, "pair", []string{"Dirt"}, nil),
 	plib.NewConsumableTemperatureItem("shorts", 0.2, "pair", 70, 120, nil, nil),
+	plib.NewTemperatureItem("cinch belt", 70, 120, nil, nil),
 	plib.NewBasicItem("pristine shirt for drive home", []string{"Burn"}, nil),
 	plib.NewConsumableItem("convertapants", 0.5, "pair", []string{"Dirt"}, nil),
 	plib.NewConsumableTemperatureItem("long underwear", 0.25, "pair", 0, 45, []string{"Camping"}, nil),
