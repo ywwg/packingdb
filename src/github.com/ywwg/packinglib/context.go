@@ -32,6 +32,8 @@ var allProperties = PropertySet{
 	"Performing":       true,
 	"Sweat":            true,
 	"Swimming":         true,
+	"Handy":            true,
+	"Tiny House":       true,
 }
 
 func RegisterProperty(prop Property) {

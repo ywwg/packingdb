@@ -25,6 +25,12 @@ var food = []plib.Item{
 	plib.NewBasicItem("hot sauce", []string{"Camping"}, nil),
 	plib.NewConsumableItem("frozen grillables", 0.75, "servings", []string{"Camping"}, nil),
 	plib.NewConsumableItem("buns", 0.75, "servings", []string{"Camping"}, nil),
+
+	// Tiny House food
+	plib.NewConsumableItem("breakfasts", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
+	plib.NewConsumableItem("lunches", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
+	plib.NewConsumableItem("dinners", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
+	plib.NewBasicItem("all non-freezable ingredients", []string{"Tiny House"}, nil),
 }
 
 func init() {

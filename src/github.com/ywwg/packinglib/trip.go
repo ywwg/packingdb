@@ -46,11 +46,11 @@ func RegisterItems(category string, items []Item) {
 
 var contexts = make(map[string]Context)
 
-func RegisterContext(name string, c Context) {
-	if _, ok := contexts[name]; ok {
-		panic(fmt.Sprintf("Duplicate context: %s", name))
+func RegisterContext(c Context) {
+	if _, ok := contexts[c.Name]; ok {
+		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
 	}
-	contexts[name] = c
+	contexts[c.Name] = c
 }
 
 func GetContext(name string) *Context {

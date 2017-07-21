@@ -48,9 +48,25 @@ var berlin = plib.Context{
 	},
 }
 
+var tinyhouseSummer = plib.Context{
+	Name:           "Tiny House Summer",
+	TemperatureMin: 60,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Bright":        true,
+		"Sweat":         true,
+		"HasToiletries": true,
+		"Dark":          true,
+		"Handy":         true,
+		"Tiny House":    true,
+		"Performing":    true,
+	},
+}
+
 func init() {
 	plib.RegisterProperty("Firefly2017")
-	plib.RegisterContext("firefly", fireflyContext)
-	plib.RegisterContext("Cape", capeContext)
-	plib.RegisterContext("Berlin", berlin)
+	plib.RegisterContext(fireflyContext)
+	plib.RegisterContext(capeContext)
+	plib.RegisterContext(berlin)
+	plib.RegisterContext(tinyhouseSummer)
 }

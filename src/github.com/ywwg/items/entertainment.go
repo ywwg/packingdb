@@ -9,6 +9,7 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("earbuds", nil, nil),
 	plib.NewBasicItem("laptop and charger", nil, nil),
 	plib.NewBasicItem("USB-C cable", nil, nil),
+	plib.NewConsumableItem("tv / movie", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
 }
 
 func init() {

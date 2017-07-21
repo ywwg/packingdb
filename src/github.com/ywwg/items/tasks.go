@@ -13,6 +13,7 @@ var tasks = []plib.Item{
 	plib.NewBasicItem("snap ends off snow peas", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("fix nevermore sign", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("fill camelbak", []string{"Camping"}, nil),
+	plib.NewBasicItem("check calendar TODO", []string{"Tiny House"}, nil),
 }
 
 func init() {
