@@ -5,12 +5,12 @@ import (
 )
 
 var clothing = []plib.Item{
-	plib.NewBasicItem("boots", []string{"Dirt"}, nil),
+	plib.NewBasicItem("boots", []string{"Dirt", "Tiny House"}, nil),
 	plib.NewConsumableItem("underwear", 1.0, "pair", nil, nil),
 	plib.NewConsumableTemperatureItem("crew socks", 1.0, "pair", 0, 65, nil, []string{"Camping"}),
 	plib.NewConsumableTemperatureItem("short socks", 1.0, "pair", 65, 120, nil, []string{"Camping"}),
 	plib.NewBasicItem("sneakers", nil, nil),
-	plib.NewConsumableItem("smartwool socks", 1.0, "pair", []string{"Camping"}, nil),
+	plib.NewConsumableItem("smartwool socks", 1.0, "pair", []string{"Camping", "Tiny House"}, nil),
 	plib.NewConsumableTemperatureItem("long pj socks", 0.25, "pair", 0, 55, nil, nil),
 	plib.NewConsumableTemperatureItem("short pj socks", 0.25, "pair", 60, 120, nil, nil),
 	plib.NewConsumableTemperatureItem("short pjs", 0.2, "set", 55, 120, nil, nil),
@@ -34,8 +34,8 @@ var clothing = []plib.Item{
 	plib.NewBasicItem("rain jacket", []string{"Camping"}, nil),
 	plib.NewTemperatureItem("warm hat", 0, 40, nil, nil),
 	plib.NewTemperatureItem("gloves", 0, 40, nil, nil),
-	plib.NewBasicItem("earplugs", []string{"Loud"}, nil),
-	plib.NewBasicItem("eye mask", []string{"Loud"}, nil),
+	plib.NewBasicItem("earplugs", nil, nil),
+	plib.NewBasicItem("eye mask", nil, nil),
 	plib.NewTemperatureItem("tevas", 70, 120, nil, nil),
 	plib.NewBasicItem("nice dinner clothes", []string{"Fancy"}, nil),
 	plib.NewBasicItem("watch", nil, nil),

@@ -13,7 +13,7 @@ var electrical = []plib.Item{
 	plib.NewBasicItem("Bluetooth speaker and cord", []string{"Burn", "Camping"}, nil),
 	plib.NewBasicItem("1/8 to 1/8", []string{"Performing"}, nil),
 	plib.NewBasicItem("long extension cord", []string{"Burn"}, nil),
-	plib.NewBasicItem("Cell Phone Charger", nil, nil),
+	plib.NewBasicItem("Cell Phone Charger", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("Batteries for headlamp", []string{"Burn"}, nil),
 	plib.NewBasicItem("DSLR", []string{"Camping"}, nil),
 	plib.NewBasicItem("DSLR Charger", []string{"Camping"}, nil),

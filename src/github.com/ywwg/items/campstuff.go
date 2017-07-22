@@ -29,7 +29,7 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("A CUP", []string{"Burn"}, nil),
 	plib.NewBasicItem("multitool", []string{"Camping"}, nil),
 	plib.NewBasicItem("lighter/matches", []string{"Camping"}, nil),
-	plib.NewBasicItem("bug spray", []string{"Camping"}, nil),
+	plib.NewBasicItem("bug spray", []string{"Camping", "Tiny House"}, nil),
 	plib.NewConsumableItem("paper towels", 0.25, "rolls", []string{"Camping"}, nil),
 	plib.NewConsumableItem("trash bag", 0.25, plib.NoUnits, []string{"Camping"}, nil),
 	plib.NewConsumableItem("recycle bag", 0.125, plib.NoUnits, []string{"Camping"}, nil),
