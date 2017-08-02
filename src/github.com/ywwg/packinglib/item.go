@@ -176,7 +176,7 @@ func (i *ConsumableItem) Itemize(t *Trip) Item {
 	p := &ConsumableItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
-		p.count = math.Ceil(i.DailyRate * float64(t.Days))
+		p.count = math.Ceil(i.DailyRate * float64(t.Nights))
 	}
 	return p
 }
@@ -205,10 +205,10 @@ type CustomConsumableItem struct {
 	ConsumableItem
 
 	// DailyRate is how much the thing gets used per day.
-	RateFunc func(days int) float64
+	RateFunc func(nights int) float64
 }
 
-func NewCustomConsumableItem(name string, rateFunc func(days int) float64, units string, allow, disallow []string) *CustomConsumableItem {
+func NewCustomConsumableItem(name string, rateFunc func(nights int) float64, units string, allow, disallow []string) *CustomConsumableItem {
 	return &CustomConsumableItem{
 		ConsumableItem: *NewConsumableItem(name, 0, units, allow, disallow),
 		RateFunc:       rateFunc,
@@ -219,7 +219,7 @@ func (i *CustomConsumableItem) Itemize(t *Trip) Item {
 	p := &CustomConsumableItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
-		p.count = i.RateFunc(t.Days)
+		p.count = i.RateFunc(t.Nights)
 	}
 	return p
 }
@@ -248,7 +248,7 @@ func (i *ConsumableTemperatureItem) Itemize(t *Trip) Item {
 	p := &ConsumableTemperatureItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
-		p.ConsumableItem.count = math.Ceil(i.DailyRate * float64(t.Days))
+		p.ConsumableItem.count = math.Ceil(i.DailyRate * float64(t.Nights))
 	}
 	return p
 }

@@ -22,9 +22,9 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("Lip Sunscreen", []string{"Camping", "Bright"}, nil),
 	plib.NewBasicItem("Regular glasses", nil, nil),
 	plib.NewBasicItem("Sunglasses", nil, nil),
-	plib.NewBasicItem("Oakleys", []string{"Contacts"}, nil),
-	plib.NewBasicItem("Contact Fluid", []string{"Contacts"}, nil),
-	plib.NewConsumableItem("Contacts", 2.0, plib.NoUnits, []string{"Contacts"}, nil),
+	plib.NewBasicItem("Oakleys", nil, []string{"Burn"}),
+	plib.NewBasicItem("Contact Fluid", nil, []string{"Burn"}),
+	plib.NewConsumableItem("Contacts", 1.0, "pairs", nil, []string{"Burn"}),
 }
 
 func init() {

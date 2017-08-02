@@ -13,7 +13,7 @@ import (
 
 var (
 	flagContext     = flag.String("context", "", "The context you want to load (not needed if packing file exists)")
-	flagDays        = flag.Int("days", 0, "The number of days for the trip (not needed if packing file exists)")
+	flagNights      = flag.Int("nights", 0, "The number of nights for the trip (not needed if packing file exists)")
 	flagPackingFile = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
 	flagCategory    = flag.String("category", "", "Only print out the given category.")
 	flagPackItem    = flag.String("pack", "", "The name of an item that has been packed (noop without packfile)")
@@ -30,10 +30,10 @@ func main() {
 		if len(*flagContext) == 0 {
 			panic("Need a context")
 		}
-		if *flagDays == 0 {
-			panic("Need a number of days")
+		if *flagNights == 0 {
+			panic("Need a number of nights")
 		}
-		t = packinglib.NewTrip(*flagDays, *flagContext)
+		t = packinglib.NewTrip(*flagNights, *flagContext)
 		for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 			fmt.Println(l)
 		}
@@ -45,8 +45,8 @@ func main() {
 		if len(*flagContext) != 0 {
 			fmt.Println("(Ignoring context when loading file)")
 		}
-		if *flagDays != 0 {
-			fmt.Println("(Ignoring days when loading file)")
+		if *flagNights != 0 {
+			fmt.Println("(Ignoring nights when loading file)")
 		}
 		t = &packinglib.Trip{}
 		if err2 := t.LoadFromFile(*flagPackingFile); err2 != nil {
@@ -56,10 +56,10 @@ func main() {
 		if len(*flagContext) == 0 {
 			panic("Need a context")
 		}
-		if *flagDays == 0 {
-			panic("Need a number of days")
+		if *flagNights == 0 {
+			panic("Need a number of nights")
 		}
-		t = packinglib.NewTrip(*flagDays, *flagContext)
+		t = packinglib.NewTrip(*flagNights, *flagContext)
 	}
 
 	if *flagPackItem != "" {

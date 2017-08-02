@@ -41,7 +41,6 @@ var berlin = plib.Context{
 	Properties: plib.PropertySet{
 		"Bright":        true,
 		"Sweat":         true,
-		"Swimming":      true,
 		"HasToiletries": true,
 		"International": true,
 		"Partying":      true,

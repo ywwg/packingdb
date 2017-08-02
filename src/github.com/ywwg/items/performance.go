@@ -34,7 +34,6 @@ var Performing = []plib.Item{
 	plib.NewBasicItem("microphone", []string{"Performing"}, nil),
 	plib.NewBasicItem("XLR cable", []string{"Performing"}, nil),
 	plib.NewBasicItem("Sound meter", []string{"Burn"}, nil),
-	plib.NewBasicItem("music ear plugs", []string{"Performing", "Partying"}, nil),
 }
 
 func init() {

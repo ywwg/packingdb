@@ -13,9 +13,9 @@ var food = []plib.Item{
 	plib.NewConsumableItem("tasty bites", 0.75, plib.NoUnits, []string{"Burn"}, nil),
 	plib.NewConsumableItem("clif bars", 1.5, plib.NoUnits, []string{"Camping"}, nil),
 	plib.NewConsumableItem("nuun", .333, "tubes", []string{"Camping"}, nil),
-	plib.NewCustomConsumableItem("eggs", func(days int) float64 {
+	plib.NewCustomConsumableItem("eggs", func(nights int) float64 {
 		// 2 Eggs for each morning that I'm there.
-		return float64((days - 1) * 2)
+		return float64((nights - 1) * 2)
 	}, plib.NoUnits, []string{"Burn"}, nil),
 	plib.NewBasicItem("mustard", []string{"Camping"}, nil),
 	plib.NewBasicItem("junk food?", []string{"Camping"}, nil),

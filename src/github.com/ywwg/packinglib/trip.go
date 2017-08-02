@@ -12,7 +12,7 @@ import (
 
 // Trip describes a trip, which includes a length and a context
 type Trip struct {
-	Days        int
+	Nights      int
 	C           *Context
 	contextName string
 	Packed      PackList
@@ -63,9 +63,9 @@ func GetContext(name string) *Context {
 	return c
 }
 
-func NewTrip(days int, context string) *Trip {
+func NewTrip(nights int, context string) *Trip {
 	t := &Trip{
-		Days:        days,
+		Nights:      nights,
 		C:           GetContext(context),
 		contextName: context,
 	}
@@ -148,11 +148,11 @@ func (t *Trip) LoadFromFile(f string) error {
 	for i := 0; scanner.Scan(); i++ {
 		toks := strings.SplitN(scanner.Text(), ",", 2)
 		if i == 0 {
-			days, err := strconv.Atoi(toks[0])
+			nights, err := strconv.Atoi(toks[0])
 			if err != nil {
 				return err
 			}
-			*t = *NewTrip(days, toks[1])
+			*t = *NewTrip(nights, toks[1])
 		} else {
 			if toks[0] == "true" {
 				t.Pack(toks[1])
@@ -166,7 +166,7 @@ func (t *Trip) LoadFromFile(f string) error {
 }
 
 func (t *Trip) SaveToFile(f string) error {
-	packedcsv := fmt.Sprintf("%d,%s\n", t.Days, t.contextName)
+	packedcsv := fmt.Sprintf("%d,%s\n", t.Nights, t.contextName)
 	for _, items := range t.Packed {
 		for _, item := range items {
 			packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
