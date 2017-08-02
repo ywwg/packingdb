@@ -33,6 +33,8 @@ var allProperties = PropertySet{
 	"Swimming":         true,
 	"Handy":            true,
 	"Tiny House":       true,
+	// Paid lodging like a hotel or airbnb
+	"Lodging": true,
 }
 
 func RegisterProperty(prop Property) {

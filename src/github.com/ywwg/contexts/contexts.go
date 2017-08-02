@@ -44,6 +44,7 @@ var berlin = plib.Context{
 		"HasToiletries": true,
 		"International": true,
 		"Partying":      true,
+		"Lodging":       true,
 		"Berlin2017":    true,
 	},
 }

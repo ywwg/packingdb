@@ -201,14 +201,37 @@ func (i *ConsumableItem) String() string {
 	}
 }
 
+type ConsumableMaxItem struct {
+	ConsumableItem
+
+	// Max is the most of these you'll ever need.
+	Max float64
+}
+
+func NewConsumableMaxItem(name string, rate float64, max float64, units string, allow, disallow []string) *ConsumableMaxItem {
+	return &ConsumableMaxItem{
+		ConsumableItem: *NewConsumableItem(name, rate, units, allow, disallow),
+		Max:            max,
+	}
+}
+
+func (i *ConsumableMaxItem) Itemize(t *Trip) Item {
+	p := &ConsumableMaxItem{}
+	*p = *i
+	if p.Satisfies(t.C) {
+		p.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), p.Max)
+	}
+	return p
+}
+
 type CustomConsumableItem struct {
 	ConsumableItem
 
 	// DailyRate is how much the thing gets used per day.
-	RateFunc func(nights int) float64
+	RateFunc func(nights int, props PropertySet) float64
 }
 
-func NewCustomConsumableItem(name string, rateFunc func(nights int) float64, units string, allow, disallow []string) *CustomConsumableItem {
+func NewCustomConsumableItem(name string, rateFunc func(nights int, props PropertySet) float64, units string, allow, disallow []string) *CustomConsumableItem {
 	return &CustomConsumableItem{
 		ConsumableItem: *NewConsumableItem(name, 0, units, allow, disallow),
 		RateFunc:       rateFunc,
@@ -219,7 +242,7 @@ func (i *CustomConsumableItem) Itemize(t *Trip) Item {
 	p := &CustomConsumableItem{}
 	*p = *i
 	if p.Satisfies(t.C) {
-		p.count = i.RateFunc(t.Nights)
+		p.count = i.RateFunc(t.Nights, t.C.Properties)
 	}
 	return p
 }
@@ -271,4 +294,53 @@ func (i *ConsumableTemperatureItem) Packed() bool {
 
 func (i *ConsumableTemperatureItem) Pack() {
 	i.ConsumableItem.Pack()
+}
+
+type ConsumableMaxTemperatureItem struct {
+	ConsumableMaxItem
+	TemperatureItem
+}
+
+func NewConsumableMaxTemperatureItem(name string, rate float64, maxNum float64, units string, min, max int, allow, disallow []string) *ConsumableMaxTemperatureItem {
+	return &ConsumableMaxTemperatureItem{
+		ConsumableMaxItem: *NewConsumableMaxItem(name, rate, maxNum, units, allow, disallow),
+		TemperatureItem:   *NewTemperatureItem(name, min, max, allow, disallow),
+	}
+}
+
+func (i *ConsumableMaxTemperatureItem) Satisfies(c *Context) bool {
+	if !i.TemperatureItem.Satisfies(c) {
+		return false
+	}
+
+	return i.ConsumableMaxItem.Satisfies(c)
+}
+
+func (i *ConsumableMaxTemperatureItem) Itemize(t *Trip) Item {
+	p := &ConsumableMaxTemperatureItem{}
+	*p = *i
+	if p.Satisfies(t.C) {
+		p.ConsumableMaxItem.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), p.Max)
+	}
+	return p
+}
+
+func (i *ConsumableMaxTemperatureItem) Name() string {
+	return i.ConsumableMaxItem.Name()
+}
+
+func (i *ConsumableMaxTemperatureItem) Count() float64 {
+	return i.ConsumableMaxItem.count
+}
+
+func (i *ConsumableMaxTemperatureItem) String() string {
+	return i.ConsumableMaxItem.String()
+}
+
+func (i *ConsumableMaxTemperatureItem) Packed() bool {
+	return i.ConsumableMaxItem.Packed()
+}
+
+func (i *ConsumableMaxTemperatureItem) Pack() {
+	i.ConsumableMaxItem.Pack()
 }
