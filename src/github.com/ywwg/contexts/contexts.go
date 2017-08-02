@@ -45,6 +45,7 @@ var berlin = plib.Context{
 		"HasToiletries": true,
 		"International": true,
 		"Partying":      true,
+		"Berlin2017":    true,
 	},
 }
 
@@ -64,6 +65,7 @@ var tinyhouseSummer = plib.Context{
 
 func init() {
 	plib.RegisterProperty("Firefly2017")
+	plib.RegisterProperty("Berlin2017")
 	plib.RegisterContext(fireflyContext)
 	plib.RegisterContext(capeContext)
 	plib.RegisterContext(berlin)
