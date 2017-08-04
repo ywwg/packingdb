@@ -64,10 +64,21 @@ var tinyhouseSummer = plib.Context{
 }
 
 func init() {
-	plib.RegisterProperty("Firefly2017")
-	plib.RegisterProperty("Berlin2017")
+	firefly2017 := fireflyContext
+	firefly2017.Name = "Firefly2017"
+
+	retreat2017 := capeContext
+	retreat2017.Name = "Retreat2017"
+	retreat2017.Properties["Retreat2017"] = true
+
+	berlin2017 := berlin
+	berlin2017.Name = "Berlin2017"
+
 	plib.RegisterContext(fireflyContext)
+	plib.RegisterContext(firefly2017)
 	plib.RegisterContext(capeContext)
+	plib.RegisterContext(retreat2017)
 	plib.RegisterContext(berlin)
+	plib.RegisterContext(berlin2017)
 	plib.RegisterContext(tinyhouseSummer)
 }

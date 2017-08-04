@@ -43,5 +43,6 @@ var clothing = []plib.Item{
 }
 
 func init() {
+	plib.RegisterProperty("Berlin2017")
 	plib.RegisterItems("Clothing", clothing)
 }

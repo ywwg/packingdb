@@ -46,11 +46,14 @@ func RegisterItems(category string, items []Item) {
 
 var contexts = make(map[string]Context)
 
+// RegisterContext registers the given context with the system.
+// Also registers a property with the context name.
 func RegisterContext(c Context) {
 	if _, ok := contexts[c.Name]; ok {
 		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
 	}
 	contexts[c.Name] = c
+	RegisterProperty(Property(c.Name))
 }
 
 func GetContext(name string) *Context {
