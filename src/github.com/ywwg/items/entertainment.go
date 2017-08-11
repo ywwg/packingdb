@@ -10,11 +10,16 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("laptop and charger", nil, nil),
 	plib.NewBasicItem("USB-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("jambox and charger", nil, []string{"International"}),
+	plib.NewBasicItem("1/8 stereo cable", nil, []string{"International"}),
 	plib.NewCustomConsumableItem("tv / movie", func(nights int, props plib.PropertySet) float64 {
 		if _, ok := props["Tiny House"]; ok {
 			return float64(nights)
 		}
-		return 3.0
+		if _, ok := props["Flight"]; ok {
+			// Should be enough for two plane flights and random nights.
+			return 4.0
+		}
+		return 0.0
 	}, plib.NoUnits, []string{"Tiny House", "International"}, nil),
 	plib.NewBasicItem("music ear plugs", []string{"Performing", "Partying"}, nil),
 }

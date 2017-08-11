@@ -14,8 +14,10 @@ var berlin2017 = []plib.Item{
 
 var virtuality2017 = []plib.Item{
 	plib.NewBasicItem("camp platewear kit", []string{"Retreat2017"}, nil),
+	plib.NewBasicItem("canned beer", []string{"Retreat2017"}, nil),
 }
 
 func init() {
 	plib.RegisterItems("Berlin2017", berlin2017)
+	plib.RegisterItems("Retreat2017", virtuality2017)
 }

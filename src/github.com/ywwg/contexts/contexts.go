@@ -36,8 +36,8 @@ var capeContext = plib.Context{
 
 var berlin = plib.Context{
 	Name:           "Berlin",
-	TemperatureMin: 60,
-	TemperatureMax: 120,
+	TemperatureMin: 53,
+	TemperatureMax: 80,
 	Properties: plib.PropertySet{
 		"Bright":        true,
 		"Sweat":         true,
@@ -46,6 +46,8 @@ var berlin = plib.Context{
 		"Partying":      true,
 		"Lodging":       true,
 		"Berlin2017":    true,
+		"Flight":        true,
+		"Fancy":         true,
 	},
 }
 
