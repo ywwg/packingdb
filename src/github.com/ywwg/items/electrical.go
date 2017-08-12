@@ -13,8 +13,7 @@ var electrical = []plib.Item{
 	plib.NewBasicItem("long extension cord", []string{"Burn"}, nil),
 	plib.NewBasicItem("Cell Phone Charger", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("Batteries for headlamp", []string{"Burn"}, nil),
-	plib.NewBasicItem("DSLR", []string{"Camping"}, nil),
-	plib.NewBasicItem("DSLR Charger", []string{"Camping"}, nil),
+	plib.NewBasicItem("DSLR and Charger", []string{"Camping", "Big Trip"}, nil),
 	plib.NewBasicItem("Plug Adapters", []string{"International"}, nil),
 }
 
