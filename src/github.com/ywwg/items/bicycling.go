@@ -5,7 +5,7 @@ import (
 )
 
 var bicycling = []plib.Item{
-	plib.NewBasicItem("ankle straps", []string{"cycling"}, nil),
+	plib.NewBasicItem("ankle straps", []string{"Cycling"}, nil),
 }
 
 func init() {

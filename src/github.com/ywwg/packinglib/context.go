@@ -33,6 +33,11 @@ var allProperties = PropertySet{
 	"Swimming":         true,
 	"Handy":            true,
 	"Tiny House":       true,
+	"Cycling":          true,
+	// Don't bring valuables
+	"Insecure": true,
+	// Used when there's camping, but no fire allowed at all
+	"NoFire": true,
 	// Paid lodging like a hotel or airbnb
 	"Lodging":  true,
 	"Flight":   true,

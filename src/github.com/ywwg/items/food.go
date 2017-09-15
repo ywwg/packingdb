@@ -17,14 +17,13 @@ var food = []plib.Item{
 		// 2 Eggs for each morning that I'm there.
 		return float64((nights - 1) * 2)
 	}, plib.NoUnits, []string{"Burn"}, nil),
-	plib.NewBasicItem("mustard", []string{"Camping"}, nil),
 	plib.NewBasicItem("junk food?", []string{"Camping"}, nil),
 	plib.NewBasicItem("lamb biryani", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("salt and pepper", []string{"Camping"}, nil),
-	plib.NewBasicItem("box soup", []string{"Camping"}, nil),
+	plib.NewBasicItem("box soup", []string{"Camping"}, []string{"NoFire"}),
 	plib.NewBasicItem("hot sauce", []string{"Camping"}, nil),
-	plib.NewConsumableItem("frozen grillables", 0.75, "servings", []string{"Camping"}, nil),
-	plib.NewConsumableItem("buns", 0.75, "servings", []string{"Camping"}, nil),
+	plib.NewConsumableItem("frozen grillables", 0.75, "servings", []string{"Camping"}, []string{"NoFire"}),
+	plib.NewConsumableItem("buns", 0.75, "servings", []string{"Camping"}, []string{"NoFire"}),
 
 	// Tiny House food
 	plib.NewConsumableItem("breakfasts", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),

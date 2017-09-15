@@ -6,7 +6,7 @@ import (
 
 var toiletries = []plib.Item{
 	plib.NewBasicItem("Deoderant", nil, nil),
-	plib.NewBasicItem("Wet Wipes", []string{"Burn"}, nil),
+	plib.NewBasicItem("Wet Wipes", []string{"Camping"}, nil),
 	plib.NewBasicItem("Toothpaste", nil, nil),
 	plib.NewBasicItem("Toothbrush", nil, nil),
 	plib.NewBasicItem("Shampoo", nil, []string{"Burn", "NoCheckedLuggage", "HasToiletries"}),

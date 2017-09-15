@@ -62,7 +62,25 @@ var tinyhouseSummer = plib.Context{
 		"HasToiletries": true,
 		"Handy":         true,
 		"Tiny House":    true,
-		"Performing":    true,
+		//"Performing":    true,
+	},
+}
+
+var sustainRelease = plib.Context{
+	Name:           "Sustain-Release",
+	TemperatureMin: 56,
+	TemperatureMax: 76,
+	Properties: plib.PropertySet{
+		"Bright":    true,
+		"Sweat":     true,
+		"Partying":  true,
+		"Camping":   true,
+		"Dark":      true,
+		"Loud":      true,
+		"NoFire":    true,
+		"Insecure":  true,
+		"Swimming":  true,
+		"PaidEvent": true,
 	},
 }
 
@@ -84,4 +102,5 @@ func init() {
 	plib.RegisterContext(berlin)
 	plib.RegisterContext(berlin2017)
 	plib.RegisterContext(tinyhouseSummer)
+	plib.RegisterContext(sustainRelease)
 }
