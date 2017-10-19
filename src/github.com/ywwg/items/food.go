@@ -8,8 +8,13 @@ var food = []plib.Item{
 	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn"}, nil),
 	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn"}, nil),
 	plib.NewConsumableItem("drinking water", 0.5, "gallons", []string{"Burn"}, nil),
+	// Burns use a camelbak
+	plib.NewBasicItem("water bottle", nil, []string{"Burn"}),
 	plib.NewConsumableItem("cooking water", 0.25, "gallons", []string{"Burn"}, nil),
 	plib.NewBasicItem("cooler", []string{"Camping"}, nil),
+	plib.NewBasicItem("spatula", []string{"Camping"}, nil),
+	plib.NewBasicItem("tongs", []string{"Camping"}, nil),
+	plib.NewBasicItem("wood spoon", []string{"Camping"}, nil),
 	plib.NewConsumableItem("tasty bites", 0.75, plib.NoUnits, []string{"Burn"}, nil),
 	plib.NewConsumableItem("clif bars", 1.5, plib.NoUnits, []string{"Camping"}, nil),
 	plib.NewConsumableItem("nuun", .333, "tubes", []string{"Camping"}, nil),

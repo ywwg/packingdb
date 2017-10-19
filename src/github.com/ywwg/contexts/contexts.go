@@ -22,6 +22,24 @@ var fireflyContext = plib.Context{
 	},
 }
 
+var nectrContext = plib.Context{
+	Name:           "Nectr",
+	TemperatureMin: 40,
+	TemperatureMax: 80,
+	Properties: plib.PropertySet{
+		"Dirt":         true,
+		"Loud":         true,
+		"Bright":       true,
+		"Sweat":        true,
+		"Camping":      true,
+		"Dark":         true,
+		"Burn":         true,
+		"Performing":   true,
+		"Partying":     true,
+		"GrumpCamping": true,
+	},
+}
+
 var capeContext = plib.Context{
 	Name:           "Cape",
 	TemperatureMin: 69,
@@ -62,7 +80,19 @@ var tinyhouseSummer = plib.Context{
 		"HasToiletries": true,
 		"Handy":         true,
 		"Tiny House":    true,
-		//"Performing":    true,
+	},
+}
+
+var tinyhouseFall = plib.Context{
+	Name:           "Tiny House Fall",
+	TemperatureMin: 50,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Bright":        true,
+		"Sweat":         true,
+		"HasToiletries": true,
+		"Handy":         true,
+		"Tiny House":    true,
 	},
 }
 
@@ -84,6 +114,19 @@ var sustainRelease = plib.Context{
 	},
 }
 
+var offsiteContext = plib.Context{
+	Name:           "Offsite",
+	TemperatureMin: 65,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Bright":        true,
+		"Sweat":         true,
+		"Swimming":      true,
+		"HasToiletries": true,
+		"Lodging":       true,
+	},
+}
+
 func init() {
 	firefly2017 := fireflyContext
 	firefly2017.Name = "Firefly2017"
@@ -95,6 +138,11 @@ func init() {
 	berlin2017 := berlin
 	berlin2017.Name = "Berlin2017"
 
+	offsite2017 := offsiteContext
+
+	nectr2017 := nectrContext
+	nectr2017.Name = "Nectr2017"
+
 	plib.RegisterContext(fireflyContext)
 	plib.RegisterContext(firefly2017)
 	plib.RegisterContext(capeContext)
@@ -102,5 +150,8 @@ func init() {
 	plib.RegisterContext(berlin)
 	plib.RegisterContext(berlin2017)
 	plib.RegisterContext(tinyhouseSummer)
+	plib.RegisterContext(tinyhouseFall)
 	plib.RegisterContext(sustainRelease)
+	plib.RegisterContext(offsite2017)
+	plib.RegisterContext(nectr2017)
 }
