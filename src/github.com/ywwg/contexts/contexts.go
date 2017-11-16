@@ -96,6 +96,18 @@ var tinyhouseFall = plib.Context{
 	},
 }
 
+var tinyhouseWinter = plib.Context{
+	Name:           "Tiny House Winter",
+	TemperatureMin: 20,
+	TemperatureMax: 50,
+	Properties: plib.PropertySet{
+		"Bright":        true,
+		"HasToiletries": true,
+		"Handy":         true,
+		"Tiny House":    true,
+	},
+}
+
 var sustainRelease = plib.Context{
 	Name:           "Sustain-Release",
 	TemperatureMin: 56,
@@ -151,6 +163,7 @@ func init() {
 	plib.RegisterContext(berlin2017)
 	plib.RegisterContext(tinyhouseSummer)
 	plib.RegisterContext(tinyhouseFall)
+	plib.RegisterContext(tinyhouseWinter)
 	plib.RegisterContext(sustainRelease)
 	plib.RegisterContext(offsite2017)
 	plib.RegisterContext(nectr2017)
