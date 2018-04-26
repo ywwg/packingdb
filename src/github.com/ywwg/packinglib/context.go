@@ -15,11 +15,11 @@ type Property string
 type PropertySet map[Property]bool
 
 var allProperties = PropertySet{
-	"Bright":           true,
+	"Bright":           true, // sun!
 	"Burn":             true,
 	"Camping":          true,
-	"Dark":             true,
-	"Dirt":             true,
+	"Dark":             true, // mostly for camping, but anytime you'll be wandering in the dark
+	"Dirt":             true, // are you going to get dirty?
 	"Fancy":            true,
 	"GrumpCamping":     true,
 	"HasToiletries":    true,
@@ -28,22 +28,23 @@ var allProperties = PropertySet{
 	"NoCheckedLuggage": true,
 	"PaidEvent":        true,
 	"Partying":         true,
-	"Performing":       true,
-	"Sweat":            true,
+	"Sweat":            true, // are you gonna sweat up the car?
 	"Swimming":         true,
-	"Handy":            true,
+	"Handy":            true, // need tools?
 	"Tiny House":       true,
 	"Cycling":          true,
-	// Don't bring valuables
-	"Insecure": true,
-	// Used when there's camping, but no fire allowed at all
-	"NoFire": true,
-	// Paid lodging like a hotel or airbnb
-	"Lodging":  true,
-	"Flight":   true,
-	"Big Trip": true,
+	"Insecure":         true, // Don't bring valuables
+	"NoFire":           true, // Used when there's camping, but no fire allowed at all
+	"Lodging":          true, // Paid lodging like a hotel or airbnb
+	"Flight":           true,
+	"Big Trip":         true,
+	// "Performing" for all music, and then add the specific ones
+	"Performing": true,
+	"Modular":    true,
+	"DJing":      true,
 }
 
+// RegisterProperty adds a new Property to the database so it can be used.
 func RegisterProperty(prop Property) {
 	// Don't worry if the property already exists.
 	allProperties[prop] = true

@@ -139,6 +139,59 @@ var offsiteContext = plib.Context{
 	},
 }
 
+var paxUnpluggedContext = plib.Context{
+	Name:           "PAX Unplugged",
+	TemperatureMin: 35,
+	TemperatureMax: 56,
+	Properties: plib.PropertySet{
+		"Lodging":   true,
+		"PaidEvent": true,
+	},
+}
+
+var daytrip = plib.Context{
+	Name:           "daytrip",
+	TemperatureMin: 25,
+	TemperatureMax: 55,
+	Properties: plib.PropertySet{
+		"Lodging":   true,
+		"PaidEvent": true,
+		"Loud":      true,
+	},
+}
+
+var florida = plib.Context{
+	Name:           "Florida",
+	TemperatureMin: 64,
+	TemperatureMax: 82,
+	Properties: plib.PropertySet{
+		"Bright":        true,
+		"Sweat":         true,
+		"Swimming":      true,
+		"HasToiletries": true,
+		"Lodging":       true,
+		"Flight":        true,
+		"Fancy":         true,
+	},
+}
+
+var conContext = plib.Context{
+	Name:           "Con",
+	TemperatureMin: 43,
+	TemperatureMax: 60,
+	Properties: plib.PropertySet{
+		"Bright":     true,
+		"Partying":   true,
+		"Loud":       true,
+		"Swimming":   true,
+		"PaidEvent":  true,
+		"Lodging":    true,
+		"Performing": true,
+		"DJing":      true,
+		"Con":        true,
+	},
+}
+
 func init() {
 	firefly2017 := fireflyContext
 	firefly2017.Name = "Firefly2017"
@@ -155,6 +208,8 @@ func init() {
 	nectr2017 := nectrContext
 	nectr2017.Name = "Nectr2017"
 
+	con := conContext
+
 	plib.RegisterContext(fireflyContext)
 	plib.RegisterContext(firefly2017)
 	plib.RegisterContext(capeContext)
@@ -167,4 +222,8 @@ func init() {
 	plib.RegisterContext(sustainRelease)
 	plib.RegisterContext(offsite2017)
 	plib.RegisterContext(nectr2017)
+	plib.RegisterContext(paxUnpluggedContext)
+	plib.RegisterContext(daytrip)
+	plib.RegisterContext(florida)
+	plib.RegisterContext(con)
 }

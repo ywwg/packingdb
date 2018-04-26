@@ -10,20 +10,23 @@ import (
 	"strings"
 )
 
+// PackList is a map from category name to slice of items
+type PackList map[string][]Item
+
+// AllItems is a convenience map of all items that packingdb knows about
+var AllItems = make(PackList)
+
 // Trip describes a trip, which includes a length and a context
 type Trip struct {
 	Nights      int
 	C           *Context
 	contextName string
-	Packed      PackList
+	// packList is a map of all the items in the trip.
+	packList PackList
 }
 
-type PackList map[string][]Item
-
-var AllItems = make(PackList)
-
-// dupeChecker is a simple map to track all of the item names and
-// make sure we don't have any duplicates.
+// dupeChecker is a map to track all of the item names and make sure we don't
+// have any duplicates.
 var dupeChecker = make(map[string]bool)
 
 // RegisterItems appends the given slice of Items to the registry under
@@ -72,7 +75,7 @@ func NewTrip(nights int, context string) *Trip {
 		C:           GetContext(context),
 		contextName: context,
 	}
-	t.Packed = t.makeList()
+	t.packList = t.makeList()
 	return t
 }
 
@@ -95,7 +98,7 @@ func (t *Trip) makeList() PackList {
 
 func (t *Trip) Pack(i string) {
 	found := false
-	for _, items := range t.Packed {
+	for _, items := range t.packList {
 		for _, item := range items {
 			if strings.ToLower(item.Name()) == strings.ToLower(i) {
 				item.Pack()
@@ -108,11 +111,21 @@ func (t *Trip) Pack(i string) {
 	}
 }
 
+func (t *Trip) PackCategory(cat string) {
+	if items, ok := t.packList[cat]; ok {
+		for _, i := range items {
+			i.Pack()
+		}
+	} else {
+		panic(fmt.Sprintf("tried to pack nonexistant category: %s", cat))
+	}
+}
+
 func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	var lines []string
 	// map iteration is nondeterministic so sort the keys.
 	var keys []string
-	for k := range t.Packed {
+	for k := range t.packList {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
@@ -125,10 +138,10 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			}
 			foundCat = true
 		}
-		if len(t.Packed[category]) > 0 {
+		if len(t.packList[category]) > 0 {
 			lines = append(lines, fmt.Sprintf("%s:", category))
 		}
-		for _, i := range t.Packed[category] {
+		for _, i := range t.packList[category] {
 			if hideUnpacked && i.Packed() {
 				continue
 			}
@@ -170,7 +183,7 @@ func (t *Trip) LoadFromFile(f string) error {
 
 func (t *Trip) SaveToFile(f string) error {
 	packedcsv := fmt.Sprintf("%d,%s\n", t.Nights, t.contextName)
-	for _, items := range t.Packed {
+	for _, items := range t.packList {
 		for _, item := range items {
 			packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
 		}
