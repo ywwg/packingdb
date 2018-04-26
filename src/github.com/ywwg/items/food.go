@@ -5,8 +5,8 @@ import (
 )
 
 var food = []plib.Item{
-	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn"}, nil),
-	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn"}, nil),
+	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn", "Drinking"}, nil),
+	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn", "Drinking"}, nil),
 	plib.NewConsumableItem("drinking water", 0.5, "gallons", []string{"Burn"}, nil),
 	// Burns use a camelbak
 	plib.NewBasicItem("water bottle", nil, []string{"Burn"}),
@@ -16,7 +16,8 @@ var food = []plib.Item{
 	plib.NewBasicItem("tongs", []string{"Camping"}, nil),
 	plib.NewBasicItem("wood spoon", []string{"Camping"}, nil),
 	plib.NewConsumableItem("tasty bites", 0.75, plib.NoUnits, []string{"Burn"}, nil),
-	plib.NewConsumableItem("clif bars", 1.5, plib.NoUnits, []string{"Camping"}, nil),
+	plib.NewConsumableItem("clif bars", 1.5, plib.NoUnits, []string{"Camping", "Con"}, nil),
+	plib.NewBasicItem("tea", []string{"Con"}, nil),
 	plib.NewConsumableItem("nuun", .333, "tubes", []string{"Camping"}, nil),
 	plib.NewCustomConsumableItem("eggs", func(nights int, _ plib.PropertySet) float64 {
 		// 2 Eggs for each morning that I'm there.

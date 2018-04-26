@@ -191,6 +191,7 @@ var conContext = plib.Context{
 		"Con":        true,
 		"Formal":     true,
 		"Art":        true,
+		"Drinking":   true,
 	},
 }
 

@@ -51,6 +51,7 @@ var clothing = []plib.Item{
 	plib.NewBasicItem("purse", nil, []string{"Burn", "Camping"}),
 
 	plib.NewBasicItem("three piece suit", []string{"Formal"}, nil),
+	plib.NewBasicItem("thin belt", []string{"Formal"}, nil),
 	plib.NewConsumableItem("suit shirts", 0.5, plib.NoUnits, []string{"Formal"}, nil),
 	plib.NewConsumableItem("ties", 0.5, plib.NoUnits, []string{"Formal"}, nil),
 }

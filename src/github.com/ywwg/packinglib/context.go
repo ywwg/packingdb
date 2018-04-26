@@ -23,6 +23,7 @@ var allProperties = PropertySet{
 	"Cycling":          true,
 	"Dark":             true, // mostly for camping, but anytime you'll be wandering in the dark
 	"Dirt":             true, // are you going to get dirty?
+	"Drinking":         true,
 	"Fancy":            true,
 	"Flight":           true,
 	"Formal":           true, // do you need to *really* dress up?
