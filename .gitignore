@@ -119,5 +119,11 @@ ENV/
 bin/*
 pkg/*
 *~
+*.csv
+src/github.com/*
+src/golang.org/*
+.cproject
+.project
+packingdb.code-workspace
 # lol
 src/github.com/ywwg/items/unmentionables.go
