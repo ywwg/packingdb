@@ -23,6 +23,10 @@ type Trip struct {
 	contextName string
 	// packList is a map of all the items in the trip.
 	packList PackList
+	// codeToItem is a map from a string code to the Item it corresponds to
+	codeToItem map[string]Item
+	// itemToCode is the reverse.
+	itemToCode map[Item]string
 }
 
 // dupeChecker is a map to track all of the item names and make sure we don't
@@ -69,6 +73,22 @@ func GetContext(name string) *Context {
 	return c
 }
 
+func getCode(idx int) string {
+	code := ""
+	adjust := 0
+	for {
+		codeVal := idx%26 - adjust
+		code = string('a'+codeVal) + code
+		idx -= idx % 26
+		idx /= 26
+		if idx == 0 {
+			break
+		}
+		adjust = 1
+	}
+	return code
+}
+
 func NewTrip(nights int, context string) *Trip {
 	t := &Trip{
 		Nights:      nights,
@@ -76,6 +96,22 @@ func NewTrip(nights int, context string) *Trip {
 		contextName: context,
 	}
 	t.packList = t.makeList()
+	t.codeToItem = make(map[string]Item)
+	t.itemToCode = make(map[Item]string)
+	idx := 0
+	var keys []string
+	for k := range t.packList {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, category := range keys {
+		for _, item := range t.packList[category] {
+			t.codeToItem[getCode(idx)] = item
+			t.itemToCode[item] = getCode(idx)
+			idx++
+		}
+	}
 	return t
 }
 
@@ -97,6 +133,13 @@ func (t *Trip) makeList() PackList {
 }
 
 func (t *Trip) Pack(i string) {
+	// First try to pack by code
+	if item, ok := t.codeToItem[i]; ok {
+		item.Pack()
+		return
+	}
+
+	// Now fall back to string matching (which we do when loading the csv)
 	found := false
 	for _, items := range t.packList {
 		for _, item := range items {
@@ -145,7 +188,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			if hideUnpacked && i.Packed() {
 				continue
 			}
-			lines = append(lines, fmt.Sprintf("\t%s", i.String()))
+			lines = append(lines, fmt.Sprintf("\t(%s) %s", t.itemToCode[i], i.String()))
 		}
 	}
 	if showCat != "" && !foundCat {
