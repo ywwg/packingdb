@@ -6,7 +6,7 @@ import (
 
 var waterStuff = []plib.Item{
 	plib.NewBasicItem("froggies", []string{"Swimming"}, nil),
-	plib.NewConsumableTemperatureItem("swim suit", 0.25, plib.NoUnits, 70, 120, []string{"Swimming"}, nil),
+	plib.NewConsumableItem("swim suit", 0.25, plib.NoUnits, []string{"Swimming"}, nil),
 	plib.NewBasicItem("swim towel", []string{"Swimming"}, nil),
 	plib.NewBasicItem("plastic bag for wet things", []string{"Swimming", "Dirt"}, nil),
 }

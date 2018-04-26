@@ -15,29 +15,31 @@ type Property string
 type PropertySet map[Property]bool
 
 var allProperties = PropertySet{
+	"Art":              true, // gonna do some drawing
+	"Big Trip":         true, // this is a big deal
 	"Bright":           true, // sun!
 	"Burn":             true,
 	"Camping":          true,
+	"Cycling":          true,
 	"Dark":             true, // mostly for camping, but anytime you'll be wandering in the dark
 	"Dirt":             true, // are you going to get dirty?
 	"Fancy":            true,
+	"Flight":           true,
+	"Formal":           true, // do you need to *really* dress up?
 	"GrumpCamping":     true,
+	"Handy":            true, // need tools?
 	"HasToiletries":    true,
+	"Insecure":         true, // Don't bring valuables
 	"International":    true,
+	"Lodging":          true, // Paid lodging like a hotel or airbnb
 	"Loud":             true,
 	"NoCheckedLuggage": true,
+	"NoFire":           true, // Used when there's camping, but no fire allowed at all
 	"PaidEvent":        true,
 	"Partying":         true,
 	"Sweat":            true, // are you gonna sweat up the car?
 	"Swimming":         true,
-	"Handy":            true, // need tools?
 	"Tiny House":       true,
-	"Cycling":          true,
-	"Insecure":         true, // Don't bring valuables
-	"NoFire":           true, // Used when there's camping, but no fire allowed at all
-	"Lodging":          true, // Paid lodging like a hotel or airbnb
-	"Flight":           true,
-	"Big Trip":         true,
 	// "Performing" for all music, and then add the specific ones
 	"Performing": true,
 	"Modular":    true,

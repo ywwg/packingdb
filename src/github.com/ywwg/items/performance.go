@@ -32,6 +32,7 @@ var Performing = []plib.Item{
 	plib.NewBasicItem("usb cable", []string{"DJing"}, nil),
 	plib.NewBasicItem("laptop", []string{"DJing"}, nil),
 	plib.NewBasicItem("laptop stand", []string{"DJing"}, nil),
+	plib.NewBasicItem("little usb audio", []string{"DJing"}, nil),
 }
 
 func init() {

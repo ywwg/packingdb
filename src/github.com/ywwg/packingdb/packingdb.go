@@ -16,7 +16,7 @@ var (
 	flagNights       = flag.Int("nights", 0, "The number of nights for the trip (not needed if packing file exists)")
 	flagPackingFile  = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
 	flagCategory     = flag.String("category", "", "Only print out the given category.")
-	flagPackItem     = flag.String("pack", "", "The name of an item that has been packed (noop without packfile)")
+	flagPackItem     = flag.String("pack", "", "The code of an item that has been packed (noop without packfile)")
 	flagPackCategory = flag.String("pack_category", "", "The name of an entire category that has been packed (noop without packfile)")
 	flagHidePacked   = flag.Bool("hide_packed", false, "Only show unpacked items")
 )
