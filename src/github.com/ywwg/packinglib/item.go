@@ -5,8 +5,10 @@ import (
 	"math"
 )
 
+// NoUnits is used when an item isn't counted by a unit word.
 const NoUnits = "nounits"
 
+// Item represents a thing that gets packed for a trip.
 type Item interface {
 	// Name returns the name of the item
 	Name() string
@@ -45,6 +47,7 @@ type BasicItem struct {
 	Prerequisites PropertySet
 }
 
+// NewBasicItem creates a Basic Item with the provided allow and disallow property prerequisites.
 func NewBasicItem(name string, allow, disallow []string) *BasicItem {
 	return &BasicItem{
 		name:          name,
@@ -52,6 +55,7 @@ func NewBasicItem(name string, allow, disallow []string) *BasicItem {
 	}
 }
 
+// Name returns the name of the item
 func (i *BasicItem) Name() string {
 	return i.name
 }
@@ -84,6 +88,7 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 	return found
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *BasicItem) Itemize(t *Trip) Item {
 	p := &BasicItem{}
 	*p = *i
@@ -93,10 +98,13 @@ func (i *BasicItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// Count returns the number of this item should be packed.
 func (i *BasicItem) Count() float64 {
 	return i.count
 }
 
+// String constructs a pretty string for printing this item, including a checkbox
+// for its packed status
 func (i *BasicItem) String() string {
 	checkbox := "☐"
 	if i.packed {
@@ -105,14 +113,17 @@ func (i *BasicItem) String() string {
 	return fmt.Sprintf("%s %s", checkbox, i.name)
 }
 
+// Pack logs the item as packed.
 func (i *BasicItem) Pack() {
 	i.packed = true
 }
 
+// Packed returns true if the item has been packed
 func (i *BasicItem) Packed() bool {
 	return i.packed
 }
 
+// TemperatureItem represents an item that only applies in a certain temperature range.
 type TemperatureItem struct {
 	BasicItem
 
@@ -123,6 +134,7 @@ type TemperatureItem struct {
 	TemperatureMax int
 }
 
+// NewTemperatureItem constructs an item given the temperature range and prereqs.
 func NewTemperatureItem(name string, min, max int, allow, disallow []string) *TemperatureItem {
 	return &TemperatureItem{
 		BasicItem:      *NewBasicItem(name, allow, disallow),
@@ -131,6 +143,7 @@ func NewTemperatureItem(name string, min, max int, allow, disallow []string) *Te
 	}
 }
 
+// Satisfies returns true if the context satisfies the item's requirements.
 func (i *TemperatureItem) Satisfies(c *Context) bool {
 	if i.TemperatureMax < c.TemperatureMin {
 		return false
@@ -142,6 +155,7 @@ func (i *TemperatureItem) Satisfies(c *Context) bool {
 	return i.BasicItem.Satisfies(c)
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *TemperatureItem) Itemize(t *Trip) Item {
 	p := &TemperatureItem{}
 	*p = *i
@@ -151,6 +165,7 @@ func (i *TemperatureItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// ConsumableItem is an item where a certain number will be used every day.
 type ConsumableItem struct {
 	BasicItem
 
@@ -164,6 +179,7 @@ type ConsumableItem struct {
 	Prerequisites map[Property]bool
 }
 
+// NewConsumableItem constructs an item with the given rate of usage and other prereqs.
 func NewConsumableItem(name string, rate float64, units string, allow, disallow []string) *ConsumableItem {
 	return &ConsumableItem{
 		BasicItem: *NewBasicItem(name, allow, disallow),
@@ -172,6 +188,7 @@ func NewConsumableItem(name string, rate float64, units string, allow, disallow 
 	}
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *ConsumableItem) Itemize(t *Trip) Item {
 	p := &ConsumableItem{}
 	*p = *i
@@ -181,6 +198,8 @@ func (i *ConsumableItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// String constructs a pretty string for printing this item, including a checkbox
+// for its packed status
 func (i *ConsumableItem) String() string {
 	checkbox := "☐"
 	if i.packed {
@@ -189,18 +208,17 @@ func (i *ConsumableItem) String() string {
 	if i.Units == NoUnits {
 		if i.count == float64(int(i.count)) {
 			return fmt.Sprintf("%s %d %s", checkbox, int(i.count), i.name)
-		} else {
-			return fmt.Sprintf("%s %.1f %s", checkbox, i.count, i.name)
 		}
-	} else {
-		if i.count == float64(int(i.count)) {
-			return fmt.Sprintf("%s %d %s of %s", checkbox, int(i.count), i.Units, i.name)
-		} else {
-			return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
-		}
+		return fmt.Sprintf("%s %.1f %s", checkbox, i.count, i.name)
 	}
+	if i.count == float64(int(i.count)) {
+		return fmt.Sprintf("%s %d %s of %s", checkbox, int(i.count), i.Units, i.name)
+	}
+	return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
 }
 
+// ConsumableMaxItem represents an item that you may need multiple of, but at some
+// point it maxes out and there's no point bringing more.
 type ConsumableMaxItem struct {
 	ConsumableItem
 
@@ -208,6 +226,7 @@ type ConsumableMaxItem struct {
 	Max float64
 }
 
+// NewConsumableMaxItem constructs an item with the given rate of usage, maximum, and other prereqs.
 func NewConsumableMaxItem(name string, rate float64, max float64, units string, allow, disallow []string) *ConsumableMaxItem {
 	return &ConsumableMaxItem{
 		ConsumableItem: *NewConsumableItem(name, rate, units, allow, disallow),
@@ -215,6 +234,7 @@ func NewConsumableMaxItem(name string, rate float64, max float64, units string, 
 	}
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *ConsumableMaxItem) Itemize(t *Trip) Item {
 	p := &ConsumableMaxItem{}
 	*p = *i
@@ -224,6 +244,8 @@ func (i *ConsumableMaxItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// CustomConsumableItem is a consumable item that takes a function to determine how many
+// are needed, instead of a simple float rate.
 type CustomConsumableItem struct {
 	ConsumableItem
 
@@ -231,6 +253,7 @@ type CustomConsumableItem struct {
 	RateFunc func(nights int, props PropertySet) float64
 }
 
+// NewCustomConsumableItem constructs an item with the given rate function and other prereqs.
 func NewCustomConsumableItem(name string, rateFunc func(nights int, props PropertySet) float64, units string, allow, disallow []string) *CustomConsumableItem {
 	return &CustomConsumableItem{
 		ConsumableItem: *NewConsumableItem(name, 0, units, allow, disallow),
@@ -238,6 +261,7 @@ func NewCustomConsumableItem(name string, rateFunc func(nights int, props Proper
 	}
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *CustomConsumableItem) Itemize(t *Trip) Item {
 	p := &CustomConsumableItem{}
 	*p = *i
@@ -247,11 +271,14 @@ func (i *CustomConsumableItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// ConsumableTemperatureItem is both consumable and only applies for a given temperature range.
+// Diamond pattern in action!
 type ConsumableTemperatureItem struct {
 	ConsumableItem
 	TemperatureItem
 }
 
+// NewConsumableTemperatureItem constructs the item with the given settings.
 func NewConsumableTemperatureItem(name string, rate float64, units string, min, max int, allow, disallow []string) *ConsumableTemperatureItem {
 	return &ConsumableTemperatureItem{
 		ConsumableItem:  *NewConsumableItem(name, rate, units, allow, disallow),
@@ -259,6 +286,7 @@ func NewConsumableTemperatureItem(name string, rate float64, units string, min, 
 	}
 }
 
+// Satisfies returns true if the item belongs in the given context
 func (i *ConsumableTemperatureItem) Satisfies(c *Context) bool {
 	if !i.TemperatureItem.Satisfies(c) {
 		return false
@@ -267,6 +295,7 @@ func (i *ConsumableTemperatureItem) Satisfies(c *Context) bool {
 	return i.ConsumableItem.Satisfies(c)
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *ConsumableTemperatureItem) Itemize(t *Trip) Item {
 	p := &ConsumableTemperatureItem{}
 	*p = *i
@@ -276,31 +305,40 @@ func (i *ConsumableTemperatureItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// Name returns the name of the item
 func (i *ConsumableTemperatureItem) Name() string {
 	return i.ConsumableItem.Name()
 }
 
+// Count returns the number of this item that got packed
 func (i *ConsumableTemperatureItem) Count() float64 {
 	return i.ConsumableItem.count
 }
 
+// String constructs a pretty string for printing this item, including a checkbox
+// for its packed status
 func (i *ConsumableTemperatureItem) String() string {
 	return i.ConsumableItem.String()
 }
 
+// Packed returns true if the item has been packed
 func (i *ConsumableTemperatureItem) Packed() bool {
 	return i.ConsumableItem.Packed()
 }
 
+// Pack logs the item as packed.
 func (i *ConsumableTemperatureItem) Pack() {
 	i.ConsumableItem.Pack()
 }
 
+// ConsumableMaxTemperatureItem is both consumable, with a maximum amount, and has a temperature range.
+// Diamond pattern again!
 type ConsumableMaxTemperatureItem struct {
 	ConsumableMaxItem
 	TemperatureItem
 }
 
+// NewConsumableMaxTemperatureItem constructs the item with the many varied requirements.
 func NewConsumableMaxTemperatureItem(name string, rate float64, maxNum float64, units string, min, max int, allow, disallow []string) *ConsumableMaxTemperatureItem {
 	return &ConsumableMaxTemperatureItem{
 		ConsumableMaxItem: *NewConsumableMaxItem(name, rate, maxNum, units, allow, disallow),
@@ -308,6 +346,7 @@ func NewConsumableMaxTemperatureItem(name string, rate float64, maxNum float64, 
 	}
 }
 
+// Satisfies returns true if the item belongs in the given context
 func (i *ConsumableMaxTemperatureItem) Satisfies(c *Context) bool {
 	if !i.TemperatureItem.Satisfies(c) {
 		return false
@@ -316,6 +355,7 @@ func (i *ConsumableMaxTemperatureItem) Satisfies(c *Context) bool {
 	return i.ConsumableMaxItem.Satisfies(c)
 }
 
+// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
 func (i *ConsumableMaxTemperatureItem) Itemize(t *Trip) Item {
 	p := &ConsumableMaxTemperatureItem{}
 	*p = *i
@@ -325,22 +365,28 @@ func (i *ConsumableMaxTemperatureItem) Itemize(t *Trip) Item {
 	return p
 }
 
+// Name returns the name of the item
 func (i *ConsumableMaxTemperatureItem) Name() string {
 	return i.ConsumableMaxItem.Name()
 }
 
+// Count returns the number of this item that got packed
 func (i *ConsumableMaxTemperatureItem) Count() float64 {
 	return i.ConsumableMaxItem.count
 }
 
+// String constructs a pretty string for printing this item, including a checkbox
+// for its packed status
 func (i *ConsumableMaxTemperatureItem) String() string {
 	return i.ConsumableMaxItem.String()
 }
 
+// Packed returns true if the item has been packed
 func (i *ConsumableMaxTemperatureItem) Packed() bool {
 	return i.ConsumableMaxItem.Packed()
 }
 
+// Pack logs the item as packed.
 func (i *ConsumableMaxTemperatureItem) Pack() {
 	i.ConsumableMaxItem.Pack()
 }

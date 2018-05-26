@@ -67,6 +67,7 @@ type Context struct {
 
 var contexts = make(map[string]Context)
 
+// ContextList returns a sorted slice of strings of the contexts.
 func ContextList() []string {
 	keys := make([]string, len(contexts))
 	i := 0
@@ -74,6 +75,7 @@ func ContextList() []string {
 		keys[i] = k
 		i++
 	}
+	sort.Strings(keys)
 	return keys
 }
 
@@ -87,6 +89,7 @@ func RegisterContext(c Context) {
 	RegisterProperty(Property(c.Name))
 }
 
+// GetContext returns the context of the given name, or panics if not found.
 func GetContext(name string) *Context {
 	c := &Context{}
 	found, ok := contexts[name]
@@ -113,6 +116,7 @@ func getCode(idx int) string {
 	return code
 }
 
+// NewTrip returns a constructed trip for the given context and number of nights.
 func NewTrip(nights int, context string) *Trip {
 	t := &Trip{
 		Nights:      nights,
@@ -156,6 +160,7 @@ func (t *Trip) makeList() PackList {
 	return packlist
 }
 
+// Pack tries to pack the provided item first by short code, then by full name.
 func (t *Trip) Pack(i string) {
 	// First try to pack by code
 	if item, ok := t.codeToItem[i]; ok {
@@ -178,6 +183,7 @@ func (t *Trip) Pack(i string) {
 	}
 }
 
+// PackCategory packs the entire category.
 func (t *Trip) PackCategory(cat string) {
 	if items, ok := t.packList[cat]; ok {
 		for _, i := range items {
@@ -188,6 +194,7 @@ func (t *Trip) PackCategory(cat string) {
 	}
 }
 
+// Strings returns a slice of pretty strings representing the entire packing list.
 func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	var lines []string
 	// map iteration is nondeterministic so sort the keys.
@@ -221,6 +228,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	return lines
 }
 
+// LoadFromFile initializes the trip from the given file.
 func (t *Trip) LoadFromFile(f string) error {
 	dat, err := ioutil.ReadFile(f)
 	if err != nil {
@@ -248,6 +256,7 @@ func (t *Trip) LoadFromFile(f string) error {
 	return nil
 }
 
+// SaveToFile saves the trip to the provided filename.
 func (t *Trip) SaveToFile(f string) error {
 	packedcsv := fmt.Sprintf("%d,%s\n", t.Nights, t.contextName)
 	for _, items := range t.packList {

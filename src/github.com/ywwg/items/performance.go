@@ -4,7 +4,7 @@ import (
 	plib "github.com/ywwg/packinglib"
 )
 
-var Performing = []plib.Item{
+var performing = []plib.Item{
 	plib.NewBasicItem("1x modular rigs", []string{"Modular"}, nil),
 	plib.NewBasicItem("1x modular power supplies", []string{"Modular"}, nil),
 	plib.NewBasicItem("patch cables", []string{"Modular"}, nil),
@@ -36,5 +36,5 @@ var Performing = []plib.Item{
 }
 
 func init() {
-	plib.RegisterItems("Performing", Performing)
+	plib.RegisterItems("Performing", performing)
 }
