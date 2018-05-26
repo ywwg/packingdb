@@ -51,6 +51,20 @@ func RegisterItems(category string, items []Item) {
 	AllItems[category] = items
 }
 
+// Context is struct that holds data about the context of the trip
+type Context struct {
+	// Name of the context ("The Cape", "The Tiny House", "Firefly")
+	Name string
+
+	// TemperatureMin is the anticipated minimum temperature.
+	TemperatureMin int
+
+	// TemperatureMax is the anticipated maximum temperature.
+	TemperatureMax int
+
+	Properties PropertySet
+}
+
 var contexts = make(map[string]Context)
 
 func ContextList() []string {

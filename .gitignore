@@ -121,6 +121,7 @@ pkg/*
 *~
 *.csv
 src/github.com/*
+!src/github.com/ywwg
 src/golang.org/*
 .cproject
 .project

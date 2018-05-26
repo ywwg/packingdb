@@ -72,17 +72,3 @@ func buildPropertySet(allow, disallow []string) PropertySet {
 	}
 	return propSet
 }
-
-// Context is struct that holds data about the context of the trip
-type Context struct {
-	// Name of the context ("The Cape", "The Tiny House", "Firefly")
-	Name string
-
-	// TemperatureMin is the anticipated minimum temperature.
-	TemperatureMin int
-
-	// TemperatureMax is the anticipated maximum temperature.
-	TemperatureMax int
-
-	Properties PropertySet
-}
