@@ -53,6 +53,14 @@ For the first mode, just specify the trip context and a number of days:
 
 This will generate a packing list for the camping context for a 5 day trip.
 
+You can list all the available contexts like this:
+
+```shell
+./packingdb --list_contexts
+```
+
+Creating new contexts is done by editing contexts.go.
+
 ### File Mode
 
 
@@ -61,18 +69,18 @@ This will generate a packing list for the camping context for a 5 day trip.
 To create a persistent file storing your packing data, add the --packfile flag:
 
 ```shell
-./packingdb --context camping --days 5 --packfile ./mytrip
+./packingdb --context camping --days 5 --packfile ./mytrip.csv
 ```
 
 This will still print out the packing list, but will also save packed data to the file.
 
 #### Recording stuff that's been packed
 
-After the file is created, the --context and --days flags are ignored.  To pack an item, just name
-it:
+After the file is created, the --context and --days flags are ignored.  To pack an item, use the
+short letter code in front of the item.  "(a)" or "(cw)".
 
 ```shell
-./packingdb --packfile ./mytrip --pack "boots"
+./packingdb --packfile ./mytrip --pack ab
 ```
 
 If you mess up the name, the program will quit with an error.
