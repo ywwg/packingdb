@@ -80,6 +80,7 @@ var tinyhouseSummer = plib.Context{
 		"HasToiletries": true,
 		"Handy":         true,
 		"Tiny House":    true,
+		"Dark":          true,
 	},
 }
 

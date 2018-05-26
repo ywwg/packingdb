@@ -19,12 +19,18 @@ var (
 	flagPackItem     = flag.String("pack", "", "The code of an item that has been packed (noop without packfile)")
 	flagPackCategory = flag.String("pack_category", "", "The name of an entire category that has been packed (noop without packfile)")
 	flagHidePacked   = flag.Bool("hide_packed", false, "Only show unpacked items")
+	flagListContexts = flag.Bool("list_contexts", false, "List the available contexts and exit")
 )
 
 func main() {
 	flag.Parse()
 
 	var t *packinglib.Trip
+	if *flagListContexts {
+		for _, c := range packinglib.ContextList() {
+			fmt.Println(c)
+		}
+	}
 
 	// Simple mode: just print the list.
 	if *flagPackingFile == "" {

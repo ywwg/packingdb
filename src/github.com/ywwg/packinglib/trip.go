@@ -53,6 +53,16 @@ func RegisterItems(category string, items []Item) {
 
 var contexts = make(map[string]Context)
 
+func ContextList() []string {
+	keys := make([]string, len(contexts))
+	i := 0
+	for k := range contexts {
+		keys[i] = k
+		i++
+	}
+	return keys
+}
+
 // RegisterContext registers the given context with the system.
 // Also registers a property with the context name.
 func RegisterContext(c Context) {
