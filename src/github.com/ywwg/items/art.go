@@ -8,6 +8,8 @@ var art = []plib.Item{
 	plib.NewBasicItem("sketchbook", []string{"Art"}, nil),
 	plib.NewBasicItem("pencil box", []string{"Art"}, nil),
 	plib.NewBasicItem("copics", []string{"Art"}, nil),
+	plib.NewBasicItem("ipad", []string{"Art"}, nil),
+	plib.NewBasicItem("ipad cable", []string{"Art"}, nil),
 }
 
 func init() {
