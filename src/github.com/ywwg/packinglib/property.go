@@ -38,6 +38,7 @@ var allProperties = PropertySet{
 	"NoCheckedLuggage": true,
 	"NoFire":           true, // Used when there's camping, but no fire allowed at all
 	"PaidEvent":        true,
+	"Partial":          true,
 	"Partying":         true,
 	"Sweat":            true, // are you gonna sweat up the car?
 	"Swimming":         true,

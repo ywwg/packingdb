@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/ywwg/packinglib"
 
@@ -104,8 +105,10 @@ func main() {
 		t.C.TemperatureMax = *flagTempMax
 	}
 	if *flagAddProperty != "" {
-		if err := t.C.AddProperty(*flagAddProperty); err != nil {
-			panic(err.Error())
+		for _, prop := range strings.Split(*flagAddProperty, ",") {
+			if err := t.C.AddProperty(prop); err != nil {
+				panic(err.Error())
+			}
 		}
 	}
 
