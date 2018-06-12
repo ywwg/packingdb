@@ -131,8 +131,11 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 }
 
 // AddProperty adds the property with the given name to the context, or returns
-// error if it's not found.
+// error if it's not found. Empty strings are ignored.
 func (c *Context) AddProperty(prop string) error {
+	if prop == "" {
+		return nil
+	}
 	if _, ok := allProperties[Property(prop)]; !ok {
 		return fmt.Errorf("didn't find property: %s", prop)
 	}
@@ -285,7 +288,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 // following lines: true/false string, name of packed item
 //
 // New file format:
-// first line: "CUST", number of nights, tmin, tmax, context name, contexts...
+// first line: "V2", number of nights, tmin, tmax, context name, contexts...
 // if context_name is known, other contexts are added to it.
 func (t *Trip) LoadFromFile(f string) error {
 	dat, err := ioutil.ReadFile(f)
@@ -297,7 +300,7 @@ func (t *Trip) LoadFromFile(f string) error {
 	for i := 0; scanner.Scan(); i++ {
 		if i == 0 {
 			toks := strings.Split(scanner.Text(), ",")
-			if toks[0] == "CUST" {
+			if toks[0] == "V2" {
 				var err error
 				nights, err := strconv.Atoi(toks[1])
 				if err != nil {
@@ -359,7 +362,11 @@ func (t *Trip) LoadFromFile(f string) error {
 
 // SaveToFile saves the trip to the provided filename.
 func (t *Trip) SaveToFile(f string) error {
-	packedcsv := fmt.Sprintf("%d,%s\n", t.Nights, t.contextName)
+	packedcsv := fmt.Sprintf("V2,%d,%d,%d,%s,", t.Nights, t.C.TemperatureMin, t.C.TemperatureMax, t.contextName)
+	for p := range t.C.Properties {
+		packedcsv += fmt.Sprintf("%s,", string(p))
+	}
+	packedcsv += "\n"
 	for _, items := range t.packList {
 		for _, item := range items {
 			packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
