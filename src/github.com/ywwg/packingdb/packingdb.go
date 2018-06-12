@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
+	"sort"
 
 	"github.com/ywwg/packinglib"
 
@@ -12,7 +14,7 @@ import (
 )
 
 var (
-	flagContext        = flag.String("context", "", "The context you want to load (not needed if packing file exists)")
+	flagContext        = flag.String("context", "", "The context you want to load or the name for a new empty context (not needed if packing file exists)")
 	flagNights         = flag.Int("nights", 0, "The number of nights for the trip (not needed if packing file exists)")
 	flagPackingFile    = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
 	flagCategory       = flag.String("category", "", "Only print out the given category.")
@@ -21,6 +23,9 @@ var (
 	flagHidePacked     = flag.Bool("hide_packed", false, "Only show unpacked items")
 	flagListContexts   = flag.Bool("list_contexts", false, "List the available contexts and exit")
 	flagListProperties = flag.Bool("list_properties", false, "List the available properties and exit")
+	flagTempMin        = flag.Int("temp_min", math.MinInt64, "Set min temperature bound")
+	flagTempMax        = flag.Int("temp_max", math.MaxInt64, "Set max temperature bound")
+	flagAddProperty    = flag.String("add_property", "", "Add this property to the context")
 )
 
 func main() {
@@ -80,6 +85,26 @@ func main() {
 		var err error
 		t, err = packinglib.NewTrip(*flagNights, *flagContext)
 		if err != nil {
+			fmt.Printf("Context %s not found, creating empty context\n", *flagContext)
+			c, err := packinglib.NewContext(*flagContext, -120, 120, nil)
+			if err != nil {
+				panic(err.Error())
+			}
+			t, err = packinglib.NewTripFromCustomContext(*flagNights, c)
+			if err != nil {
+				panic(err.Error())
+			}
+		}
+	}
+
+	if *flagTempMin != math.MinInt64 {
+		t.C.TemperatureMin = *flagTempMin
+	}
+	if *flagTempMax != math.MaxInt64 {
+		t.C.TemperatureMax = *flagTempMax
+	}
+	if *flagAddProperty != "" {
+		if err := t.C.AddProperty(*flagAddProperty); err != nil {
 			panic(err.Error())
 		}
 	}
@@ -90,6 +115,26 @@ func main() {
 	if *flagPackCategory != "" {
 		t.PackCategory(*flagPackCategory)
 	}
+
+	// Print out trip context and information
+	fmt.Printf("Context: %s\n", t.C.Name)
+	fmt.Printf("Nights: %d\n", t.Nights)
+	fmt.Printf("Properties: ")
+	var plist []string
+	for p := range t.C.Properties {
+		plist = append(plist, string(p))
+	}
+	sort.Strings(plist)
+	for i, p := range plist {
+		if i == 0 {
+			fmt.Printf("%s", p)
+		} else {
+			fmt.Printf(", %s", p)
+		}
+	}
+	fmt.Printf("\n\n")
+
+	// Print the packing list
 	for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 		fmt.Println(l)
 	}

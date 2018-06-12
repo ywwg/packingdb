@@ -119,6 +119,7 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 		Name:           name,
 		TemperatureMin: tmin,
 		TemperatureMax: tmax,
+		Properties:     make(PropertySet),
 	}
 
 	for _, p := range properties {
