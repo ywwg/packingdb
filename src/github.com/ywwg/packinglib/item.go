@@ -30,6 +30,9 @@ type Item interface {
 
 	// Packed returns true if the item has been packed
 	Packed() bool
+
+	// Prerequisites returns the PropertySet of prereqs for this item
+	Prerequisites() PropertySet
 }
 
 // BasicItem is the simplest item -- just prerequisites and no count, like "tent"
@@ -44,14 +47,14 @@ type BasicItem struct {
 	packed bool
 
 	// Prerequisites is a set of all properties that the context must have for this item to appear.
-	Prerequisites PropertySet
+	prerequisites PropertySet
 }
 
 // NewBasicItem creates a Basic Item with the provided allow and disallow property prerequisites.
 func NewBasicItem(name string, allow, disallow []string) *BasicItem {
 	return &BasicItem{
 		name:          name,
-		Prerequisites: buildPropertySet(allow, disallow),
+		prerequisites: buildPropertySet(allow, disallow),
 	}
 }
 
@@ -63,14 +66,14 @@ func (i *BasicItem) Name() string {
 // Satisfies returns true if the context satisfies the item's requirements.
 func (i *BasicItem) Satisfies(c *Context) bool {
 	// Any property satisfies (OR)
-	if len(i.Prerequisites) == 0 {
+	if len(i.prerequisites) == 0 {
 		return true
 	}
 	found := false
 	// If all prereqs are denies, we can return true as long as none of the
 	// denials were activated (no need for a positive requirement).
 	allDenies := true
-	for p, allow := range i.Prerequisites {
+	for p, allow := range i.prerequisites {
 		if allow == true {
 			allDenies = false
 		}
@@ -121,6 +124,11 @@ func (i *BasicItem) Pack() {
 // Packed returns true if the item has been packed
 func (i *BasicItem) Packed() bool {
 	return i.packed
+}
+
+// Prerequisites returns the PropertySet of prereqs for this item
+func (i *BasicItem) Prerequisites() PropertySet {
+	return i.prerequisites
 }
 
 // TemperatureItem represents an item that only applies in a certain temperature range.
@@ -175,8 +183,8 @@ type ConsumableItem struct {
 	// What units the rate is in.  Use NoUnits for things without "of" qualifiers. ("1 car")
 	Units string
 
-	// Prerequisites is a set of all properties that the context must have for this item to appear.
-	Prerequisites map[Property]bool
+	// prerequisites is a set of all properties that the context must have for this item to appear.
+	prerequisites map[Property]bool
 }
 
 // NewConsumableItem constructs an item with the given rate of usage and other prereqs.
@@ -329,6 +337,11 @@ func (i *ConsumableTemperatureItem) Packed() bool {
 // Pack logs the item as packed.
 func (i *ConsumableTemperatureItem) Pack() {
 	i.ConsumableItem.Pack()
+}
+
+// Prerequisites returns the PropertySet of prereqs for this item
+func (i *ConsumableTemperatureItem) Prerequisites() PropertySet {
+	return i.ConsumableItem.Prerequisites()
 }
 
 // ConsumableMaxTemperatureItem is both consumable, with a maximum amount, and has a temperature range.

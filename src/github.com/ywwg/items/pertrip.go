@@ -17,7 +17,13 @@ var virtuality2017 = []plib.Item{
 	plib.NewBasicItem("canned beer", []string{"Retreat2017"}, nil),
 }
 
+var pride = []plib.Item{
+	plib.NewBasicItem("pride shirt", []string{"PortlandPride"}, nil),
+}
+
 func init() {
 	plib.RegisterItems("Berlin2017", berlin2017)
 	plib.RegisterItems("Retreat2017", virtuality2017)
+	plib.RegisterProperty(plib.Property("PortlandPride"))
+	plib.RegisterItems("PortlandPride", pride)
 }

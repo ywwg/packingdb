@@ -43,6 +43,11 @@ func RegisterItems(category string, items []Item) {
 			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
 		}
 		dupeChecker[i.Name()] = true
+		for p := range i.Prerequisites() {
+			if _, ok := allProperties[p]; !ok {
+				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
+			}
+		}
 	}
 	if existing, ok := AllItems[category]; ok {
 		AllItems[category] = append(existing, items...)
@@ -122,12 +127,17 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 		Properties:     make(PropertySet),
 	}
 
+	RegisterProperty(Property(c.Name))
+	if err := c.AddProperty(c.Name); err != nil {
+		return nil, err
+	}
 	for _, p := range properties {
 		if err := c.AddProperty(p); err != nil {
 			return nil, err
 		}
 	}
 
+	RegisterContext(*c)
 	return c, nil
 }
 
@@ -138,7 +148,7 @@ func (c *Context) AddProperty(prop string) error {
 		return nil
 	}
 	if _, ok := allProperties[Property(prop)]; !ok {
-		return fmt.Errorf("didn't find property: %s", prop)
+		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
 	c.Properties[Property(prop)] = true
 	return nil
@@ -322,11 +332,11 @@ func (t *Trip) LoadFromFile(f string) error {
 					context, err = NewContext(toks[4], tmin, tmax, nil)
 				}
 				if err != nil {
-					panic(err.Error())
+					panic(fmt.Sprintf("Error while building context for trip: %s", err.Error()))
 				}
 				for _, prop := range toks[5:] {
 					if err := context.AddProperty(prop); err != nil {
-						panic(err.Error())
+						panic(fmt.Sprintf("Error adding property while building trip: %s", err.Error()))
 					}
 				}
 				loaded, err := NewTripFromCustomContext(nights, context)

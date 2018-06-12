@@ -34,6 +34,7 @@ var allProperties = PropertySet{
 	"Insecure":         true, // Don't bring valuables
 	"International":    true,
 	"Lodging":          true, // Paid lodging like a hotel or airbnb
+	"LongRide":         true, // biking a long distance
 	"Loud":             true,
 	"NoCheckedLuggage": true,
 	"NoFire":           true, // Used when there's camping, but no fire allowed at all
@@ -50,6 +51,7 @@ var allProperties = PropertySet{
 }
 
 // RegisterProperty adds a new Property to the database so it can be used.
+// Does not verify that all of the properties are in the allProperties map.
 func RegisterProperty(prop Property) {
 	// Don't worry if the property already exists.
 	allProperties[prop] = true
@@ -58,15 +60,9 @@ func RegisterProperty(prop Property) {
 func buildPropertySet(allow, disallow []string) PropertySet {
 	propSet := make(PropertySet)
 	for _, a := range allow {
-		if _, ok := allProperties[Property(a)]; !ok {
-			panic(fmt.Sprintf("Property not found in allProperties: %s", a))
-		}
 		propSet[Property(a)] = true
 	}
 	for _, d := range disallow {
-		if _, ok := allProperties[Property(d)]; !ok {
-			panic(fmt.Sprintf("Property not found in allProperties: %s", d))
-		}
 		if _, ok := propSet[Property(d)]; ok {
 			panic(fmt.Sprintf("Contradiction: Property already registered in allowed side: %s", d))
 		}
