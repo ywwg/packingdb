@@ -40,7 +40,10 @@ func main() {
 		if *flagNights == 0 {
 			panic("Need a number of nights")
 		}
-		t = packinglib.NewTrip(*flagNights, *flagContext)
+		t, err := packinglib.NewTrip(*flagNights, *flagContext)
+		if err != nil {
+			panic(err.Error())
+		}
 		for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 			fmt.Println(l)
 		}
@@ -48,6 +51,7 @@ func main() {
 	}
 
 	// File mode: load if the file already exists or create new if not
+	t = &packinglib.Trip{}
 	if _, err := os.Stat(*flagPackingFile); !os.IsNotExist(err) {
 		if len(*flagContext) != 0 {
 			fmt.Println("(Ignoring context when loading file)")
@@ -55,7 +59,6 @@ func main() {
 		if *flagNights != 0 {
 			fmt.Println("(Ignoring nights when loading file)")
 		}
-		t = &packinglib.Trip{}
 		if err2 := t.LoadFromFile(*flagPackingFile); err2 != nil {
 			panic(fmt.Sprintf("%v", err2))
 		}
@@ -66,7 +69,11 @@ func main() {
 		if *flagNights == 0 {
 			panic("Need a number of nights")
 		}
-		t = packinglib.NewTrip(*flagNights, *flagContext)
+		var err error
+		t, err = packinglib.NewTrip(*flagNights, *flagContext)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	if *flagPackItem != "" {

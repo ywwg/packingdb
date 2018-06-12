@@ -90,14 +90,54 @@ func RegisterContext(c Context) {
 }
 
 // GetContext returns the context of the given name, or panics if not found.
-func GetContext(name string) *Context {
+func GetContext(name string) (*Context, error) {
 	c := &Context{}
 	found, ok := contexts[name]
 	if !ok {
-		panic(fmt.Sprintf("Unknown context: %s", name))
+		return nil, fmt.Errorf("Unknown context: %s", name)
 	}
 	*c = found
-	return c
+	return c, nil
+}
+
+// GetContextWithTemperature loads the given context and substitutes the provided
+// temperature range.
+func GetContextWithTemperature(name string, tmin, tmax int) (*Context, error) {
+	c, err := GetContext(name)
+	if err != nil {
+		return nil, err
+	}
+	c.TemperatureMin = tmin
+	c.TemperatureMax = tmax
+	return c, nil
+}
+
+// NewContext creates a new context with the given name, temperature range, and properties.
+// Returns nil if any of the properties is unknown.  Properties are optional.
+func NewContext(name string, tmin, tmax int, properties []string) (*Context, error) {
+	c := &Context{
+		Name:           name,
+		TemperatureMin: tmin,
+		TemperatureMax: tmax,
+	}
+
+	for _, p := range properties {
+		if err := c.AddProperty(p); err != nil {
+			return nil, err
+		}
+	}
+
+	return c, nil
+}
+
+// AddProperty adds the property with the given name to the context, or returns
+// error if it's not found.
+func (c *Context) AddProperty(prop string) error {
+	if _, ok := allProperties[Property(prop)]; !ok {
+		return fmt.Errorf("didn't find property: %s", prop)
+	}
+	c.Properties[Property(prop)] = true
+	return nil
 }
 
 func getCode(idx int) string {
@@ -116,12 +156,13 @@ func getCode(idx int) string {
 	return code
 }
 
-// NewTrip returns a constructed trip for the given context and number of nights.
-func NewTrip(nights int, context string) *Trip {
+// NewTripFromCustomContext returns a constructed trip for the given
+// constructed context and number of nights.
+func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 	t := &Trip{
 		Nights:      nights,
-		C:           GetContext(context),
-		contextName: context,
+		C:           context,
+		contextName: context.Name,
 	}
 	t.packList = t.makeList()
 	t.codeToItem = make(map[string]Item)
@@ -140,7 +181,17 @@ func NewTrip(nights int, context string) *Trip {
 			idx++
 		}
 	}
-	return t
+	return t, nil
+}
+
+// NewTrip returns a constructed trip for the given named context and
+// number of nights.
+func NewTrip(nights int, cname string) (*Trip, error) {
+	c, err := GetContext(cname)
+	if err != nil {
+		return nil, err
+	}
+	return NewTripFromCustomContext(nights, c)
 }
 
 // MakeList returns a map of category to slice of PackedItems for the given trip
@@ -229,6 +280,13 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 }
 
 // LoadFromFile initializes the trip from the given file.
+// Old file format:
+// first line: number of nights, context name
+// following lines: true/false string, name of packed item
+//
+// New file format:
+// first line: "CUST", number of nights, tmin, tmax, context name, contexts...
+// if context_name is known, other contexts are added to it.
 func (t *Trip) LoadFromFile(f string) error {
 	dat, err := ioutil.ReadFile(f)
 	if err != nil {
@@ -237,14 +295,57 @@ func (t *Trip) LoadFromFile(f string) error {
 	buf := bytes.NewBuffer(dat)
 	scanner := bufio.NewScanner(buf)
 	for i := 0; scanner.Scan(); i++ {
-		toks := strings.SplitN(scanner.Text(), ",", 2)
 		if i == 0 {
-			nights, err := strconv.Atoi(toks[0])
-			if err != nil {
-				return err
+			toks := strings.Split(scanner.Text(), ",")
+			if toks[0] == "CUST" {
+				var err error
+				nights, err := strconv.Atoi(toks[1])
+				if err != nil {
+					return err
+				}
+				tmin, err := strconv.Atoi(toks[2])
+				if err != nil {
+					return err
+				}
+				tmax, err := strconv.Atoi(toks[3])
+				if err != nil {
+					return err
+				}
+				var context *Context
+				if _, ok := contexts[toks[4]]; ok {
+					context, err = GetContextWithTemperature(toks[4], tmin, tmax)
+				} else {
+					context, err = NewContext(toks[4], tmin, tmax, nil)
+				}
+				if err != nil {
+					panic(err.Error())
+				}
+				for _, prop := range toks[5:] {
+					if err := context.AddProperty(prop); err != nil {
+						panic(err.Error())
+					}
+				}
+				loaded, err := NewTripFromCustomContext(nights, context)
+				if err != nil {
+					panic(err.Error())
+				}
+				*t = *loaded
+			} else {
+				if len(toks) != 2 {
+					panic("Expected exactly two values in non-custom (old style) file")
+				}
+				nights, err := strconv.Atoi(toks[0])
+				if err != nil {
+					return err
+				}
+				loaded, err := NewTrip(nights, toks[1])
+				if err != nil {
+					panic(err.Error())
+				}
+				*t = *loaded
 			}
-			*t = *NewTrip(nights, toks[1])
 		} else {
+			toks := strings.SplitN(scanner.Text(), ",", 2)
 			if toks[0] == "true" {
 				t.Pack(toks[1])
 			}
