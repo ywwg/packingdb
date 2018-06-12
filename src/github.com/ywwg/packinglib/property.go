@@ -2,6 +2,7 @@ package packinglib
 
 import (
 	"fmt"
+	"sort"
 )
 
 // Property is a value describing a property the context has.  Sort of like boolean flags.
@@ -71,4 +72,14 @@ func buildPropertySet(allow, disallow []string) PropertySet {
 		propSet[Property(d)] = false
 	}
 	return propSet
+}
+
+// ListProperties returns all of the registered properties as a slice of strings.
+func ListProperties() []string {
+	var l []string
+	for k := range allProperties {
+		l = append(l, string(k))
+	}
+	sort.Strings(l)
+	return l
 }

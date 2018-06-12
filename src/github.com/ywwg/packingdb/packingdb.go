@@ -12,14 +12,15 @@ import (
 )
 
 var (
-	flagContext      = flag.String("context", "", "The context you want to load (not needed if packing file exists)")
-	flagNights       = flag.Int("nights", 0, "The number of nights for the trip (not needed if packing file exists)")
-	flagPackingFile  = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
-	flagCategory     = flag.String("category", "", "Only print out the given category.")
-	flagPackItem     = flag.String("pack", "", "The code of an item that has been packed (noop without packfile)")
-	flagPackCategory = flag.String("pack_category", "", "The name of an entire category that has been packed (noop without packfile)")
-	flagHidePacked   = flag.Bool("hide_packed", false, "Only show unpacked items")
-	flagListContexts = flag.Bool("list_contexts", false, "List the available contexts and exit")
+	flagContext        = flag.String("context", "", "The context you want to load (not needed if packing file exists)")
+	flagNights         = flag.Int("nights", 0, "The number of nights for the trip (not needed if packing file exists)")
+	flagPackingFile    = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
+	flagCategory       = flag.String("category", "", "Only print out the given category.")
+	flagPackItem       = flag.String("pack", "", "The code of an item that has been packed (noop without packfile)")
+	flagPackCategory   = flag.String("pack_category", "", "The name of an entire category that has been packed (noop without packfile)")
+	flagHidePacked     = flag.Bool("hide_packed", false, "Only show unpacked items")
+	flagListContexts   = flag.Bool("list_contexts", false, "List the available contexts and exit")
+	flagListProperties = flag.Bool("list_properties", false, "List the available properties and exit")
 )
 
 func main() {
@@ -30,6 +31,13 @@ func main() {
 		for _, c := range packinglib.ContextList() {
 			fmt.Println(c)
 		}
+		return
+	}
+	if *flagListProperties {
+		for _, p := range packinglib.ListProperties() {
+			fmt.Println(p)
+		}
+		return
 	}
 
 	// Simple mode: just print the list.
