@@ -7,6 +7,8 @@ import (
 var bicycling = []plib.Item{
 	plib.NewBasicItem("bike", []string{"Cycling"}, nil),
 	plib.NewBasicItem("helmet", []string{"Cycling"}, nil),
+	plib.NewBasicItem("bike jersey", []string{"Cycling"}, nil),
+	plib.NewBasicItem("bike shorts", []string{"Cycling"}, nil),
 	plib.NewBasicItem("bike shoes", []string{"Cycling"}, nil),
 	plib.NewBasicItem("bike socks", []string{"Cycling"}, nil),
 	plib.NewBasicItem("water bottles", []string{"Cycling"}, nil),
