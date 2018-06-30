@@ -250,11 +250,18 @@ func (t *Trip) Pack(i string) {
 
 // PackCategory packs the entire category.
 func (t *Trip) PackCategory(cat string) {
-	if items, ok := t.packList[cat]; ok {
-		for _, i := range items {
-			i.Pack()
+	found := false
+	for packCat := range t.packList {
+		if strings.ToLower(cat) == strings.ToLower(packCat) {
+			found = true
+			for _, i := range t.packList[packCat] {
+				i.Pack()
+			}
+			break
 		}
-	} else {
+	}
+
+	if !found {
 		panic(fmt.Sprintf("tried to pack nonexistant category: %s", cat))
 	}
 }
