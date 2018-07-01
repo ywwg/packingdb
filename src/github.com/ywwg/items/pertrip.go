@@ -17,6 +17,11 @@ var berlin2017 = []plib.Item{
 // 	plib.NewBasicItem("canned beer", []string{"Retreat2017"}, nil),
 // }
 
+var firefly2018 = []plib.Item{
+	plib.NewBasicItem("Spreadsheet items", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("2 5gal water", []string{"Firefly2018"}, nil),
+}
+
 var pride = []plib.Item{
 	plib.NewBasicItem("pride shirt", []string{"PortlandPride"}, nil),
 }
@@ -24,6 +29,7 @@ var pride = []plib.Item{
 func init() {
 	plib.RegisterItems("Berlin2017", berlin2017)
 	// plib.RegisterItems("Retreat2017", virtuality2017)
+	plib.RegisterItems("Firefly2018", firefly2018)
 	plib.RegisterProperty(plib.Property("PortlandPride"))
 	plib.RegisterItems("PortlandPride", pride)
 }
