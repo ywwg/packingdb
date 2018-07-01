@@ -36,10 +36,11 @@ var allProperties = PropertySet{
 	"Lodging":          true, // Paid lodging like a hotel or airbnb
 	"LongRide":         true, // biking a long distance
 	"Loud":             true,
+	"Nevermore":        true,
 	"NoCheckedLuggage": true,
 	"NoFire":           true, // Used when there's camping, but no fire allowed at all
 	"PaidEvent":        true,
-	"Partial":          true,
+	"Suiting":          true,
 	"Partying":         true,
 	"Sweat":            true, // are you gonna sweat up the car?
 	"Swimming":         true,

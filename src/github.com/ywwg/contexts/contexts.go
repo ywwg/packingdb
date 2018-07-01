@@ -6,19 +6,24 @@ import (
 
 var fireflyContext = plib.Context{
 	Name:           "Firefly",
-	TemperatureMin: 52,
-	TemperatureMax: 80,
+	TemperatureMin: 55,
+	TemperatureMax: 95,
 	Properties: plib.PropertySet{
-		"Dirt":        true,
-		"Loud":        true,
-		"Bright":      true,
-		"Sweat":       true,
-		"Camping":     true,
-		"Dark":        true,
-		"Burn":        true,
-		"Performing":  true,
-		"Partying":    true,
-		"Firefly2017": true,
+		"Dirt":         true,
+		"Loud":         true,
+		"Bright":       true,
+		"Sweat":        true,
+		"Camping":      true,
+		"GrumpCamping": true,
+		"Dark":         true,
+		"Burn":         true,
+		"Performing":   true,
+		"Modular":      true,
+		"DJing":        true,
+		"Partying":     true,
+		"Firefly2018":  true,
+		"Suiting":      true,
+		"Swimming":     true,
 	},
 }
 
@@ -201,6 +206,9 @@ func init() {
 	firefly2017 := fireflyContext
 	firefly2017.Name = "Firefly2017"
 
+	firefly2018 := fireflyContext
+	firefly2018.Name = "Firefly2018"
+
 	// retreat2017 := capeContext
 	// retreat2017.Name = "Retreat2017"
 	// retreat2017.Properties["Retreat2017"] = true
@@ -217,6 +225,7 @@ func init() {
 
 	plib.RegisterContext(fireflyContext)
 	plib.RegisterContext(firefly2017)
+	plib.RegisterContext(firefly2018)
 	plib.RegisterContext(capeContext)
 	// plib.RegisterContext(retreat2017)
 	plib.RegisterContext(berlin)
