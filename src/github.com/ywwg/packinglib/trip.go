@@ -226,10 +226,10 @@ func (t *Trip) makeList() PackList {
 }
 
 // Pack tries to pack the provided item first by short code, then by full name.
-func (t *Trip) Pack(i string) {
+func (t *Trip) Pack(i string, pack bool) {
 	// First try to pack by code
 	if item, ok := t.codeToItem[i]; ok {
-		item.Pack()
+		item.Pack(pack)
 		return
 	}
 
@@ -238,7 +238,7 @@ func (t *Trip) Pack(i string) {
 	for _, items := range t.packList {
 		for _, item := range items {
 			if strings.ToLower(item.Name()) == strings.ToLower(i) {
-				item.Pack()
+				item.Pack(pack)
 				found = true
 			}
 		}
@@ -255,7 +255,7 @@ func (t *Trip) PackCategory(cat string) {
 		if strings.ToLower(cat) == strings.ToLower(packCat) {
 			found = true
 			for _, i := range t.packList[packCat] {
-				i.Pack()
+				i.Pack(true)
 			}
 			break
 		}
@@ -368,7 +368,7 @@ func (t *Trip) LoadFromFile(f string) error {
 		} else {
 			toks := strings.SplitN(scanner.Text(), ",", 2)
 			if toks[0] == "true" {
-				t.Pack(toks[1])
+				t.Pack(toks[1], true)
 			}
 		}
 	}

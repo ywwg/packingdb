@@ -20,6 +20,7 @@ var (
 	flagPackingFile    = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
 	flagCategory       = flag.String("category", "", "Only print out the given category.")
 	flagPackItem       = flag.String("pack", "", "The code of an item that has been packed (noop without packfile)")
+	flagUnpackItem     = flag.String("unpack", "", "The code of an item that has not been packed (noop without packfile)")
 	flagPackCategory   = flag.String("pack_category", "", "The name of an entire category that has been packed (noop without packfile)")
 	flagHidePacked     = flag.Bool("hide_packed", false, "Only show unpacked items")
 	flagListContexts   = flag.Bool("list_contexts", false, "List the available contexts and exit")
@@ -113,7 +114,10 @@ func main() {
 	}
 
 	if *flagPackItem != "" {
-		t.Pack(*flagPackItem)
+		t.Pack(*flagPackItem, true)
+	}
+	if *flagUnpackItem != "" {
+		t.Pack(*flagUnpackItem, false)
 	}
 	if *flagPackCategory != "" {
 		t.PackCategory(*flagPackCategory)

@@ -25,8 +25,8 @@ type Item interface {
 	// String prints out a string representation of the packed item(s)
 	String() string
 
-	// Pack set the packed value to true
-	Pack()
+	// Pack set the packed value to whatever is passed in
+	Pack(bool)
 
 	// Packed returns true if the item has been packed
 	Packed() bool
@@ -117,8 +117,8 @@ func (i *BasicItem) String() string {
 }
 
 // Pack logs the item as packed.
-func (i *BasicItem) Pack() {
-	i.packed = true
+func (i *BasicItem) Pack(p bool) {
+	i.packed = p
 }
 
 // Packed returns true if the item has been packed
@@ -335,8 +335,8 @@ func (i *ConsumableTemperatureItem) Packed() bool {
 }
 
 // Pack logs the item as packed.
-func (i *ConsumableTemperatureItem) Pack() {
-	i.ConsumableItem.Pack()
+func (i *ConsumableTemperatureItem) Pack(p bool) {
+	i.ConsumableItem.Pack(p)
 }
 
 // Prerequisites returns the PropertySet of prereqs for this item
@@ -400,6 +400,6 @@ func (i *ConsumableMaxTemperatureItem) Packed() bool {
 }
 
 // Pack logs the item as packed.
-func (i *ConsumableMaxTemperatureItem) Pack() {
-	i.ConsumableMaxItem.Pack()
+func (i *ConsumableMaxTemperatureItem) Pack(p bool) {
+	i.ConsumableMaxItem.Pack(p)
 }
