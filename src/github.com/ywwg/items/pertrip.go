@@ -20,6 +20,16 @@ var berlin2017 = []plib.Item{
 var firefly2018 = []plib.Item{
 	plib.NewBasicItem("Spreadsheet items", []string{"Firefly2018"}, nil),
 	plib.NewBasicItem("2 5gal water", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("2 doz eggs", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("3 pkgs jackfruit", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("2 cans refried beans", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("tupperware cut peppers", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("1 pkg cheese", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("1 jar jalapenos", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("2 bottle hot sauce", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("2 jar salsa", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("corn tortillas", []string{"Firefly2018"}, nil),
+	plib.NewBasicItem("flour tortillas", []string{"Firefly2018"}, nil),
 }
 
 var pride = []plib.Item{

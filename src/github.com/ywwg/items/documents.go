@@ -11,6 +11,7 @@ var documents = []plib.Item{
 	plib.NewBasicItem("Global Entry Card", []string{"Flight"}, nil),
 	plib.NewBasicItem("Event Ticket", []string{"PaidEvent"}, nil),
 	plib.NewBasicItem("Print Wiki", []string{"Big Trip"}, nil),
+	plib.NewBasicItem("Waiver", []string{"Burn"}, nil),
 }
 
 func init() {
