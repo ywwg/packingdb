@@ -167,6 +167,13 @@ var daytrip = plib.Context{
 	},
 }
 
+var blanktrip = plib.Context{
+	Name:           "blanktrip",
+	TemperatureMin: 0,
+	TemperatureMax: 120,
+	Properties:     plib.PropertySet{},
+}
+
 var florida = plib.Context{
 	Name:           "Florida",
 	TemperatureMin: 64,
@@ -238,6 +245,7 @@ func init() {
 	plib.RegisterContext(nectr2017)
 	plib.RegisterContext(paxUnpluggedContext)
 	plib.RegisterContext(daytrip)
+	plib.RegisterContext(blanktrip)
 	plib.RegisterContext(florida)
 	plib.RegisterContext(con)
 }

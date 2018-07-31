@@ -17,7 +17,7 @@ var tasks = []plib.Item{
 	plib.NewBasicItem("travel alerts", []string{"Big Trip"}, nil),
 	plib.NewBasicItem("intl data", []string{"International"}, nil),
 	plib.NewBasicItem("sync music", nil, nil),
-	plib.NewBasicItem("thermostat on hold", nil, nil)
+	plib.NewBasicItem("thermostat on hold", nil, nil),
 }
 
 func init() {
