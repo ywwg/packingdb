@@ -18,7 +18,7 @@ type PropertySet map[Property]bool
 var allProperties = PropertySet{
 	"Art":              true, // gonna do some drawing
 	"Big Trip":         true, // this is a big deal
-	"Bright":           true, // sun!
+	"Bright":           true, // sun, and therefore sunscreen.
 	"Burn":             true,
 	"Camping":          true,
 	"Climbing":         true,
@@ -41,6 +41,7 @@ var allProperties = PropertySet{
 	"NoCheckedLuggage": true,
 	"NoFire":           true, // Used when there's camping, but no fire allowed at all
 	"PaidEvent":        true,
+	"Speaker":          true, // Need to play some music
 	"Suiting":          true,
 	"Partying":         true,
 	"Sweat":            true, // are you gonna sweat up the car?

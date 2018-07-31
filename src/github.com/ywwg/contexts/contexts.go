@@ -41,6 +41,7 @@ var nectrContext = plib.Context{
 		"Burn":         true,
 		"Performing":   true,
 		"Partying":     true,
+		"Speaker":      true,
 		"GrumpCamping": true,
 	},
 }
@@ -87,6 +88,7 @@ var tinyhouseSummer = plib.Context{
 		"Tiny House":    true,
 		"Dark":          true,
 		"Art":           true,
+		"Speaker":       true,
 	},
 }
 
@@ -100,6 +102,7 @@ var tinyhouseFall = plib.Context{
 		"HasToiletries": true,
 		"Handy":         true,
 		"Tiny House":    true,
+		"Speaker":       true,
 	},
 }
 
@@ -112,6 +115,7 @@ var tinyhouseWinter = plib.Context{
 		"HasToiletries": true,
 		"Handy":         true,
 		"Tiny House":    true,
+		"Speaker":       true,
 	},
 }
 
@@ -130,6 +134,7 @@ var sustainRelease = plib.Context{
 		"Insecure":  true,
 		"Swimming":  true,
 		"PaidEvent": true,
+		"Speaker":   true,
 	},
 }
 
@@ -206,6 +211,7 @@ var conContext = plib.Context{
 		"Formal":     true,
 		"Art":        true,
 		"Drinking":   true,
+		"Speaker":    true,
 	},
 }
 
