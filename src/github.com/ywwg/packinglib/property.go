@@ -20,6 +20,7 @@ var allProperties = PropertySet{
 	"Big Trip":         true, // this is a big deal
 	"Bright":           true, // sun, and therefore sunscreen.
 	"Burn":             true,
+	"Business":         true, // some work happening.
 	"Camping":          true,
 	"Climbing":         true,
 	"Cycling":          true,
