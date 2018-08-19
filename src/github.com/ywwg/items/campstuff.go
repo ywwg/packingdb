@@ -12,7 +12,7 @@ var campStuff = []plib.Item{
 	plib.NewTemperatureItem("wool blanket", 0, 44, []string{"Camping"}, nil),
 	plib.NewBasicItem("2 pillow cases", []string{"Camping"}, nil),
 	plib.NewBasicItem("tent light", []string{"Camping"}, nil),
-	plib.NewBasicItem("headlamp", []string{"Dark"}, []string{"Tiny House"}),
+	plib.NewBasicItem("headlamp", []string{"Dark", nil),
 	plib.NewBasicItem("towel for butt driving home", []string{"Burn"}, nil),
 	plib.NewBasicItem("tarps", []string{"Burn"}, nil),
 	plib.NewBasicItem("pool pole", []string{"Burn"}, nil),
