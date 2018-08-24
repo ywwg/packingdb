@@ -42,6 +42,7 @@ var allProperties = PropertySet{
 	"NoCheckedLuggage": true,
 	"NoFire":           true, // Used when there's camping, but no fire allowed at all
 	"PaidEvent":        true,
+	"PaidTravel":       true, // Paying to travel (Flight, rail, bus, etc)
 	"Speaker":          true, // Need to play some music
 	"Suiting":          true,
 	"Partying":         true,
