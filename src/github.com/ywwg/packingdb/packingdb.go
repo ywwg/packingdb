@@ -21,13 +21,13 @@ var (
 	flagCategory       = flag.String("category", "", "Only print out the given category.")
 	flagPackItem       = flag.String("pack", "", "The code of an item that has been packed (noop without packfile)")
 	flagUnpackItem     = flag.String("unpack", "", "The code of an item that has not been packed (noop without packfile)")
-	flagPackCategory   = flag.String("pack_category", "", "The name of an entire category that has been packed (noop without packfile)")
+	flagPackCategory   = flag.String("pack-category", "", "The name of an entire category that has been packed (noop without packfile)")
 	flagHidePacked     = flag.Bool("hide-packed", false, "Only show unpacked items")
 	flagListContexts   = flag.Bool("list-contexts", false, "List the available contexts and exit")
 	flagListProperties = flag.Bool("list-properties", false, "List the available properties and exit")
 	flagTempMin        = flag.Int("temp-min", math.MinInt64, "Set min temperature bound")
 	flagTempMax        = flag.Int("temp-max", math.MaxInt64, "Set max temperature bound")
-	flagAddProperty    = flag.String("add_property", "", "Add this property to the context")
+	flagAddProperty    = flag.String("add-property", "", "Add this property to the context")
 )
 
 func main() {
