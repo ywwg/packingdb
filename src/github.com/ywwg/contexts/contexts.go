@@ -215,6 +215,29 @@ var conContext = plib.Context{
 	},
 }
 
+var japan = plib.Context{
+	Name:           "Japan",
+	TemperatureMin: 63,
+	TemperatureMax: 80,
+	Properties: plib.PropertySet{
+		"Big Trip":      true,
+		"Bright":        true,
+		"Business":      true,
+		"Fancy":         true,
+		"Flight":        true,
+		"HasToiletries": true,
+		"International": true,
+		"Japan2018":     true,
+		"Lodging":       true,
+		"Loud":          true,
+		"PaidEvent":     true,
+		"PaidTravel":    true,
+		"Swimming":      true,
+		"Partying":      true,
+		"Sweat":         true,
+	},
+}
+
 func init() {
 	firefly2017 := fireflyContext
 	firefly2017.Name = "Firefly2017"
@@ -236,6 +259,9 @@ func init() {
 
 	con := conContext
 
+	japan2018 := japan
+	japan2018.Name = "Japan2018"
+
 	plib.RegisterContext(fireflyContext)
 	plib.RegisterContext(firefly2017)
 	plib.RegisterContext(firefly2018)
@@ -254,4 +280,6 @@ func init() {
 	plib.RegisterContext(blanktrip)
 	plib.RegisterContext(florida)
 	plib.RegisterContext(con)
+	plib.RegisterContext(japan)
+	plib.RegisterContext(japan2018)
 }

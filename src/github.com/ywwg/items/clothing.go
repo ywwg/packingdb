@@ -19,10 +19,9 @@ var clothing = []plib.Item{
 	plib.NewConsumableMaxItem("work jeans", 0.2, 2.0, "pair", []string{"Dirt"}, []string{"Burn"}),
 	plib.NewConsumableTemperatureItem("shorts", 0.3, "pair", 70, 120, nil, []string{"Burn"}),
 	plib.NewConsumableTemperatureItem("jeans", 0.1, "pair", 0, 70, nil, nil),
-	plib.NewTemperatureItem("casual belt", 0, 70, nil, nil),
-	plib.NewTemperatureItem("fabric belt", 70, 120, nil, nil),
+	plib.NewBasicItem("belt", nil, nil),
 	plib.NewBasicItem("pristine shirt for drive home", []string{"Burn"}, nil),
-	plib.NewConsumableItem("convertapants", 0.5, "pair", []string{"Dirt"}, nil),
+	plib.NewConsumableMaxItem("convertapants", 0.5, 2.0, "pair", []string{"Dirt"}, nil),
 	plib.NewConsumableTemperatureItem("sweater", 0.5, plib.NoUnits, 0, 50, nil, nil),
 	plib.NewConsumableTemperatureItem("undershirt", 0.5, plib.NoUnits, 0, 50, nil, nil),
 	plib.NewConsumableTemperatureItem("long underwear", 0.25, "pair", 0, 45, []string{"Camping"}, nil),
@@ -36,13 +35,13 @@ var clothing = []plib.Item{
 	plib.NewBasicItem("REALLY fun outfits", []string{"Berlin2017"}, nil),
 	plib.NewBasicItem("shirt for flight", []string{"Flight"}, nil),
 	plib.NewBasicItem("kigarumi", []string{"Burn"}, []string{"Firefly2017"}),
-	plib.NewConsumableTemperatureItem("sweaty shirts", 0.5, plib.NoUnits, 65, 120, []string{"Dirt", "Handy"}, nil),
+	plib.NewConsumableMaxTemperatureItem("sweaty shirts", 0.5, 3.0, plib.NoUnits, 65, 120, []string{"Dirt", "Handy"}, nil),
 	plib.NewTemperatureItem("light jacket", 51, 60, nil, nil),
 	plib.NewTemperatureItem("medium jacket", 41, 50, nil, nil),
 	plib.NewTemperatureItem("heavy jacket", 0, 40, nil, nil),
 	plib.NewBasicItem("rain jacket", nil, nil),
-	plib.NewTemperatureItem("warm hat", 0, 40, nil, nil),
-	plib.NewTemperatureItem("gloves", 0, 40, nil, nil),
+	plib.NewTemperatureItem("warm hat", 0, 55, nil, nil),
+	plib.NewTemperatureItem("gloves", 0, 55, nil, nil),
 	plib.NewBasicItem("sleep earplugs", nil, nil),
 	plib.NewBasicItem("eye mask", nil, nil),
 	plib.NewTemperatureItem("tevas", 70, 120, nil, []string{"International"}),
@@ -57,7 +56,14 @@ var clothing = []plib.Item{
 	plib.NewConsumableItem("ties", 0.5, plib.NoUnits, []string{"Formal"}, nil),
 }
 
+var flightSupplies = []plib.Item{
+	plib.NewBasicItem("turtl pillow", []string{"International"}, nil),
+	plib.NewBasicItem("foot sling", []string{"International"}, nil),
+	plib.NewBasicItem("compression socks in carryon", []string{"International"}, nil),
+}
+
 func init() {
 	plib.RegisterProperty("Berlin2017")
 	plib.RegisterItems("Clothing", clothing)
+	plib.RegisterItems("Flight Stuff", flightSupplies)
 }
