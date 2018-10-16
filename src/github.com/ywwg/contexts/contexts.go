@@ -166,9 +166,8 @@ var daytrip = plib.Context{
 	TemperatureMin: 25,
 	TemperatureMax: 55,
 	Properties: plib.PropertySet{
-		"Lodging":   true,
-		"PaidEvent": true,
-		"Loud":      true,
+		"Lodging": true,
+		"Loud":    true,
 	},
 }
 
