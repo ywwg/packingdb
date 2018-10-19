@@ -17,31 +17,30 @@ type PropertySet map[Property]bool
 
 var allProperties = PropertySet{
 	"Art":              true, // gonna do some drawing
-	"Big Trip":         true, // this is a big deal
+	"BigTrip":          true, // this is a big deal
 	"Bright":           true, // sun, and therefore sunscreen.
 	"Burn":             true,
 	"Business":         true, // some work happening.
+	"BYOB":             true, // need to pack some booze
 	"Camping":          true,
 	"Climbing":         true,
-	"Cycling":          true,
+	"Cycling":          true, // moderate amount of biking
+	"CyclingLongRide":  true, // biking a long distance
 	"Dark":             true, // mostly for camping, but anytime you'll be wandering in the dark
 	"Dirt":             true, // are you going to get dirty?
-	"Drinking":         true, // need to pack some booze
-	"Fancy":            true,
+	"DiningOut":        true,
 	"Flight":           true,
-	"Formal":           true, // do you need to *really* dress up?
-	"GrumpCamping":     true,
+	"GrumpCamping":     true, // A special type of burn
 	"Handy":            true, // need tools?
 	"HasToiletries":    true,
 	"Insecure":         true, // Don't bring valuables
 	"International":    true,
 	"Lodging":          true, // Paid lodging like a hotel or airbnb
-	"LongRide":         true, // biking a long distance
 	"Loud":             true,
 	"Nevermore":        true,
 	"NoCheckedLuggage": true,
 	"NoFire":           true, // Used when there's camping, but no fire allowed at all
-	"PaidEvent":        true,
+	"PaidEvent":        true, // Concerts, shows, cons, etc
 	"PaidTravel":       true, // Paying to travel (Flight, rail, bus, etc)
 	"Speaker":          true, // Need to play some music
 	"Suiting":          true,
@@ -49,6 +48,7 @@ var allProperties = PropertySet{
 	"Sweat":            true, // are you gonna sweat up the car?
 	"Swimming":         true,
 	"Tiny House":       true,
+	"UltraFormal":      true, // do you need to *really* dress up?
 	// "Performing" for all music, and then add the specific ones
 	"Performing": true,
 	"Modular":    true,

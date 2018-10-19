@@ -45,21 +45,21 @@ var clothing = []plib.Item{
 	plib.NewBasicItem("sleep earplugs", nil, nil),
 	plib.NewBasicItem("eye mask", nil, nil),
 	plib.NewTemperatureItem("tevas", 70, 120, nil, []string{"International"}),
-	plib.NewBasicItem("nice dinner clothes", []string{"Fancy"}, nil),
+	plib.NewBasicItem("nice dinner clothes", []string{"DiningOut"}, nil),
 	plib.NewBasicItem("watch", nil, nil),
 	plib.NewBasicItem("purse", nil, []string{"Burn", "Camping"}),
 	plib.NewBasicItem("mini wallet", nil, []string{"Burn", "Camping"}),
 
-	plib.NewBasicItem("three piece suit", []string{"Formal"}, nil),
-	plib.NewBasicItem("thin belt", []string{"Formal"}, nil),
-	plib.NewConsumableItem("suit shirts", 0.5, plib.NoUnits, []string{"Formal"}, nil),
-	plib.NewConsumableItem("ties", 0.5, plib.NoUnits, []string{"Formal"}, nil),
+	plib.NewBasicItem("three piece suit", []string{"UltraFormal"}, nil),
+	plib.NewBasicItem("thin belt", []string{"UltraFormal"}, nil),
+	plib.NewConsumableItem("suit shirts", 0.5, plib.NoUnits, []string{"UltraFormal"}, nil),
+	plib.NewConsumableItem("ties", 0.5, plib.NoUnits, []string{"UltraFormal"}, nil),
 }
 
 var flightSupplies = []plib.Item{
-	plib.NewBasicItem("turtl pillow", []string{"International"}, nil),
+	plib.NewBasicItem("turtl pillow", []string{"Flight"}, nil),
 	plib.NewBasicItem("foot sling", []string{"International"}, nil),
-	plib.NewBasicItem("compression socks in carryon", []string{"International"}, nil),
+	plib.NewBasicItem("compression socks in carryon", []string{"Flight"}, nil),
 }
 
 func init() {

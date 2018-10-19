@@ -14,7 +14,7 @@ var tasks = []plib.Item{
 	plib.NewBasicItem("fix nevermore sign", []string{"Firefly2017"}, nil),
 	plib.NewBasicItem("fill camelbak", []string{"Camping"}, nil),
 	plib.NewBasicItem("check calendar TODO", []string{"Tiny House"}, nil),
-	plib.NewBasicItem("travel alerts", []string{"Big Trip"}, nil),
+	plib.NewBasicItem("CC travel alerts", []string{"BigTrip"}, nil),
 	plib.NewBasicItem("intl data", []string{"International"}, nil),
 	plib.NewBasicItem("sync music", nil, nil),
 	plib.NewBasicItem("thermostat on hold", nil, nil),

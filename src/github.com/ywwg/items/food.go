@@ -5,9 +5,9 @@ import (
 )
 
 var food = []plib.Item{
-	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn", "Drinking"}, nil),
-	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn", "Drinking"}, nil),
-	plib.NewConsumableItem("drinking water", 0.5, "gallons", []string{"Burn"}, nil),
+	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn", "BYOB"}, nil),
+	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn", "BYOB"}, nil),
+	plib.NewConsumableItem("Drinking water", 0.5, "gallons", []string{"Burn"}, nil),
 	// Burns use a camelbak
 	plib.NewBasicItem("water bottle", nil, []string{"Burn"}),
 	plib.NewConsumableItem("cooking water", 0.25, "gallons", []string{"Burn"}, nil),

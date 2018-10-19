@@ -10,9 +10,9 @@ var documents = []plib.Item{
 	plib.NewBasicItem("Passport", []string{"International"}, nil),
 	plib.NewBasicItem("Global Entry Card", []string{"Flight"}, nil),
 	plib.NewBasicItem("Event Ticket", []string{"PaidEvent"}, nil),
-	plib.NewBasicItem("Print Wiki", []string{"Big Trip"}, nil),
+	plib.NewBasicItem("Print Wiki", []string{"BigTrip"}, nil),
 	plib.NewBasicItem("Waiver", []string{"Burn"}, nil),
-	plib.NewBasicItem("Transporation Tickets", []string{"PaidTravel"}, nil),
+	plib.NewBasicItem("Transporation Tickets", []string{"PaidTravel", "Flight"}, nil),
 }
 
 func init() {
