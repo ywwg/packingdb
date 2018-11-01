@@ -25,8 +25,8 @@ var (
 	flagHidePacked     = flag.Bool("hide-packed", false, "Only show unpacked items")
 	flagListContexts   = flag.Bool("list-contexts", false, "List the available contexts and exit")
 	flagListProperties = flag.Bool("list-properties", false, "List the available properties and exit")
-	flagTempMin        = flag.Int("temp-min", math.MinInt64, "Set min temperature bound")
-	flagTempMax        = flag.Int("temp-max", math.MaxInt64, "Set max temperature bound")
+	flagMinTemp        = flag.Int("min-temp", math.MinInt64, "Set min temperature bound")
+	flagMaxTemp        = flag.Int("max-temp", math.MaxInt64, "Set max temperature bound")
 	flagAddProperty    = flag.String("add-property", "", "Add this property to the context")
 )
 
@@ -99,11 +99,11 @@ func main() {
 		}
 	}
 
-	if *flagTempMin != math.MinInt64 {
-		t.C.TemperatureMin = *flagTempMin
+	if *flagMinTemp != math.MinInt64 {
+		t.C.TemperatureMin = *flagMinTemp
 	}
-	if *flagTempMax != math.MaxInt64 {
-		t.C.TemperatureMax = *flagTempMax
+	if *flagMaxTemp != math.MaxInt64 {
+		t.C.TemperatureMax = *flagMaxTemp
 	}
 	if *flagAddProperty != "" {
 		for _, prop := range strings.Split(*flagAddProperty, ",") {
