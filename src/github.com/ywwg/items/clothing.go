@@ -34,7 +34,7 @@ var clothing = []plib.Item{
 	plib.NewConsumableMaxItem("fun outfits", 0.75, 3.0, plib.NoUnits, []string{"Partying"}, nil),
 	plib.NewBasicItem("REALLY fun outfits", []string{"Berlin2017"}, nil),
 	plib.NewBasicItem("shirt for flight", []string{"Flight"}, nil),
-	plib.NewBasicItem("kigarumi", []string{"Burn"}, []string{"Firefly2017"}),
+	plib.NewBasicItem("kigarumi", []string{"Burn", "Con"}, []string{"Firefly2017"}),
 	plib.NewConsumableMaxTemperatureItem("sweaty shirts", 0.5, 3.0, plib.NoUnits, 65, 120, []string{"Dirt", "Handy"}, nil),
 	plib.NewTemperatureItem("light jacket", 51, 60, nil, nil),
 	plib.NewTemperatureItem("medium jacket", 41, 50, nil, nil),

@@ -9,6 +9,7 @@ var art = []plib.Item{
 	plib.NewBasicItem("pencil box", []string{"Art"}, nil),
 	plib.NewBasicItem("references", []string{"Art"}, nil),
 	plib.NewBasicItem("ipad", []string{"Art"}, nil),
+	plib.NewBasicItem("apple pencil coupler", []string{"Art"}, nil),
 	plib.NewBasicItem("ipad cable", []string{"Art"}, nil),
 }
 
