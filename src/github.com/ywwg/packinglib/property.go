@@ -23,6 +23,7 @@ var allProperties = PropertySet{
 	"Business":         true, // some work happening.
 	"BYOB":             true, // need to pack some booze
 	"Camping":          true,
+	"Con":              true, // convention of any sort
 	"Climbing":         true,
 	"Cycling":          true, // moderate amount of biking
 	"CyclingLongRide":  true, // biking a long distance
@@ -45,6 +46,7 @@ var allProperties = PropertySet{
 	"Speaker":          true, // Need to play some music
 	"Suiting":          true,
 	"Partying":         true,
+	"Snow":             true,
 	"Sweat":            true, // are you gonna sweat up the car?
 	"Swimming":         true,
 	"Tiny House":       true,

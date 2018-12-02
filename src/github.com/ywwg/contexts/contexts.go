@@ -156,8 +156,11 @@ var paxUnpluggedContext = plib.Context{
 	TemperatureMin: 35,
 	TemperatureMax: 56,
 	Properties: plib.PropertySet{
-		"Lodging":   true,
-		"PaidEvent": true,
+		"Con":           true,
+		"Lodging":       true,
+		"PaidEvent":     true,
+		"PaidTravel":    true,
+		"HasToiletries": true,
 	},
 }
 
@@ -193,11 +196,12 @@ var florida = plib.Context{
 	},
 }
 
-var conContext = plib.Context{
-	Name:           "Con",
+var fanconContext = plib.Context{
+	Name:           "fancon",
 	TemperatureMin: 43,
 	TemperatureMax: 60,
 	Properties: plib.PropertySet{
+		"Con":        true,
 		"Bright":     true,
 		"Partying":   true,
 		"Loud":       true,
@@ -278,7 +282,7 @@ func init() {
 	plib.RegisterContext(daytrip)
 	plib.RegisterContext(blanktrip)
 	plib.RegisterContext(florida)
-	plib.RegisterContext(con)
+	plib.RegisterContext(fancon)
 	plib.RegisterContext(japan)
 	plib.RegisterContext(japan2018)
 }
