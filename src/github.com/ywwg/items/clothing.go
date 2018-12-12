@@ -23,7 +23,7 @@ var clothing = []plib.Item{
 	plib.NewConsumableMaxItem("convertapants", 0.5, 2.0, "pair", []string{"Dirt"}, nil),
 	plib.NewConsumableTemperatureItem("sweater", 0.5, plib.NoUnits, 0, 55, nil, nil),
 	plib.NewConsumableTemperatureItem("undershirt", 0.5, plib.NoUnits, 0, 50, nil, nil),
-	plib.NewConsumableTemperatureItem("long underwear", 0.25, "pair", 0, 45, []string{"Camping"}, nil),
+	plib.NewConsumableTemperatureItem("long underwear", 0.25, "pair", 0, 45, []string{"Camping", "Tiny House"}, nil),
 	plib.NewConsumableTemperatureItem("thick slipper socks", 0.25, plib.NoUnits, 0, 50, nil, nil),
 	plib.NewConsumableMaxTemperatureItem("tshirts", 0.75, 4.0, plib.NoUnits, 40, 120, nil, nil),
 	plib.NewTemperatureItem("longsleeves for under tshirt", 40, 60, nil, nil),

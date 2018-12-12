@@ -210,7 +210,6 @@ var fanconContext = plib.Context{
 		"Lodging":    true,
 		"Performing": true,
 		"DJing":      true,
-		"Con":        true,
 		"Art":        true,
 		"BYOB":       true,
 		"Speaker":    true,
@@ -260,7 +259,7 @@ func init() {
 	nectr2017 := nectrContext
 	nectr2017.Name = "Nectr2017"
 
-	con := conContext
+	fancon := fanconContext
 
 	japan2018 := japan
 	japan2018.Name = "Japan2018"
