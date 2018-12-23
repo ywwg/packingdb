@@ -13,6 +13,12 @@ variable to point to the root of this repository.
 export GOPATH="$(pwd)"
 ```
 
+You'll need the promptui module: (TODO: make this versioned!)
+
+```shell
+go get -v github.com/manifoldco/promptui
+```
+
 Then, you should be able to build and run the program:
 
 ```shell
