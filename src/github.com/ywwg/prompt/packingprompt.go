@@ -99,6 +99,10 @@ func packMenu(t *packinglib.Trip) error {
 			if err := t.ToggleCategoryVisibility(selected.Code); err != nil {
 				panic(err)
 			}
+		} else if selected.Type == packinglib.MenuPackable {
+			if err := t.ToggleItemPacked(selected.Code); err != nil {
+				panic(err)
+			}
 		}
 		cursor = i
 	}

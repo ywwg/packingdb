@@ -16,7 +16,7 @@ type PackCategory struct {
 }
 
 // PackList is a map from category name to slice of items
-type PackList map[string]PackCategory
+type PackList map[string]*PackCategory
 
 func (p PackList) ItemsForCategory(category string) []Item {
 	return p[category].Items
@@ -62,7 +62,7 @@ func RegisterItems(category string, items []Item) {
 		existing.Items = append(existing.Items, items...)
 		return
 	}
-	AllItems[category] = PackCategory{
+	AllItems[category] = &PackCategory{
 		Visible: true,
 		Items:   items,
 	}
@@ -231,7 +231,7 @@ func (t *Trip) makeList() PackList {
 				toPack = append(toPack, calced)
 			}
 		}
-		packlist[category] = PackCategory{
+		packlist[category] = &PackCategory{
 			Visible: true,
 			Items:   toPack,
 		}
@@ -342,10 +342,18 @@ func (t *Trip) ToggleCategoryVisibility(cat string) error {
 	if !ok {
 		return fmt.Errorf("didn't find category %s", cat)
 	}
-	t.packList[cat] = PackCategory{
-		Visible: !pl.Visible,
-		Items:   pl.Items,
+	t.packList[cat].Visible = !pl.Visible
+	return nil
+}
+
+func (t *Trip) ToggleItemPacked(code string) error {
+	// Only works with codes
+	item, ok := t.codeToItem[code]
+	if !ok {
+		return fmt.Errorf("Couldn't find item to pack with code %s", code)
 	}
+
+	item.Pack(!item.Packed())
 	return nil
 }
 
