@@ -99,6 +99,14 @@ func packMenu(t *packinglib.Trip) error {
 			},
 			// Should get this from terminal window size
 			Size: 25,
+			// TODO: figure out how to bind to pageup and pagedown
+			Keys: &promptui.SelectKeys{
+				Prev:     promptui.Key{Code: promptui.KeyPrev, Display: promptui.KeyPrevDisplay},
+				Next:     promptui.Key{Code: promptui.KeyNext, Display: promptui.KeyNextDisplay},
+				PageUp:   promptui.Key{Code: promptui.KeyBackward, Display: promptui.KeyBackwardDisplay},
+				PageDown: promptui.Key{Code: promptui.KeyForward, Display: promptui.KeyForwardDisplay},
+				Search:   promptui.Key{Code: '/', Display: "/"},
+			},
 		}
 
 		i, _, err := prompt.RunStartingAt(cursor)
