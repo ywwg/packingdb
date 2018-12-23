@@ -308,7 +308,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 // New file format:
 // first line: "V2", number of nights, tmin, tmax, context name, contexts...
 // if context_name is known, other contexts are added to it.
-func (t *Trip) LoadFromFile(f string) error {
+func (t *Trip) LoadFromFile(nights int, f string) error {
 	dat, err := ioutil.ReadFile(f)
 	if err != nil {
 		return err
@@ -320,9 +320,12 @@ func (t *Trip) LoadFromFile(f string) error {
 			toks := strings.Split(scanner.Text(), ",")
 			if toks[0] == "V2" {
 				var err error
-				nights, err := strconv.Atoi(toks[1])
+				fileNights, err := strconv.Atoi(toks[1])
 				if err != nil {
 					return err
+				}
+				if nights == 0 {
+					nights = fileNights
 				}
 				tmin, err := strconv.Atoi(toks[2])
 				if err != nil {

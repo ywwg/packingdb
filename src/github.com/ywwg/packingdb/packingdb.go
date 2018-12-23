@@ -71,10 +71,7 @@ func main() {
 		if len(*flagContext) != 0 {
 			fmt.Println("(Ignoring context when loading file)")
 		}
-		if *flagNights != 0 {
-			fmt.Println("(Ignoring nights when loading file)")
-		}
-		if err2 := t.LoadFromFile(*flagPackingFile); err2 != nil {
+		if err2 := t.LoadFromFile(*flagNights, *flagPackingFile); err2 != nil {
 			panic(fmt.Sprintf("%v", err2))
 		}
 	} else {
