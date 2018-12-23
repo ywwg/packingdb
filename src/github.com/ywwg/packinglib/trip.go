@@ -10,21 +10,8 @@ import (
 	"strings"
 )
 
-// PackCategory is a type that holds a list of packable items, and whether
-// the category should be visible in the UI (yikes).
-type PackCategory struct {
-	Visible bool
-	Items   []Item
-}
-
 // PackList is a map from category name to slice of items
-type PackList map[string]*PackCategory
-
-// ItemsForCategory returns all of the items for the given category in the
-// PackList
-func (p PackList) ItemsForCategory(category string) []Item {
-	return p[category].Items
-}
+type PackList map[string][]Item
 
 // AllItems is a convenience map of all items that packingdb knows about
 var AllItems = make(PackList)
@@ -63,13 +50,10 @@ func RegisterItems(category string, items []Item) {
 		}
 	}
 	if existing, ok := AllItems[category]; ok {
-		existing.Items = append(existing.Items, items...)
+		existing = append(existing, items...)
 		return
 	}
-	AllItems[category] = &PackCategory{
-		Visible: true,
-		Items:   items,
-	}
+	AllItems[category] = items
 }
 
 // Context is struct that holds data about the context of the trip
@@ -205,7 +189,7 @@ func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 	sort.Strings(keys)
 
 	for _, category := range keys {
-		for _, item := range t.packList.ItemsForCategory(category) {
+		for _, item := range t.packList[category] {
 			t.codeToItem[getCode(idx)] = item
 			t.itemToCode[item] = getCode(idx)
 			idx++
@@ -227,18 +211,15 @@ func NewTrip(nights int, cname string) (*Trip, error) {
 // MakeList returns a map of category to slice of PackedItems for the given trip
 func (t *Trip) makeList() PackList {
 	packlist := make(PackList)
-	for category, packCat := range AllItems {
+	for category, items := range AllItems {
 		var toPack []Item
-		for _, i := range packCat.Items {
+		for _, i := range items {
 			calced := i.Itemize(t)
 			if calced.Count() > 0 {
 				toPack = append(toPack, calced)
 			}
 		}
-		packlist[category] = &PackCategory{
-			Visible: true,
-			Items:   toPack,
-		}
+		packlist[category] = toPack
 	}
 
 	return packlist
@@ -254,8 +235,8 @@ func (t *Trip) Pack(i string, pack bool) {
 
 	// Now fall back to string matching (which we do when loading the csv)
 	found := false
-	for _, packCat := range t.packList {
-		for _, item := range packCat.Items {
+	for _, items := range t.packList {
+		for _, item := range items {
 			if strings.ToLower(item.Name()) == strings.ToLower(i) {
 				item.Pack(pack)
 				found = true
@@ -273,7 +254,7 @@ func (t *Trip) PackCategory(cat string) {
 	for category := range t.packList {
 		if strings.ToLower(cat) == strings.ToLower(category) {
 			found = true
-			for _, i := range t.packList.ItemsForCategory(category) {
+			for _, i := range t.packList[category] {
 				i.Pack(true)
 			}
 			break
@@ -303,10 +284,10 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			}
 			foundCat = true
 		}
-		if len(t.packList.ItemsForCategory(category)) > 0 {
+		if len(t.packList[category]) > 0 {
 			lines = append(lines, fmt.Sprintf("%s:", category))
 		}
-		for _, i := range t.packList.ItemsForCategory(category) {
+		for _, i := range t.packList[category] {
 			if hideUnpacked && i.Packed() {
 				continue
 			}
@@ -319,8 +300,10 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	return lines
 }
 
-// MenuItems returns a list of PackMenuItems for the given trip.
-func (t *Trip) MenuItems(hidePacked bool) []PackMenuItem {
+// MenuItems returns a list of PackMenuItems for the given trip. Any categories
+// in hiddenCategories will be hidden, and hidePacked will hide all packed
+// items.
+func (t *Trip) MenuItems(hiddenCategories map[string]bool, hidePacked bool) []PackMenuItem {
 	var items []PackMenuItem
 	// map iteration is nondeterministic so sort the keys.
 	var keys []string
@@ -330,11 +313,11 @@ func (t *Trip) MenuItems(hidePacked bool) []PackMenuItem {
 	sort.Strings(keys)
 
 	for _, category := range keys {
-		if len(t.packList.ItemsForCategory(category)) > 0 {
+		if len(t.packList[category]) > 0 {
 			items = append(items, NewMenuItem(category, MenuCategory, category))
 		}
-		if t.packList[category].Visible {
-			for _, i := range t.packList.ItemsForCategory(category) {
+		if hide := hiddenCategories[category]; !hide {
+			for _, i := range t.packList[category] {
 				if hidePacked && i.Packed() {
 					continue
 				}
@@ -343,15 +326,6 @@ func (t *Trip) MenuItems(hidePacked bool) []PackMenuItem {
 		}
 	}
 	return items
-}
-
-func (t *Trip) ToggleCategoryVisibility(cat string) error {
-	pl, ok := t.packList[cat]
-	if !ok {
-		return fmt.Errorf("didn't find category %s", cat)
-	}
-	t.packList[cat].Visible = !pl.Visible
-	return nil
 }
 
 // ToggleItemPacked flips the packed state of the given item.
@@ -455,7 +429,7 @@ func (t *Trip) SaveToFile(f string) error {
 	}
 	packedcsv += "\n"
 	for _, items := range t.packList {
-		for _, item := range items.Items {
+		for _, item := range items {
 			packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
 		}
 	}

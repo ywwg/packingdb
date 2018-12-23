@@ -72,19 +72,22 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 func packMenu(t *packinglib.Trip) error {
 	cursor := 0
 	hidePacked := false
+	hiddenCats := make(map[string]bool)
 
 	BackMenuItem := packinglib.NewMenuItem("Back", packinglib.MenuAction, "back")
 	HidePackedMenuItem := packinglib.NewMenuItem("Hide Packed", packinglib.MenuAction, "hidepacked")
 	ShowPackedMenuItem := packinglib.NewMenuItem("Show Packed", packinglib.MenuAction, "hidepacked")
+	UnhideAllCatsItem := packinglib.NewMenuItem("Show All Categories", packinglib.MenuAction, "showcats")
 
 	for {
 		items := []packinglib.PackMenuItem{BackMenuItem}
+		items = append(items, UnhideAllCatsItem)
 		if hidePacked {
 			items = append(items, ShowPackedMenuItem)
 		} else {
 			items = append(items, HidePackedMenuItem)
 		}
-		items = append(items, t.MenuItems(hidePacked)...)
+		items = append(items, t.MenuItems(hiddenCats, hidePacked)...)
 		prompt := promptui.Select{
 			Label: "Packing Menu",
 			Items: items,
@@ -108,9 +111,13 @@ func packMenu(t *packinglib.Trip) error {
 			return nil
 		} else if selected.Equals(HidePackedMenuItem) {
 			hidePacked = !hidePacked
+		} else if selected.Equals(UnhideAllCatsItem) {
+			hiddenCats = make(map[string]bool)
 		} else if selected.Type == packinglib.MenuCategory {
-			if err := t.ToggleCategoryVisibility(selected.Code); err != nil {
-				panic(err)
+			if val, ok := hiddenCats[selected.Code]; ok {
+				hiddenCats[selected.Code] = !val
+			} else {
+				hiddenCats[selected.Code] = true
 			}
 		} else if selected.Type == packinglib.MenuPackable {
 			if err := t.ToggleItemPacked(selected.Code); err != nil {
