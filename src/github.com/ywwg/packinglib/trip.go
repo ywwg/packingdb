@@ -313,10 +313,17 @@ func (t *Trip) MenuItems(hiddenCategories map[string]bool, hidePacked bool) []Pa
 	sort.Strings(keys)
 
 	for _, category := range keys {
+		hide := hiddenCategories[category]
 		if len(t.packList[category]) > 0 {
-			items = append(items, NewMenuItem(category, MenuCategory, category))
+			var displayCat string
+			if hide {
+				displayCat = fmt.Sprintf("⊞ %s", category)
+			} else {
+				displayCat = fmt.Sprintf("⊟ %s", category)
+			}
+			items = append(items, NewMenuItem(displayCat, MenuCategory, category))
 		}
-		if hide := hiddenCategories[category]; !hide {
+		if !hide {
 			for _, i := range t.packList[category] {
 				if hidePacked && i.Packed() {
 					continue
