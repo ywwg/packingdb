@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// PackCategory is a type that holds a list of packable items, and whether
+// the category should be visible in the UI (yikes).
 type PackCategory struct {
 	Visible bool
 	Items   []Item
@@ -18,6 +20,8 @@ type PackCategory struct {
 // PackList is a map from category name to slice of items
 type PackList map[string]*PackCategory
 
+// ItemsForCategory returns all of the items for the given category in the
+// PackList
 func (p PackList) ItemsForCategory(category string) []Item {
 	return p[category].Items
 }
@@ -315,7 +319,8 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	return lines
 }
 
-func (t *Trip) MenuItems() []PackMenuItem {
+// MenuItems returns a list of PackMenuItems for the given trip.
+func (t *Trip) MenuItems(hidePacked bool) []PackMenuItem {
 	var items []PackMenuItem
 	// map iteration is nondeterministic so sort the keys.
 	var keys []string
@@ -326,11 +331,14 @@ func (t *Trip) MenuItems() []PackMenuItem {
 
 	for _, category := range keys {
 		if len(t.packList.ItemsForCategory(category)) > 0 {
-			items = append(items, New(category, MenuCategory, category))
+			items = append(items, NewMenuItem(category, MenuCategory, category))
 		}
 		if t.packList[category].Visible {
 			for _, i := range t.packList.ItemsForCategory(category) {
-				items = append(items, New(i.String(), MenuPackable, t.itemToCode[i]))
+				if hidePacked && i.Packed() {
+					continue
+				}
+				items = append(items, NewMenuItem(i.String(), MenuPackable, t.itemToCode[i]))
 			}
 		}
 	}
@@ -346,6 +354,7 @@ func (t *Trip) ToggleCategoryVisibility(cat string) error {
 	return nil
 }
 
+// ToggleItemPacked flips the packed state of the given item.
 func (t *Trip) ToggleItemPacked(code string) error {
 	// Only works with codes
 	item, ok := t.codeToItem[code]

@@ -71,16 +71,27 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 
 func packMenu(t *packinglib.Trip) error {
 	cursor := 0
+	hidePacked := false
+
+	BackMenuItem := packinglib.NewMenuItem("Back", packinglib.MenuAction, "back")
+	HidePackedMenuItem := packinglib.NewMenuItem("Hide Packed", packinglib.MenuAction, "hidepacked")
+	ShowPackedMenuItem := packinglib.NewMenuItem("Show Packed", packinglib.MenuAction, "hidepacked")
+
 	for {
-		items := []packinglib.PackMenuItem{packinglib.BackMenuItem}
-		items = append(items, t.MenuItems()...)
+		items := []packinglib.PackMenuItem{BackMenuItem}
+		if hidePacked {
+			items = append(items, ShowPackedMenuItem)
+		} else {
+			items = append(items, HidePackedMenuItem)
+		}
+		items = append(items, t.MenuItems(hidePacked)...)
 		prompt := promptui.Select{
 			Label: "Packing Menu",
 			Items: items,
 			Templates: &promptui.SelectTemplates{
 				Label:    "  {{ .Name }}",
-				Active:   "▸ {{ .Name |}}",
-				Inactive: "  {{ .Name |}}",
+				Active:   "▸ {{ .Name | underline}}",
+				Inactive: "  {{ .Name }}",
 				Selected: "{{ .Name }}",
 			},
 			// Should get this from terminal window size
@@ -93,8 +104,10 @@ func packMenu(t *packinglib.Trip) error {
 		}
 		selected := items[i]
 		// TODO: I forget, does go have operator overriding? Probs not.
-		if selected.Equals(packinglib.BackMenuItem) {
+		if selected.Equals(BackMenuItem) {
 			return nil
+		} else if selected.Equals(HidePackedMenuItem) {
+			hidePacked = !hidePacked
 		} else if selected.Type == packinglib.MenuCategory {
 			if err := t.ToggleCategoryVisibility(selected.Code); err != nil {
 				panic(err)
