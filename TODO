@@ -1,0 +1,5 @@
+* complete my stateful list change, try to upstream it
+ * or include in my own tree
+* try to split checkboxes out from Strings()
+* add the rest of the features like setting temperature, etc
+* pgup pgdn
