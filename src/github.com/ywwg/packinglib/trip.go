@@ -10,8 +10,17 @@ import (
 	"strings"
 )
 
+type PackCategory struct {
+	Visible bool
+	Items   []Item
+}
+
 // PackList is a map from category name to slice of items
-type PackList map[string][]Item
+type PackList map[string]PackCategory
+
+func (p PackList) ItemsForCategory(category string) []Item {
+	return p[category].Items
+}
 
 // AllItems is a convenience map of all items that packingdb knows about
 var AllItems = make(PackList)
@@ -50,10 +59,13 @@ func RegisterItems(category string, items []Item) {
 		}
 	}
 	if existing, ok := AllItems[category]; ok {
-		AllItems[category] = append(existing, items...)
+		existing.Items = append(existing.Items, items...)
 		return
 	}
-	AllItems[category] = items
+	AllItems[category] = PackCategory{
+		Visible: true,
+		Items:   items,
+	}
 }
 
 // Context is struct that holds data about the context of the trip
@@ -189,7 +201,7 @@ func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 	sort.Strings(keys)
 
 	for _, category := range keys {
-		for _, item := range t.packList[category] {
+		for _, item := range t.packList.ItemsForCategory(category) {
 			t.codeToItem[getCode(idx)] = item
 			t.itemToCode[item] = getCode(idx)
 			idx++
@@ -211,15 +223,18 @@ func NewTrip(nights int, cname string) (*Trip, error) {
 // MakeList returns a map of category to slice of PackedItems for the given trip
 func (t *Trip) makeList() PackList {
 	packlist := make(PackList)
-	for category, items := range AllItems {
+	for category, packCat := range AllItems {
 		var toPack []Item
-		for _, i := range items {
+		for _, i := range packCat.Items {
 			calced := i.Itemize(t)
 			if calced.Count() > 0 {
 				toPack = append(toPack, calced)
 			}
 		}
-		packlist[category] = toPack
+		packlist[category] = PackCategory{
+			Visible: true,
+			Items:   toPack,
+		}
 	}
 
 	return packlist
@@ -235,8 +250,8 @@ func (t *Trip) Pack(i string, pack bool) {
 
 	// Now fall back to string matching (which we do when loading the csv)
 	found := false
-	for _, items := range t.packList {
-		for _, item := range items {
+	for _, packCat := range t.packList {
+		for _, item := range packCat.Items {
 			if strings.ToLower(item.Name()) == strings.ToLower(i) {
 				item.Pack(pack)
 				found = true
@@ -251,10 +266,10 @@ func (t *Trip) Pack(i string, pack bool) {
 // PackCategory packs the entire category.
 func (t *Trip) PackCategory(cat string) {
 	found := false
-	for packCat := range t.packList {
-		if strings.ToLower(cat) == strings.ToLower(packCat) {
+	for category := range t.packList {
+		if strings.ToLower(cat) == strings.ToLower(category) {
 			found = true
-			for _, i := range t.packList[packCat] {
+			for _, i := range t.packList.ItemsForCategory(category) {
 				i.Pack(true)
 			}
 			break
@@ -284,10 +299,10 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			}
 			foundCat = true
 		}
-		if len(t.packList[category]) > 0 {
+		if len(t.packList.ItemsForCategory(category)) > 0 {
 			lines = append(lines, fmt.Sprintf("%s:", category))
 		}
-		for _, i := range t.packList[category] {
+		for _, i := range t.packList.ItemsForCategory(category) {
 			if hideUnpacked && i.Packed() {
 				continue
 			}
@@ -298,6 +313,40 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 		panic(fmt.Sprintf("Didn't find category %s", showCat))
 	}
 	return lines
+}
+
+func (t *Trip) MenuItems() []PackMenuItem {
+	var items []PackMenuItem
+	// map iteration is nondeterministic so sort the keys.
+	var keys []string
+	for k := range t.packList {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, category := range keys {
+		if len(t.packList.ItemsForCategory(category)) > 0 {
+			items = append(items, New(category, MenuCategory, category))
+		}
+		if t.packList[category].Visible {
+			for _, i := range t.packList.ItemsForCategory(category) {
+				items = append(items, New(i.String(), MenuPackable, t.itemToCode[i]))
+			}
+		}
+	}
+	return items
+}
+
+func (t *Trip) ToggleCategoryVisibility(cat string) error {
+	pl, ok := t.packList[cat]
+	if !ok {
+		return fmt.Errorf("didn't find category %s", cat)
+	}
+	t.packList[cat] = PackCategory{
+		Visible: !pl.Visible,
+		Items:   pl.Items,
+	}
+	return nil
 }
 
 // LoadFromFile initializes the trip from the given file.
@@ -389,7 +438,7 @@ func (t *Trip) SaveToFile(f string) error {
 	}
 	packedcsv += "\n"
 	for _, items := range t.packList {
-		for _, item := range items {
+		for _, item := range items.Items {
 			packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
 		}
 	}
