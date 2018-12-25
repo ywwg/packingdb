@@ -7,6 +7,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/ywwg/packinglib"
+	"golang.org/x/crypto/ssh/terminal"
 
 	_ "github.com/ywwg/contexts"
 	_ "github.com/ywwg/items"
@@ -88,6 +89,14 @@ func packMenu(t *packinglib.Trip) error {
 			items = append(items, HidePackedMenuItem)
 		}
 		items = append(items, t.MenuItems(hiddenCats, hidePacked)...)
+		_, height, err := terminal.GetSize(int(os.Stdin.Fd()))
+		if err != nil {
+			panic(fmt.Sprintf("couldn't get terminal size %v", err))
+		}
+		// Take off 10 lines to account for bits of ui (history, etc)
+		if height > 10 {
+			height -= 10
+		}
 		prompt := promptui.Select{
 			Label: "Packing Menu",
 			Items: items,
@@ -97,8 +106,7 @@ func packMenu(t *packinglib.Trip) error {
 				Inactive: "  {{ .Name }}",
 				Selected: "{{ .Name }}",
 			},
-			// Should get this from terminal window size
-			Size: 25,
+			Size: height,
 			// TODO: figure out how to bind to pageup and pagedown
 			Keys: &promptui.SelectKeys{
 				Prev:     promptui.Key{Code: promptui.KeyPrev, Display: promptui.KeyPrevDisplay},
@@ -122,11 +130,7 @@ func packMenu(t *packinglib.Trip) error {
 		} else if selected.Equals(UnhideAllCatsItem) {
 			hiddenCats = make(map[string]bool)
 		} else if selected.Type == packinglib.MenuCategory {
-			if val, ok := hiddenCats[selected.Code]; ok {
-				hiddenCats[selected.Code] = !val
-			} else {
-				hiddenCats[selected.Code] = true
-			}
+			hiddenCats[selected.Code] = !hiddenCats[selected.Code]
 		} else if selected.Type == packinglib.MenuPackable {
 			if err := t.ToggleItemPacked(selected.Code); err != nil {
 				panic(err)
