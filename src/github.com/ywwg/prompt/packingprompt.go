@@ -20,71 +20,46 @@ var (
 	flagPackingFile = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
 )
 
-func main() {
-	flag.Parse()
-
-	if *flagPackingFile == "" {
-		panic("Need a packing file")
-	}
-
-	// File mode: load if the file already exists or create new if not
-	t := &packinglib.Trip{}
-	if _, err := os.Stat(*flagPackingFile); os.IsNotExist(err) {
-		panic("File not found")
-	}
-
-	if err := t.LoadFromFile(0, *flagPackingFile); err != nil {
-		panic(fmt.Sprintf("%v", err))
-	}
-
-	// Main Menu
-	for {
-		result, err := mainMenu(t)
-		if err != nil {
-			break
-		}
-		if result == "Quit" {
-			break
-		}
-		switch result {
-		case "Configure Trip Properties":
-			propertyMenu(t)
-		case "Set Min Temperature":
-			if temp, err := temperatureEntry(t.C.TemperatureMin); err == nil {
-				t.C.TemperatureMin = temp
-			}
-		case "Set Max Temperature":
-			if temp, err := temperatureEntry(t.C.TemperatureMax); err == nil {
-				t.C.TemperatureMax = temp
-			}
-		case "Pack":
-			err := packMenu(t)
-			if err != nil {
-				break
-			}
-		}
-	}
-
-	if err := t.SaveToFile(*flagPackingFile); err != nil {
-		panic(fmt.Sprintf("%v", err))
-	}
-}
-
 func mainMenu(t *packinglib.Trip) (string, error) {
+	items := []string{
+		"Pack",
+		"Configure Trip Properties",
+		"Set Nights",
+		"Set Min Temperature",
+		"Set Max Temperature",
+		"Quit",
+	}
+
 	prompt := promptui.Select{
 		Label: "Main Menu",
-		Items: []string{
-			"Pack",
-			"Configure Trip Properties",
-			"Set Min Temperature",
-			"Set Max Temperature",
-			"Quit",
-		},
+		Items: items,
+		Size:  len(items),
 	}
 
 	_, result, err := prompt.Run()
 
 	return result, err
+}
+
+func nightsEntry(current int) (int, error) {
+	validate := func(input string) error {
+		_, err := strconv.ParseInt(input, 10, 64)
+		if err != nil {
+			return errors.New("Invalid number")
+		}
+		return nil
+	}
+	prompt := promptui.Prompt{
+		Label:    fmt.Sprintf("Number of nights (current setting: %d)", current),
+		Validate: validate,
+	}
+
+	result, err := prompt.Run()
+	if err != nil {
+		return -1, err
+	}
+	temp, err := strconv.ParseInt(result, 10, 64)
+	return int(temp), err
 }
 
 func temperatureEntry(current int) (int, error) {
@@ -226,5 +201,59 @@ func propertyMenu(t *packinglib.Trip) error {
 			}
 		}
 		cursor = i
+	}
+}
+
+func main() {
+	flag.Parse()
+
+	if *flagPackingFile == "" {
+		panic("Need a packing file")
+	}
+
+	// File mode: load if the file already exists or create new if not
+	t := &packinglib.Trip{}
+	if _, err := os.Stat(*flagPackingFile); os.IsNotExist(err) {
+		panic("File not found")
+	}
+
+	if err := t.LoadFromFile(0, *flagPackingFile); err != nil {
+		panic(fmt.Sprintf("%v", err))
+	}
+
+	// Main Menu
+	for {
+		result, err := mainMenu(t)
+		if err != nil {
+			break
+		}
+		if result == "Quit" {
+			break
+		}
+		switch result {
+		case "Configure Trip Properties":
+			propertyMenu(t)
+		case "Set Nights":
+			if nights, err := nightsEntry(t.Nights); err == nil {
+				t.Nights = nights
+			}
+		case "Set Min Temperature":
+			if temp, err := temperatureEntry(t.C.TemperatureMin); err == nil {
+				t.C.TemperatureMin = temp
+			}
+		case "Set Max Temperature":
+			if temp, err := temperatureEntry(t.C.TemperatureMax); err == nil {
+				t.C.TemperatureMax = temp
+			}
+		case "Pack":
+			err := packMenu(t)
+			if err != nil {
+				break
+			}
+		}
+	}
+
+	if err := t.SaveToFile(*flagPackingFile); err != nil {
+		panic(fmt.Sprintf("%v", err))
 	}
 }
