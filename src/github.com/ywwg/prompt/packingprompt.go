@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/manifoldco/promptui"
 	"github.com/ywwg/packinglib"
@@ -43,7 +45,16 @@ func main() {
 		if result == "Quit" {
 			break
 		}
-		if result == "Pack" {
+		switch result {
+		case "Set Min Temperature":
+			if temp, err := temperatureEntry(t.C.TemperatureMin); err == nil {
+				t.C.TemperatureMin = temp
+			}
+		case "Set Max Temperature":
+			if temp, err := temperatureEntry(t.C.TemperatureMax); err == nil {
+				t.C.TemperatureMax = temp
+			}
+		case "Pack":
 			err := packMenu(t)
 			if err != nil {
 				break
@@ -61,6 +72,8 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 		Label: "Main Menu",
 		Items: []string{
 			"Pack",
+			"Set Min Temperature",
+			"Set Max Temperature",
 			"Quit",
 		},
 	}
@@ -68,6 +81,27 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 	_, result, err := prompt.Run()
 
 	return result, err
+}
+
+func temperatureEntry(current int) (int, error) {
+	validate := func(input string) error {
+		_, err := strconv.ParseInt(input, 10, 64)
+		if err != nil {
+			return errors.New("Invalid number")
+		}
+		return nil
+	}
+	prompt := promptui.Prompt{
+		Label:    fmt.Sprintf("Temperature (current setting: %d)", current),
+		Validate: validate,
+	}
+
+	result, err := prompt.Run()
+	if err != nil {
+		return -1, err
+	}
+	temp, err := strconv.ParseInt(result, 10, 64)
+	return int(temp), err
 }
 
 func packMenu(t *packinglib.Trip) error {
