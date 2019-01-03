@@ -43,53 +43,16 @@ Then you can point your eclipse project to those binaries.
 
 ## Running
 
-packingdb has two basic modes.  One just prints out a packing list.  The other can keep track of what you've packed.
+packingdb has two binaries.  An older non-interactive program and a newer promptui-based interactive program.  The prompt-based program is much easier to use.
 
-A "context" (TODO: change that term, it sucks) is sort of "where" you're traveling but also sort of "what".  So "Key West" could be a context, but so could "skiing."  Do what you want.
-
-### Simple Mode
-
-For the first mode, just specify the trip context and a number of days:
+To start a new packing list, just specify a filename where the data will be stored:
 
 ```shell
-./packingdb --context camping --days 5
+./packingdb mytrip.csv
 ```
 
-This will generate a packing list for the camping context for a 5 day trip.
+packingdb will ask you some basic questions about the trip, like the number of nights and the minimum and maximum predicted temperatures. Then you'll be presented with a list of all the configured Properties, and you can scroll through the list and select which ones apply to the current trip.
 
-You can list all the available contexts like this:
-
-```shell
-./packingdb --list_contexts
-```
-
-Creating new contexts is done by editing contexts.go.
-
-### File Mode
-
-
-#### Creating a new file
-
-To create a persistent file storing your packing data, add the --packfile flag:
-
-```shell
-./packingdb --context camping --days 5 --packfile ./mytrip.csv
-```
-
-This will still print out the packing list, but will also save packed data to the file.
-
-#### Recording stuff that's been packed
-
-After the file is created, the --context and --days flags are ignored.  To pack an item, use the
-short letter code in front of the item.  "(a)" or "(cw)".
-
-```shell
-./packingdb --packfile ./mytrip --pack ab
-```
-
-If you mess up the name, the program will quit with an error.
-
-Note that if you change your item .go files, subsequent runs of packingdb on your old packfile
-*will* pick up the changes!
+You can change all of these parameters later from the main menu.
 
 You can also edit the packfile yourself.  It's simple csv.
