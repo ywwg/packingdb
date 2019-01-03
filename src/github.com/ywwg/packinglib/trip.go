@@ -154,6 +154,24 @@ func (c *Context) AddProperty(prop string) error {
 	return nil
 }
 
+// RemoveProperty removes the property with the given name to the context, or
+// returns error if it's not found. Empty strings are ignored.
+func (c *Context) RemoveProperty(prop string) error {
+	if prop == "" {
+		return nil
+	}
+	if _, ok := allProperties[Property(prop)]; !ok {
+		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
+	}
+	c.Properties[Property(prop)] = false
+	return nil
+}
+
+// HasProperty returns true if the context has this property.
+func (c *Context) HasProperty(prop string) bool {
+	return c.Properties[Property(prop)]
+}
+
 func getCode(idx int) string {
 	code := ""
 	adjust := 0

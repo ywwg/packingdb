@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/ywwg/packinglib"
@@ -46,6 +47,8 @@ func main() {
 			break
 		}
 		switch result {
+		case "Configure Trip Properties":
+			propertyMenu(t)
 		case "Set Min Temperature":
 			if temp, err := temperatureEntry(t.C.TemperatureMin); err == nil {
 				t.C.TemperatureMin = temp
@@ -72,6 +75,7 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 		Label: "Main Menu",
 		Items: []string{
 			"Pack",
+			"Configure Trip Properties",
 			"Set Min Temperature",
 			"Set Max Temperature",
 			"Quit",
@@ -109,7 +113,7 @@ func packMenu(t *packinglib.Trip) error {
 	hidePacked := false
 	hiddenCats := make(map[string]bool)
 
-	BackMenuItem := packinglib.NewMenuItem("Back", packinglib.MenuAction, "back")
+	BackMenuItem := packinglib.NewMenuItem("↩ Back", packinglib.MenuAction, "back")
 	HidePackedMenuItem := packinglib.NewMenuItem("Hide Packed", packinglib.MenuAction, "hidepacked")
 	ShowPackedMenuItem := packinglib.NewMenuItem("Show Packed", packinglib.MenuAction, "hidepacked")
 	UnhideAllCatsItem := packinglib.NewMenuItem("Show All Categories", packinglib.MenuAction, "showcats")
@@ -167,6 +171,57 @@ func packMenu(t *packinglib.Trip) error {
 			hiddenCats[selected.Code] = !hiddenCats[selected.Code]
 		} else if selected.Type == packinglib.MenuPackable {
 			if err := t.ToggleItemPacked(selected.Code); err != nil {
+				panic(err)
+			}
+		}
+		cursor = i
+	}
+}
+
+func styleProperty(t *packinglib.Trip, prop string) string {
+	if t.C.HasProperty(prop) {
+		return "☑ " + prop
+	}
+	return "☐ " + prop
+}
+
+func propertyMenu(t *packinglib.Trip) error {
+	cursor := 0
+
+	for {
+		items := []string{"↩ Back"}
+		for _, prop := range packinglib.ListProperties() {
+			items = append(items, styleProperty(t, prop))
+		}
+		_, height, err := terminal.GetSize(int(os.Stdin.Fd()))
+		if err != nil {
+			panic(fmt.Sprintf("couldn't get terminal size %v", err))
+		}
+		// Take off 10 lines to account for bits of ui (history, etc)
+		if height > 10 {
+			height -= 10
+		}
+		prompt := promptui.Select{
+			Label: "Property Menu",
+			Items: items,
+			Size:  height,
+		}
+
+		i, _, err := prompt.RunStartingAt(cursor)
+		if err != nil {
+			return err
+		}
+
+		// Hack to remove the checkbox before the name of the property
+		selected := strings.SplitAfterN(items[i], " ", 2)[1]
+		if selected == "Back" {
+			return nil
+		} else if t.C.HasProperty(selected) {
+			if err := t.C.RemoveProperty(selected); err != nil {
+				panic(err)
+			}
+		} else {
+			if err := t.C.AddProperty(selected); err != nil {
 				panic(err)
 			}
 		}

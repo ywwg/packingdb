@@ -1,4 +1,4 @@
-* add the rest of the features like setting temperature, etc
+* add support for initial creation
 * complete my stateful list change, try to upstream it
  * (scroll position changes unnecessarily so we need to persist it)
  * or include in my own tree
