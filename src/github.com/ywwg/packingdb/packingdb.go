@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -57,6 +58,9 @@ func nameEntry() (string, error) {
 
 func nightsEntry(current int) (int, error) {
 	validate := func(input string) error {
+		if input == "" {
+			return nil
+		}
 		_, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
 			return errors.New("Invalid number")
@@ -76,12 +80,18 @@ func nightsEntry(current int) (int, error) {
 	if err != nil {
 		return -1, err
 	}
+	if result == "" {
+		return current, nil
+	}
 	temp, err := strconv.ParseInt(result, 10, 64)
 	return int(temp), err
 }
 
 func temperatureEntry(help string, current int) (int, error) {
 	validate := func(input string) error {
+		if input == "" {
+			return nil
+		}
 		_, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
 			return errors.New("Invalid number")
@@ -100,6 +110,9 @@ func temperatureEntry(help string, current int) (int, error) {
 	result, err := prompt.Run()
 	if err != nil {
 		return -1, err
+	}
+	if result == "" {
+		return current, nil
 	}
 	temp, err := strconv.ParseInt(result, 10, 64)
 	return int(temp), err
@@ -274,6 +287,26 @@ func main() {
 
 	// Main Menu
 	for {
+		fmt.Printf("\033[1m")
+		fmt.Printf("\n\nName: %s\n", t.C.Name)
+		fmt.Printf("Nights: %d\n", t.Nights)
+		fmt.Printf("Temperatures: %d - %d\n", t.C.TemperatureMin, t.C.TemperatureMax)
+		fmt.Printf("Properties: ")
+		var plist []string
+		for p := range t.C.Properties {
+			plist = append(plist, string(p))
+		}
+		sort.Strings(plist)
+		for i, p := range plist {
+			if i == 0 {
+				fmt.Printf("%s", p)
+			} else {
+				fmt.Printf(", %s", p)
+			}
+		}
+		fmt.Printf("\n")
+		fmt.Printf("\033[0m")
+
 		result, err := mainMenu(t)
 		if err != nil {
 			break

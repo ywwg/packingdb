@@ -3,6 +3,7 @@ package packinglib
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // Property is a value describing a property the context has.  Sort of like boolean flags.
@@ -84,6 +85,9 @@ func ListProperties() []string {
 	for k := range allProperties {
 		l = append(l, string(k))
 	}
-	sort.Strings(l)
+	less := func(i, j int) bool {
+		return strings.ToLower(l[i]) < strings.ToLower(l[j])
+	}
+	sort.Slice(l, less)
 	return l
 }
