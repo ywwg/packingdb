@@ -43,11 +43,9 @@ Then you can point your eclipse project to those binaries.
 
 ## Running
 
-packingdb has two basic modes.  One just prints out a packing list.  The other can keep track of
-what you've packed.
+packingdb has two basic modes.  One just prints out a packing list.  The other can keep track of what you've packed.
 
-A "context" (TODO: change that term, it sucks) is sort of "where" you're traveling but also sort
-of "what".  So "Key West" could be a context, but so could "skiing."  Do what you want.
+A "context" (TODO: change that term, it sucks) is sort of "where" you're traveling but also sort of "what".  So "Key West" could be a context, but so could "skiing."  Do what you want.
 
 ### Simple Mode
 
