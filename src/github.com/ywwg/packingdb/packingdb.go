@@ -19,10 +19,6 @@ import (
 	_ "github.com/ywwg/items"
 )
 
-var (
-	flagPackingFile = flag.String("packfile", "", "The filename to create or load (not needed if you just want to print a list)")
-)
-
 func mainMenu(t *packinglib.Trip) (string, error) {
 	items := []string{
 		"Pack",
@@ -232,15 +228,16 @@ func propertyMenu(t *packinglib.Trip) error {
 
 func main() {
 	flag.Parse()
-
-	if *flagPackingFile == "" {
+	args := flag.Args()
+	if len(args) < 1 {
 		log.Fatal("Need a packing filename (one will be created if it doesn't exist)")
 	}
+	filename := args[0]
 
 	// File mode: load if the file already exists or create new if not
 	t := &packinglib.Trip{}
-	if _, err := os.Stat(*flagPackingFile); !os.IsNotExist(err) {
-		if err2 := t.LoadFromFile(0, *flagPackingFile); err2 != nil {
+	if _, err := os.Stat(filename); !os.IsNotExist(err) {
+		if err2 := t.LoadFromFile(0, filename); err2 != nil {
 			log.Fatal(fmt.Sprintf("%v", err2))
 		}
 	} else {
@@ -307,7 +304,7 @@ func main() {
 		}
 	}
 
-	if err := t.SaveToFile(*flagPackingFile); err != nil {
+	if err := t.SaveToFile(filename); err != nil {
 		log.Fatal(fmt.Sprintf("%v", err))
 	}
 }
