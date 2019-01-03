@@ -41,6 +41,21 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 	return result, err
 }
 
+func nameEntry() (string, error) {
+	validate := func(input string) error {
+		if len(input) == 0 {
+			return errors.New("Must provide a name for this trip")
+		}
+		return nil
+	}
+	prompt := promptui.Prompt{
+		Label:    "Trip Name",
+		Validate: validate,
+	}
+
+	return prompt.Run()
+}
+
 func nightsEntry(current int) (int, error) {
 	validate := func(input string) error {
 		_, err := strconv.ParseInt(input, 10, 64)
@@ -49,8 +64,12 @@ func nightsEntry(current int) (int, error) {
 		}
 		return nil
 	}
+	label := "Number of nights"
+	if current != -1 {
+		label = fmt.Sprintf("Number of nights (current setting: %d)", current)
+	}
 	prompt := promptui.Prompt{
-		Label:    fmt.Sprintf("Number of nights (current setting: %d)", current),
+		Label:    label,
 		Validate: validate,
 	}
 
@@ -62,7 +81,7 @@ func nightsEntry(current int) (int, error) {
 	return int(temp), err
 }
 
-func temperatureEntry(current int) (int, error) {
+func temperatureEntry(help string, current int) (int, error) {
 	validate := func(input string) error {
 		_, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
@@ -70,8 +89,12 @@ func temperatureEntry(current int) (int, error) {
 		}
 		return nil
 	}
+	label := help + " Temperature"
+	if current != -100 {
+		label = fmt.Sprintf("%s Temperature (current setting: %d)", help, current)
+	}
 	prompt := promptui.Prompt{
-		Label:    fmt.Sprintf("Temperature (current setting: %d)", current),
+		Label:    label,
 		Validate: validate,
 	}
 
@@ -208,17 +231,45 @@ func main() {
 	flag.Parse()
 
 	if *flagPackingFile == "" {
-		panic("Need a packing file")
+		panic("Need a packing filename (one will be created if it doesn't exist")
 	}
 
 	// File mode: load if the file already exists or create new if not
 	t := &packinglib.Trip{}
-	if _, err := os.Stat(*flagPackingFile); os.IsNotExist(err) {
-		panic("File not found")
-	}
+	if _, err := os.Stat(*flagPackingFile); !os.IsNotExist(err) {
+		if err2 := t.LoadFromFile(0, *flagPackingFile); err2 != nil {
+			panic(fmt.Sprintf("%v", err2))
+		}
+	} else {
+		title, err := nameEntry()
+		if err != nil {
+			panic(err)
+		}
 
-	if err := t.LoadFromFile(0, *flagPackingFile); err != nil {
-		panic(fmt.Sprintf("%v", err))
+		nights, err := nightsEntry(-1)
+		if err != nil {
+			panic(err)
+		}
+
+		context := &packinglib.Context{
+			Name:       title,
+			Properties: make(packinglib.PropertySet),
+		}
+		context.TemperatureMin, err = temperatureEntry("Minimum", -100)
+		if err != nil {
+			panic(err)
+		}
+		context.TemperatureMax, err = temperatureEntry("Maximum", -100)
+		if err != nil {
+			panic(err)
+		}
+
+		t, err = packinglib.NewTripFromCustomContext(nights, context)
+		if err != nil {
+			panic(err)
+		}
+
+		propertyMenu(t)
 	}
 
 	// Main Menu
@@ -238,11 +289,11 @@ func main() {
 				t.Nights = nights
 			}
 		case "Set Min Temperature":
-			if temp, err := temperatureEntry(t.C.TemperatureMin); err == nil {
+			if temp, err := temperatureEntry("Minimum", t.C.TemperatureMin); err == nil {
 				t.C.TemperatureMin = temp
 			}
 		case "Set Max Temperature":
-			if temp, err := temperatureEntry(t.C.TemperatureMax); err == nil {
+			if temp, err := temperatureEntry("Maximum", t.C.TemperatureMax); err == nil {
 				t.C.TemperatureMax = temp
 			}
 		case "Pack":
