@@ -109,9 +109,9 @@ func (i *BasicItem) Count() float64 {
 // String constructs a pretty string for printing this item, including a checkbox
 // for its packed status
 func (i *BasicItem) String() string {
-	checkbox := "☐"
+	checkbox := "○"
 	if i.packed {
-		checkbox = "☑"
+		checkbox = "●"
 	}
 	return fmt.Sprintf("%s %s", checkbox, i.name)
 }
@@ -209,9 +209,9 @@ func (i *ConsumableItem) Itemize(t *Trip) Item {
 // String constructs a pretty string for printing this item, including a checkbox
 // for its packed status
 func (i *ConsumableItem) String() string {
-	checkbox := "☐"
+	checkbox := "○"
 	if i.packed {
-		checkbox = "☑"
+		checkbox = "●"
 	}
 	if i.Units == NoUnits {
 		if i.count == float64(int(i.count)) {

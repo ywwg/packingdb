@@ -190,9 +190,9 @@ func packMenu(t *packinglib.Trip) error {
 
 func styleProperty(t *packinglib.Trip, prop string) string {
 	if t.C.HasProperty(prop) {
-		return "☑ " + prop
+		return "● " + prop
 	}
-	return "☐ " + prop
+	return "○ " + prop
 }
 
 func propertyMenu(t *packinglib.Trip) error {
