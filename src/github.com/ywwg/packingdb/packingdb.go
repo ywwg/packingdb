@@ -293,8 +293,10 @@ func main() {
 		fmt.Printf("Temperatures: %d - %d\n", t.C.TemperatureMin, t.C.TemperatureMax)
 		fmt.Printf("Properties: ")
 		var plist []string
-		for p := range t.C.Properties {
-			plist = append(plist, string(p))
+		for p, val := range t.C.Properties {
+			if val {
+				plist = append(plist, string(p))
+			}
 		}
 		sort.Strings(plist)
 		for i, p := range plist {

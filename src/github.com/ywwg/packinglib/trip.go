@@ -380,8 +380,10 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 // SaveToFile saves the trip to the provided filename.
 func (t *Trip) SaveToFile(f string) error {
 	packedcsv := fmt.Sprintf("V2,%d,%d,%d,%s,", t.Nights, t.C.TemperatureMin, t.C.TemperatureMax, t.contextName)
-	for p := range t.C.Properties {
-		packedcsv += fmt.Sprintf("%s,", string(p))
+	for p, val := range t.C.Properties {
+		if val {
+			packedcsv += fmt.Sprintf("%s,", string(p))
+		}
 	}
 	packedcsv += "\n"
 	for _, items := range t.packList {

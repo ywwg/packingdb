@@ -78,7 +78,7 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 			allDenies = false
 		}
 		// Any item that has a disallowing prerequisite immediately dissatisfies.
-		if _, ok := c.Properties[p]; ok {
+		if c.Properties[p] {
 			if !allow {
 				return false
 			}
