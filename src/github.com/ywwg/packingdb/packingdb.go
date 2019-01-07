@@ -120,6 +120,7 @@ func temperatureEntry(help string, current int) (int, error) {
 
 func packMenu(t *packinglib.Trip) error {
 	cursor := 0
+	scroll := 0
 	hidePacked := false
 	hiddenCats := make(map[string]bool)
 
@@ -165,7 +166,7 @@ func packMenu(t *packinglib.Trip) error {
 			},
 		}
 
-		i, _, err := prompt.RunStartingAt(cursor)
+		i, _, err := prompt.RunCursorAt(cursor, scroll)
 		if err != nil {
 			return err
 		}
@@ -185,6 +186,7 @@ func packMenu(t *packinglib.Trip) error {
 			}
 		}
 		cursor = i
+		scroll = prompt.ScrollPosition()
 	}
 }
 
@@ -197,6 +199,7 @@ func styleProperty(t *packinglib.Trip, prop string) string {
 
 func propertyMenu(t *packinglib.Trip) error {
 	cursor := 0
+	scroll := 0
 
 	for {
 		items := []string{"↩ Back"}
@@ -217,7 +220,7 @@ func propertyMenu(t *packinglib.Trip) error {
 			Size:  height,
 		}
 
-		i, _, err := prompt.RunStartingAt(cursor)
+		i, _, err := prompt.RunCursorAt(cursor, scroll)
 		if err != nil {
 			return err
 		}
@@ -236,6 +239,7 @@ func propertyMenu(t *packinglib.Trip) error {
 			}
 		}
 		cursor = i
+		scroll = prompt.ScrollPosition()
 	}
 }
 
