@@ -10,6 +10,9 @@ const (
 	// MenuPackable is the type for individual packable items
 	MenuPackable
 
+	// MenuProperty is the type for packing properties.
+	MenuProperty
+
 	// MenuAction is the type for prompt interaction operations (back, quit, etc)
 	MenuAction
 )
@@ -35,6 +38,8 @@ func NewMenuItem(name string, t PackMenuType, code string) PackMenuItem {
 		displayName = " " + name
 	case MenuPackable:
 		displayName = "  " + name
+	case MenuProperty:
+		displayName = " " + name
 	}
 
 	return PackMenuItem{

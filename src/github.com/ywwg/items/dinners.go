@@ -22,7 +22,7 @@ var saturdayDinner = []plib.Item{
 }
 
 func init() {
-	plib.RegisterProperty("Firefly2017")
+	plib.RegisterProperty("Firefly2017", "")
 	plib.RegisterItems("Food: Burn Night Dinner", burnDinner)
 	plib.RegisterItems("Food: Saturday Dinner Fresh Ingredients", saturdayDinner)
 }

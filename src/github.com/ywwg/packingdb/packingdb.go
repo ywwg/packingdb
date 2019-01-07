@@ -10,7 +10,6 @@ import (
 	"os"
 	"sort"
 	"strconv"
-	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/ywwg/packinglib"
@@ -137,7 +136,7 @@ func packMenu(t *packinglib.Trip) error {
 		} else {
 			items = append(items, HidePackedMenuItem)
 		}
-		items = append(items, t.MenuItems(hiddenCats, hidePacked)...)
+		items = append(items, t.PackingMenuItems(hiddenCats, hidePacked)...)
 		_, height, err := terminal.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
 			log.Fatal(fmt.Sprintf("couldn't get terminal size %v", err))
@@ -190,22 +189,14 @@ func packMenu(t *packinglib.Trip) error {
 	}
 }
 
-func styleProperty(t *packinglib.Trip, prop string) string {
-	if t.C.HasProperty(prop) {
-		return "● " + prop
-	}
-	return "○ " + prop
-}
-
 func propertyMenu(t *packinglib.Trip) error {
 	cursor := 0
 	scroll := 0
+	BackMenuItem := packinglib.NewMenuItem("↩ Back", packinglib.MenuAction, "back")
 
 	for {
-		items := []string{"↩ Back"}
-		for _, prop := range packinglib.ListProperties() {
-			items = append(items, styleProperty(t, prop))
-		}
+		items := []packinglib.PackMenuItem{BackMenuItem}
+		items = append(items, t.PropertyMenuItems()...)
 		_, height, err := terminal.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
 			log.Fatal(fmt.Sprintf("couldn't get terminal size %v", err))
@@ -218,6 +209,12 @@ func propertyMenu(t *packinglib.Trip) error {
 			Label: "Property Menu",
 			Items: items,
 			Size:  height,
+			Templates: &promptui.SelectTemplates{
+				Label:    "  {{ .Name }}",
+				Active:   "▸ {{ .Name | underline}}",
+				Inactive: "  {{ .Name }}",
+				Selected: "{{ .Name }}",
+			},
 		}
 
 		i, _, err := prompt.RunCursorAt(cursor, scroll)
@@ -226,15 +223,15 @@ func propertyMenu(t *packinglib.Trip) error {
 		}
 
 		// Hack to remove the checkbox before the name of the property
-		selected := strings.SplitAfterN(items[i], " ", 2)[1]
-		if selected == "Back" {
+		selected := items[i]
+		if selected.Equals(BackMenuItem) {
 			return nil
-		} else if t.C.HasProperty(selected) {
-			if err := t.RemoveProperty(selected); err != nil {
+		} else if t.HasProperty(packinglib.Property(selected.Code)) {
+			if err := t.RemoveProperty(selected.Code); err != nil {
 				log.Fatal(err)
 			}
 		} else {
-			if err := t.AddProperty(selected); err != nil {
+			if err := t.AddProperty(selected.Code); err != nil {
 				log.Fatal(err)
 			}
 		}

@@ -78,7 +78,7 @@ func RegisterContext(c Context) {
 		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
 	}
 	contexts[c.Name] = c
-	RegisterProperty(Property(c.Name))
+	RegisterProperty(Property(c.Name), "")
 }
 
 // GetContext returns the context of the given name, or panics if not found.
@@ -168,6 +168,10 @@ func (t *Trip) RemoveProperty(p string) error {
 	}
 	t.updateList()
 	return nil
+}
+
+func (t *Trip) HasProperty(p Property) bool {
+	return t.C.hasProperty(p)
 }
 
 // makeList returns a map of category to slice of PackedItems for the given trip
@@ -284,10 +288,10 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	return lines
 }
 
-// MenuItems returns a list of PackMenuItems for the given trip. Any categories
+// PackingMenuItems returns a list of PackPackingMenuItems for the given trip. Any categories
 // in hiddenCategories will be hidden, and hidePacked will hide all packed
 // items.
-func (t *Trip) MenuItems(hiddenCategories map[Category]bool, hidePacked bool) []PackMenuItem {
+func (t *Trip) PackingMenuItems(hiddenCategories map[Category]bool, hidePacked bool) []PackMenuItem {
 	var items []PackMenuItem
 	keys := t.SortedCategories()
 
@@ -312,6 +316,34 @@ func (t *Trip) MenuItems(hiddenCategories map[Category]bool, hidePacked bool) []
 				}
 			}
 		}
+	}
+	return items
+}
+
+func (t *Trip) styleProperty(p Property) string {
+	if t.HasProperty(p) {
+		return fmt.Sprintf("● %-20s %s", string(p), allProperties[p])
+	}
+	return fmt.Sprintf("○ %-20s %s", string(p), allProperties[p])
+}
+
+// PropertyMenuItems returns a list of PackPackingMenuItems for the given trip. Any categories
+// in hiddenCategories will be hidden, and hidePacked will hide all packed
+// items.
+func (t *Trip) PropertyMenuItems() []PackMenuItem {
+	var l []Property
+	for name := range allProperties {
+		l = append(l, name)
+	}
+	less := func(i, j int) bool {
+		return strings.ToLower(string(l[i])) < strings.ToLower(string(l[j]))
+	}
+	sort.Slice(l, less)
+
+	var items []PackMenuItem
+	for _, prop := range ListProperties() {
+		displayProp := t.styleProperty(prop)
+		items = append(items, NewMenuItem(displayProp, MenuCategory, string(prop)))
 	}
 	return items
 }

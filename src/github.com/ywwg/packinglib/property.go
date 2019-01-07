@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-// Property is a value describing a property the context has.  Sort of like boolean flags.
+// Property is used to describe an attribute of a context that should be
+// user understandable.  Users will choose which properties apply to a given
+// context.
 type Property string
 
 // PropertySet is a map holding a list of Properties.  A value of true
@@ -16,53 +18,53 @@ type Property string
 // disallowed Property causes the item to reject.
 type PropertySet map[Property]bool
 
-var allProperties = PropertySet{
-	"Art":              true, // gonna do some drawing
-	"BigTrip":          true, // this is a big deal
-	"Bright":           true, // sun, and therefore sunscreen.
-	"Burn":             true,
-	"Business":         true, // some work happening.
-	"BYOB":             true, // need to pack some booze
-	"Camping":          true,
-	"Con":              true, // convention of any sort
-	"Climbing":         true,
-	"Cycling":          true, // moderate amount of biking
-	"CyclingLongRide":  true, // biking a long distance
-	"Dark":             true, // mostly for camping, but anytime you'll be wandering in the dark
-	"Dirt":             true, // are you going to get dirty?
-	"DiningOut":        true,
-	"Flight":           true,
-	"GrumpCamping":     true, // A special type of burn
-	"Handy":            true, // need tools?
-	"HasToiletries":    true,
-	"Insecure":         true, // Don't bring valuables
-	"International":    true,
-	"Lodging":          true, // Paid lodging like a hotel or airbnb
-	"Loud":             true,
-	"Nevermore":        true,
-	"NoCheckedLuggage": true,
-	"NoFire":           true, // Used when there's camping, but no fire allowed at all
-	"PaidEvent":        true, // Concerts, shows, cons, etc
-	"PaidTravel":       true, // Paying to travel (Flight, rail, bus, etc)
-	"Speaker":          true, // Need to play some music
-	"Suiting":          true,
-	"Partying":         true,
-	"Snow":             true,
-	"Sweat":            true, // are you gonna sweat up the car?
-	"Swimming":         true,
-	"Tiny House":       true,
-	"UltraFormal":      true, // do you need to *really* dress up?
-	// "Performing" for all music, and then add the specific ones
-	"Performing": true,
-	"Modular":    true,
-	"DJing":      true,
+var allProperties = map[Property]string{
+	"Art":              "gonna do some drawing",
+	"BigTrip":          "this is a big deal",
+	"Bright":           "sun, and therefore sunscreen.",
+	"Burn":             "",
+	"Business":         "some work happening.",
+	"BYOB":             "need to pack some booze",
+	"Camping":          "",
+	"Con":              "convention of any sort",
+	"Climbing":         "",
+	"Cycling":          "moderate amount of biking",
+	"CyclingLongRide":  "biking a long distance",
+	"Dark":             "mostly for camping, but anytime you'll be wandering in the dark",
+	"Dirt":             "are you going to get dirty?",
+	"DiningOut":        "",
+	"Flight":           "",
+	"GrumpCamping":     "A special type of burn",
+	"Handy":            "need tools?",
+	"HasToiletries":    "",
+	"Insecure":         "Don't bring valuables",
+	"International":    "",
+	"Lodging":          "Paid lodging like a hotel or airbnb",
+	"Loud":             "",
+	"Nevermore":        "",
+	"NoCheckedLuggage": "",
+	"NoFire":           "Used when there's camping, but no fire allowed at all",
+	"PaidEvent":        "Concerts, shows, cons, etc",
+	"PaidTravel":       "Paying to travel (Flight, rail, bus, etc)",
+	"Speaker":          "Need to play some music",
+	"Suiting":          "",
+	"Partying":         "",
+	"Snow":             "",
+	"Sweat":            "are you gonna sweat up the car?",
+	"Swimming":         "",
+	"Tiny House":       "",
+	"UltraFormal":      "do you need to *really* dress up?",
+	"Performing":       "Use this for all music, and then add the specific ones",
+	"Modular":          "",
+	"DJing":            "",
 }
 
 // RegisterProperty adds a new Property to the database so it can be used.
+// desc should be a user-visible description of the property.
 // Does not verify that all of the properties are in the allProperties map.
-func RegisterProperty(prop Property) {
+func RegisterProperty(prop Property, desc string) {
 	// Don't worry if the property already exists.
-	allProperties[prop] = true
+	allProperties[prop] = desc
 }
 
 func buildPropertySet(allow, disallow []string) PropertySet {
@@ -80,13 +82,13 @@ func buildPropertySet(allow, disallow []string) PropertySet {
 }
 
 // ListProperties returns all of the registered properties as a slice of strings.
-func ListProperties() []string {
-	var l []string
+func ListProperties() []Property {
+	var l []Property
 	for k := range allProperties {
-		l = append(l, string(k))
+		l = append(l, k)
 	}
 	less := func(i, j int) bool {
-		return strings.ToLower(l[i]) < strings.ToLower(l[j])
+		return strings.ToLower(string(l[i])) < strings.ToLower(string(l[j]))
 	}
 	sort.Slice(l, less)
 	return l

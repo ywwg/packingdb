@@ -67,7 +67,7 @@ var conSupplies = []plib.Item{
 }
 
 func init() {
-	plib.RegisterProperty("Berlin2017")
+	plib.RegisterProperty("Berlin2017", "")
 	plib.RegisterItems("Clothing", clothing)
 	plib.RegisterItems("Flight Stuff", flightSupplies)
 }

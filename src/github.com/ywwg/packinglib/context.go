@@ -28,7 +28,7 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 		Properties:     make(PropertySet),
 	}
 
-	RegisterProperty(Property(c.Name))
+	RegisterProperty(Property(c.Name), "")
 	if err := c.addProperty(c.Name); err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Context) removeProperty(prop string) error {
 	return nil
 }
 
-// HasProperty returns true if the context has this property.
-func (c *Context) HasProperty(prop string) bool {
-	return c.Properties[Property(prop)]
+// hasProperty returns true if the context has this property.
+func (c *Context) hasProperty(prop Property) bool {
+	return c.Properties[prop]
 }

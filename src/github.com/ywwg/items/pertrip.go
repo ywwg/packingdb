@@ -40,6 +40,6 @@ func init() {
 	plib.RegisterItems("Berlin2017", berlin2017)
 	// plib.RegisterItems("Retreat2017", virtuality2017)
 	plib.RegisterItems("Firefly2018", firefly2018)
-	plib.RegisterProperty(plib.Property("PortlandPride"))
+	plib.RegisterProperty(plib.Property("PortlandPride"), "Portland Pride Parade!")
 	plib.RegisterItems("PortlandPride", pride)
 }
