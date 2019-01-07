@@ -108,7 +108,7 @@ func main() {
 	}
 	if *flagAddProperty != "" {
 		for _, prop := range strings.Split(*flagAddProperty, ",") {
-			if err := t.C.AddProperty(prop); err != nil {
+			if err := t.AddProperty(prop); err != nil {
 				panic(err.Error())
 			}
 		}

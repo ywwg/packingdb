@@ -29,11 +29,11 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 	}
 
 	RegisterProperty(Property(c.Name))
-	if err := c.AddProperty(c.Name); err != nil {
+	if err := c.addProperty(c.Name); err != nil {
 		return nil, err
 	}
 	for _, p := range properties {
-		if err := c.AddProperty(p); err != nil {
+		if err := c.addProperty(p); err != nil {
 			return nil, err
 		}
 	}
@@ -42,9 +42,9 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 	return c, nil
 }
 
-// AddProperty adds the property with the given name to the context, or returns
+// addProperty adds the property with the given name to the context, or returns
 // error if it's not found. Empty strings are ignored.
-func (c *Context) AddProperty(prop string) error {
+func (c *Context) addProperty(prop string) error {
 	if prop == "" {
 		return nil
 	}
@@ -55,9 +55,9 @@ func (c *Context) AddProperty(prop string) error {
 	return nil
 }
 
-// RemoveProperty removes the property with the given name to the context, or
+// removeProperty removes the property with the given name to the context, or
 // returns error if it's not found. Empty strings are ignored.
-func (c *Context) RemoveProperty(prop string) error {
+func (c *Context) removeProperty(prop string) error {
 	if prop == "" {
 		return nil
 	}

@@ -16,8 +16,9 @@ type Item interface {
 	// Satisfies returns true if the item belongs in the given context
 	Satisfies(*Context) bool
 
-	// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-	Itemize(*Trip) Item
+	// Itemize tells the item to calculate how much of itself is needed given the
+	// context.
+	Itemize(*Trip)
 
 	// Count returns the number of this item that got packed
 	Count() float64
@@ -92,13 +93,12 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *BasicItem) Itemize(t *Trip) Item {
-	p := &BasicItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.count = 1.0
+func (i *BasicItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.count = 1.0
+	} else {
+		i.count = 0.0
 	}
-	return p
 }
 
 // Count returns the number of this item should be packed.
@@ -164,13 +164,12 @@ func (i *TemperatureItem) Satisfies(c *Context) bool {
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *TemperatureItem) Itemize(t *Trip) Item {
-	p := &TemperatureItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.count = 1.0
+func (i *TemperatureItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.count = 1.0
+	} else {
+		i.count = 0.0
 	}
-	return p
 }
 
 // ConsumableItem is an item where a certain number will be used every day.
@@ -197,13 +196,12 @@ func NewConsumableItem(name string, rate float64, units string, allow, disallow 
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableItem) Itemize(t *Trip) Item {
-	p := &ConsumableItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.count = math.Ceil(i.DailyRate * float64(t.Nights))
+func (i *ConsumableItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.count = math.Ceil(i.DailyRate * float64(t.Nights))
+	} else {
+		i.count = 0.0
 	}
-	return p
 }
 
 // String constructs a pretty string for printing this item, including a checkbox
@@ -243,13 +241,12 @@ func NewConsumableMaxItem(name string, rate float64, max float64, units string, 
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableMaxItem) Itemize(t *Trip) Item {
-	p := &ConsumableMaxItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), p.Max)
+func (i *ConsumableMaxItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), i.Max)
+	} else {
+		i.count = 0.0
 	}
-	return p
 }
 
 // CustomConsumableItem is a consumable item that takes a function to determine how many
@@ -270,13 +267,12 @@ func NewCustomConsumableItem(name string, rateFunc func(nights int, props Proper
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *CustomConsumableItem) Itemize(t *Trip) Item {
-	p := &CustomConsumableItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.count = i.RateFunc(t.Nights, t.C.Properties)
+func (i *CustomConsumableItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.count = i.RateFunc(t.Nights, t.C.Properties)
+	} else {
+		i.count = 0.0
 	}
-	return p
 }
 
 // ConsumableTemperatureItem is both consumable and only applies for a given temperature range.
@@ -304,13 +300,12 @@ func (i *ConsumableTemperatureItem) Satisfies(c *Context) bool {
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableTemperatureItem) Itemize(t *Trip) Item {
-	p := &ConsumableTemperatureItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.ConsumableItem.count = math.Ceil(i.DailyRate * float64(t.Nights))
+func (i *ConsumableTemperatureItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.ConsumableItem.count = math.Ceil(i.DailyRate * float64(t.Nights))
+	} else {
+		i.ConsumableItem.count = 0.0
 	}
-	return p
 }
 
 // Name returns the name of the item
@@ -369,13 +364,12 @@ func (i *ConsumableMaxTemperatureItem) Satisfies(c *Context) bool {
 }
 
 // Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableMaxTemperatureItem) Itemize(t *Trip) Item {
-	p := &ConsumableMaxTemperatureItem{}
-	*p = *i
-	if p.Satisfies(t.C) {
-		p.ConsumableMaxItem.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), p.Max)
+func (i *ConsumableMaxTemperatureItem) Itemize(t *Trip) {
+	if i.Satisfies(t.C) {
+		i.ConsumableMaxItem.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), i.Max)
+	} else {
+		i.ConsumableMaxItem.count = 0.0
 	}
-	return p
 }
 
 // Name returns the name of the item

@@ -122,7 +122,7 @@ func packMenu(t *packinglib.Trip) error {
 	cursor := 0
 	scroll := 0
 	hidePacked := false
-	hiddenCats := make(map[string]bool)
+	hiddenCats := make(map[packinglib.Category]bool)
 
 	BackMenuItem := packinglib.NewMenuItem("↩ Back", packinglib.MenuAction, "back")
 	HidePackedMenuItem := packinglib.NewMenuItem("Hide Packed", packinglib.MenuAction, "hidepacked")
@@ -177,9 +177,9 @@ func packMenu(t *packinglib.Trip) error {
 		} else if selected.Equals(HidePackedMenuItem) {
 			hidePacked = !hidePacked
 		} else if selected.Equals(UnhideAllCatsItem) {
-			hiddenCats = make(map[string]bool)
+			hiddenCats = make(map[packinglib.Category]bool)
 		} else if selected.Type == packinglib.MenuCategory {
-			hiddenCats[selected.Code] = !hiddenCats[selected.Code]
+			hiddenCats[packinglib.Category(selected.Code)] = !hiddenCats[packinglib.Category(selected.Code)]
 		} else if selected.Type == packinglib.MenuPackable {
 			if err := t.ToggleItemPacked(selected.Code); err != nil {
 				log.Fatal(err)
@@ -230,11 +230,11 @@ func propertyMenu(t *packinglib.Trip) error {
 		if selected == "Back" {
 			return nil
 		} else if t.C.HasProperty(selected) {
-			if err := t.C.RemoveProperty(selected); err != nil {
+			if err := t.RemoveProperty(selected); err != nil {
 				log.Fatal(err)
 			}
 		} else {
-			if err := t.C.AddProperty(selected); err != nil {
+			if err := t.AddProperty(selected); err != nil {
 				log.Fatal(err)
 			}
 		}

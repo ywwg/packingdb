@@ -11,9 +11,9 @@ import (
 )
 
 // PackList is a map from category name to slice of items
-type PackList map[string][]Item
+type PackList map[Category][]Item
 
-// AllItems is a convenience map of all items that packingdb knows about
+// AllItems is a convenience map of all items that packingdb knows about.
 var AllItems = make(PackList)
 
 // Trip describes a trip, which includes a length and a context
@@ -21,6 +21,7 @@ type Trip struct {
 	Nights      int
 	C           *Context
 	contextName string
+
 	// packList is a map of all the items in the trip.
 	packList PackList
 	// codeToItem is a map from a string code to the Item it corresponds to
@@ -37,7 +38,7 @@ var dupeChecker = make(map[string]bool)
 // the given category.  Duplicate categories will be appended.  Items
 // with duplicate case-insensitive names, even across categories,
 // cause a panic.
-func RegisterItems(category string, items []Item) {
+func RegisterItems(category Category, items []Item) {
 	for _, i := range items {
 		if _, ok := dupeChecker[strings.ToLower(i.Name())]; ok {
 			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
@@ -131,11 +132,7 @@ func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 	t.codeToItem = make(map[string]Item)
 	t.itemToCode = make(map[Item]string)
 	idx := 0
-	var keys []string
-	for k := range t.packList {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	keys := t.SortedCategories()
 
 	for _, category := range keys {
 		for _, item := range t.packList[category] {
@@ -157,13 +154,30 @@ func NewTrip(nights int, cname string) (*Trip, error) {
 	return NewTripFromCustomContext(nights, c)
 }
 
-// MakeList returns a map of category to slice of PackedItems for the given trip
+func (t *Trip) AddProperty(p string) error {
+	if err := t.C.addProperty(p); err != nil {
+		return err
+	}
+	t.updateList()
+	return nil
+}
+
+func (t *Trip) RemoveProperty(p string) error {
+	if err := t.C.removeProperty(p); err != nil {
+		return err
+	}
+	t.updateList()
+	return nil
+}
+
+// makeList returns a map of category to slice of PackedItems for the given trip
 func (t *Trip) makeList() PackList {
 	packlist := make(PackList)
 	for category, items := range AllItems {
 		var toPack []Item
 		for _, i := range items {
-			calced := i.Itemize(t)
+			calced := i
+			calced.Itemize(t)
 			if calced.Count() > 0 {
 				toPack = append(toPack, calced)
 			}
@@ -172,6 +186,19 @@ func (t *Trip) makeList() PackList {
 	}
 
 	return packlist
+}
+
+// updateList reitemizes the packing list, changing the Count for each item.
+// This can cause some items to go to Count of zero, but retain their packed
+// state.  This allows users to remove and readd properties in one session
+// and the packing state will be maintained. Once the list is written to disk
+// however, the Count=0 items will be removed.
+func (t *Trip) updateList() {
+	for _, items := range t.packList {
+		for _, i := range items {
+			i.Itemize(t)
+		}
+	}
 }
 
 // Pack tries to pack the provided item first by short code, then by full name.
@@ -201,7 +228,7 @@ func (t *Trip) Pack(i string, pack bool) {
 func (t *Trip) PackCategory(cat string) {
 	found := false
 	for category := range t.packList {
-		if strings.ToLower(cat) == strings.ToLower(category) {
+		if strings.ToLower(cat) == strings.ToLower(string(category)) {
 			found = true
 			for _, i := range t.packList[category] {
 				i.Pack(true)
@@ -215,20 +242,28 @@ func (t *Trip) PackCategory(cat string) {
 	}
 }
 
-// Strings returns a slice of pretty strings representing the entire packing list.
-func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
-	var lines []string
+// SortedCategories returns a list of all the categories currently represented
+// by the context.
+func (t *Trip) SortedCategories() []Category {
 	// map iteration is nondeterministic so sort the keys.
-	var keys []string
+	var keys []Category
 	for k := range t.packList {
 		keys = append(keys, k)
 	}
-	sort.Strings(keys)
+	SortCategories(keys)
+	return keys
+}
+
+// Strings returns a slice of pretty strings representing the entire packing list.
+func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
+	var lines []string
+
+	keys := t.SortedCategories()
 
 	foundCat := false
 	for _, category := range keys {
 		if showCat != "" {
-			if strings.ToLower(category) != strings.ToLower(showCat) {
+			if strings.ToLower(string(category)) != strings.ToLower(showCat) {
 				continue
 			}
 			foundCat = true
@@ -252,14 +287,9 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 // MenuItems returns a list of PackMenuItems for the given trip. Any categories
 // in hiddenCategories will be hidden, and hidePacked will hide all packed
 // items.
-func (t *Trip) MenuItems(hiddenCategories map[string]bool, hidePacked bool) []PackMenuItem {
+func (t *Trip) MenuItems(hiddenCategories map[Category]bool, hidePacked bool) []PackMenuItem {
 	var items []PackMenuItem
-	// map iteration is nondeterministic so sort the keys.
-	var keys []string
-	for k := range t.packList {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	keys := t.SortedCategories()
 
 	for _, category := range keys {
 		hide := hiddenCategories[category]
@@ -270,14 +300,16 @@ func (t *Trip) MenuItems(hiddenCategories map[string]bool, hidePacked bool) []Pa
 			} else {
 				displayCat = fmt.Sprintf("⊟ %s", category)
 			}
-			items = append(items, NewMenuItem(displayCat, MenuCategory, category))
+			items = append(items, NewMenuItem(displayCat, MenuCategory, string(category)))
 		}
 		if !hide {
 			for _, i := range t.packList[category] {
 				if hidePacked && i.Packed() {
 					continue
 				}
-				items = append(items, NewMenuItem(i.String(), MenuPackable, t.itemToCode[i]))
+				if i.Count() > 0 {
+					items = append(items, NewMenuItem(i.String(), MenuPackable, t.itemToCode[i]))
+				}
 			}
 		}
 	}
@@ -341,7 +373,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 					panic(fmt.Sprintf("Error while building context for trip: %s", err.Error()))
 				}
 				for _, prop := range toks[5:] {
-					if err := context.AddProperty(prop); err != nil {
+					if err := context.addProperty(prop); err != nil {
 						panic(fmt.Sprintf("Error adding property while building trip: %s", err.Error()))
 					}
 				}
@@ -388,7 +420,9 @@ func (t *Trip) SaveToFile(f string) error {
 	packedcsv += "\n"
 	for _, items := range t.packList {
 		for _, item := range items {
-			packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
+			if item.Count() > 0 {
+				packedcsv += fmt.Sprintf("%v,%s\n", item.Packed(), item.Name())
+			}
 		}
 	}
 	return ioutil.WriteFile(f, []byte(packedcsv), 0644)
