@@ -33,12 +33,7 @@ type PackMenuItem struct {
 // NewMenuItem creates a new menu item with the given name, type, and code.
 func NewMenuItem(name string, t PackMenuType, code string) PackMenuItem {
 	displayName := name
-	switch t {
-	case MenuCategory:
-		displayName = " " + name
-	case MenuPackable:
-		displayName = "  " + name
-	case MenuProperty:
+	if t == MenuPackable {
 		displayName = " " + name
 	}
 

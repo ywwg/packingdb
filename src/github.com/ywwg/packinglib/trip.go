@@ -336,9 +336,9 @@ func (t *Trip) styleProperty(p Property) string {
 	return fmt.Sprintf("○ %-20s %s", string(p), allProperties[p])
 }
 
-// PropertyMenuItems returns a list of PackPackingMenuItems for the given trip. Any categories
-// in hiddenCategories will be hidden, and hidePacked will hide all packed
-// items.
+// PropertyMenuItems returns a list of PackPackingMenuItems for the given trip.
+// Any categories in hiddenCategories will be hidden, and hidePacked will hide
+// all packed items.
 func (t *Trip) PropertyMenuItems() []PackMenuItem {
 	var l []Property
 	for name := range allProperties {
@@ -352,7 +352,7 @@ func (t *Trip) PropertyMenuItems() []PackMenuItem {
 	var items []PackMenuItem
 	for _, prop := range ListProperties() {
 		displayProp := t.styleProperty(prop)
-		items = append(items, NewMenuItem(displayProp, MenuCategory, string(prop)))
+		items = append(items, NewMenuItem(displayProp, MenuProperty, string(prop)))
 	}
 	return items
 }

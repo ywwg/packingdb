@@ -21,12 +21,12 @@ import (
 
 func mainMenu(t *packinglib.Trip) (string, error) {
 	items := []string{
+		"↩ Quit",
 		"Pack",
 		"Configure Trip Properties",
 		"Set Nights",
 		"Set Min Temperature",
 		"Set Max Temperature",
-		"Quit",
 	}
 
 	prompt := promptui.Select{
@@ -314,7 +314,7 @@ func main() {
 		if err != nil {
 			break
 		}
-		if result == "Quit" {
+		if result == "↩ Quit" {
 			break
 		}
 		switch result {
