@@ -182,9 +182,7 @@ func (t *Trip) makeList() PackList {
 		for _, i := range items {
 			calced := i
 			calced.Itemize(t)
-			if calced.Count() > 0 {
-				toPack = append(toPack, calced)
-			}
+			toPack = append(toPack, calced)
 		}
 		packlist[category] = toPack
 	}
@@ -258,6 +256,17 @@ func (t *Trip) SortedCategories() []Category {
 	return keys
 }
 
+// itemsNonEmpty returns true if at least one item in the list has a non-zero
+// Count.
+func itemsNonEmpty(items []Item) bool {
+	for _, i := range items {
+		if i.Count() > 0 {
+			return true
+		}
+	}
+	return false
+}
+
 // Strings returns a slice of pretty strings representing the entire packing list.
 func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	var lines []string
@@ -272,7 +281,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			}
 			foundCat = true
 		}
-		if len(t.packList[category]) > 0 {
+		if itemsNonEmpty(t.packList[category]) {
 			lines = append(lines, fmt.Sprintf("%s:", category))
 		}
 		for _, i := range t.packList[category] {
@@ -297,7 +306,7 @@ func (t *Trip) PackingMenuItems(hiddenCategories map[Category]bool, hidePacked b
 
 	for _, category := range keys {
 		hide := hiddenCategories[category]
-		if len(t.packList[category]) > 0 {
+		if itemsNonEmpty(t.packList[category]) {
 			var displayCat string
 			if hide {
 				displayCat = fmt.Sprintf("⊞ %s", category)
