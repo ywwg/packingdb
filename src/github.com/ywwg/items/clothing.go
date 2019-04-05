@@ -39,6 +39,7 @@ var clothing = []plib.Item{
 	plib.NewTemperatureItem("medium jacket", 41, 50, nil, nil),
 	plib.NewTemperatureItem("heavy jacket", 0, 40, nil, nil),
 	plib.NewBasicItem("rain jacket", nil, nil),
+	plib.NewBasicItem("snow pants", []string{"Snow"}, nil),
 	plib.NewBasicItem("umbrella", nil, nil),
 	plib.NewTemperatureItem("warm hat", 0, 55, nil, nil),
 	plib.NewTemperatureItem("gloves", 0, 55, nil, nil),
