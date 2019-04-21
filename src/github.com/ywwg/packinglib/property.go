@@ -26,6 +26,7 @@ var allProperties = map[Property]string{
 	"Business":         "some work happening.",
 	"BYOB":             "need to pack some booze",
 	"Camping":          "",
+	"CarRide":          "includes a long drive",
 	"Con":              "convention of any sort",
 	"Climbing":         "",
 	"Cycling":          "moderate amount of biking",

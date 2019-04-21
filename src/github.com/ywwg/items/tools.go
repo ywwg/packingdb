@@ -9,6 +9,7 @@ var tools = []plib.Item{
 	plib.NewBasicItem("Tiny House ALC", []string{"Tiny House"}, nil),
 	plib.NewConsumableItem("Gas for Generator", 1.0, "gallons", []string{"Tiny House"}, nil),
 	plib.NewBasicItem("Hand vac", []string{"Tiny House"}, nil),
+	plib.NewBasicItem("5 gallon water jug", []string{"Tiny House"}, nil),
 }
 
 func init() {

@@ -37,6 +37,8 @@ var food = []plib.Item{
 	plib.NewBasicItem("all non-freezable ingredients", []string{"Tiny House"}, nil),
 
 	plib.NewConsumableMaxItem("green tea", 1.0, 6.0, "bags", []string{"Lodging", "Con"}, nil),
+	plib.NewBasicItem("no-think food for drive", []string{"Tiny House", "CarRide"}, nil),
+	plib.NewBasicItem("liquid for drive", []string{"Tiny House", "CarRide"}, nil),
 }
 
 func init() {
