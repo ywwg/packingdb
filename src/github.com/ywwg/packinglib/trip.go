@@ -288,7 +288,9 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 			if hideUnpacked && i.Packed() {
 				continue
 			}
-			lines = append(lines, fmt.Sprintf("\t(%s) %s", t.itemToCode[i], i.String()))
+			if i.Count() > 0 {
+				lines = append(lines, fmt.Sprintf("\t(%s) %s", t.itemToCode[i], i.String()))
+			}
 		}
 	}
 	if showCat != "" && !foundCat {
