@@ -21,6 +21,8 @@ var nevermore = []plib.Item{
 	plib.NewBasicItem("2 copper light strings", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("6 wooden bracket things", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("round table", []string{"Nevermore"}, nil),
+	plib.NewBasicItem("4 screws for table", []string{"Nevermore"}, nil),
+	plib.NewBasicItem("drill to assemble table", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("olpc", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("midi fighter w/cable", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("nevermore binder", []string{"Nevermore"}, nil),
