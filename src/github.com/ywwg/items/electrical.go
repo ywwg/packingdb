@@ -6,6 +6,7 @@ import (
 
 var electrical = []plib.Item{
 	plib.NewBasicItem("Generator", []string{"Burn", "Tiny House"}, nil),
+	plib.NewBasicItem("Fire extinguisher for genny", []string{"Burn"}, nil),
 	plib.NewConsumableItem("Gas", 1.0, "gallons", []string{"Burn"}, nil),
 	plib.NewBasicItem("Kill-A-Watt", []string{"Burn"}, nil),
 	plib.NewBasicItem("1/8 to 1/8", []string{"Performing"}, []string{"Tiny House"}),

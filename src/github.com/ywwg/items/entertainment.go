@@ -5,7 +5,7 @@ import (
 )
 
 var entertainment = []plib.Item{
-	plib.NewConsumableMaxItem("books", 0.5, 3.0, plib.NoUnits, nil, nil),
+	plib.NewConsumableMaxItem("books", 1.0, 3.0, plib.NoUnits, nil, nil),
 	plib.NewBasicItem("35mm camera", nil, nil),
 	plib.NewBasicItem("guidebooks", []string{"BigTrip"}, nil),
 	plib.NewBasicItem("earbuds", nil, nil),

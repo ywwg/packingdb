@@ -19,7 +19,14 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("tissues", nil, nil),
 	plib.NewBasicItem("shaving Cream", nil, []string{"Burn"}),
 	plib.NewBasicItem("aftershave", nil, []string{"Burn"}),
-	plib.NewBasicItem("hair stuff", nil, []string{"Burn"}),
+	plib.NewBasicItem("hair stuff", nil, []string{"Burn", "NoCheckedLuggage"}),
+	plib.NewCustomConsumableItem("hair dye", func(nights int, props plib.PropertySet) float64 {
+		if nights >= 3 {
+			return 1
+		}
+		return 0
+	}, plib.NoUnits, nil, []string{"Burn"}),
+	plib.NewBasicItem("travel hair stuff", []string{"NoCheckedLuggage"}, nil),
 	plib.NewBasicItem("electric razor", []string{"Burn", "Tiny House"}, nil),
 	plib.NewBasicItem("razor", nil, []string{"Burn"}),
 	plib.NewTemperatureItem("spray sunscreen", 70, 120, []string{"Camping", "Bright"}, []string{"Flight"}),
@@ -31,6 +38,7 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("oakleys", nil, []string{"Burn"}),
 	plib.NewBasicItem("contact Fluid", nil, []string{"Burn"}),
 	plib.NewConsumableItem("contacts", 1.0, "pairs", nil, []string{"Burn"}),
+	plib.NewBasicItem("epi pens", nil, nil),
 }
 
 func init() {

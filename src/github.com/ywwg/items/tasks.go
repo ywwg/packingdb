@@ -5,6 +5,7 @@ import (
 )
 
 var tasks = []plib.Item{
+	plib.NewBasicItem("Cash Money", nil, nil),
 	plib.NewBasicItem("permetherin", []string{"Camping"}, nil),
 	plib.NewBasicItem("label things", []string{"Camping"}, nil),
 	plib.NewBasicItem("chop broccoli thumb-size", []string{"Firefly2017"}, nil),
