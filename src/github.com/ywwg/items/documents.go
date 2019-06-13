@@ -12,6 +12,7 @@ var documents = []plib.Item{
 	plib.NewBasicItem("Print Wiki", []string{"BigTrip"}, nil),
 	plib.NewBasicItem("Waiver", []string{"Burn"}, nil),
 	plib.NewBasicItem("Transportation Tickets", []string{"PaidTravel", "Flight"}, nil),
+	plib.NewBasicItem("MTA Metrocard", []string{"NYC"}, nil),
 }
 
 func init() {

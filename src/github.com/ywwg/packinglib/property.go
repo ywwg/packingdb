@@ -45,6 +45,7 @@ var allProperties = map[Property]string{
 	"Nevermore":        "",
 	"NoCheckedLuggage": "",
 	"NoFire":           "Used when there's camping, but no fire allowed at all",
+	"NYC":              "New York City???",
 	"PaidEvent":        "Concerts, shows, cons, etc",
 	"PaidTravel":       "Paying to travel (Flight, rail, bus, etc)",
 	"Speaker":          "Need to play some music",

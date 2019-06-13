@@ -5,6 +5,8 @@ import (
 )
 
 var toiletries = []plib.Item{
+	plib.NewBasicItem("sleep earplugs", nil, nil),
+	plib.NewBasicItem("eye mask", nil, nil),
 	plib.NewBasicItem("deoderant", nil, nil),
 	plib.NewBasicItem("wet wipes", []string{"Camping", "Tiny House"}, nil),
 	plib.NewBasicItem("towel", []string{"Tiny House"}, nil),
