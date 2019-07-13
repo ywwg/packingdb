@@ -21,7 +21,7 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("cute clippers", nil, nil),
 	plib.NewBasicItem("tissues", nil, nil),
 	plib.NewBasicItem("shaving Cream", nil, []string{"Burn"}),
-	plib.NewBasicItem("aftershave", nil, []string{"Burn"}),
+	plib.NewBasicItem("aftershave", nil, nil),
 	plib.NewBasicItem("hair stuff", nil, []string{"Burn", "NoCheckedLuggage"}),
 	plib.NewCustomConsumableItem("hair dye", func(nights int, props plib.PropertySet) float64 {
 		if nights >= 3 {

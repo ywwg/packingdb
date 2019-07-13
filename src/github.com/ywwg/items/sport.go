@@ -11,6 +11,7 @@ var bicycling = []plib.Item{
 	plib.NewBasicItem("bike shorts", []string{"Cycling"}, nil),
 	plib.NewBasicItem("bike shoes", []string{"Cycling"}, nil),
 	plib.NewBasicItem("bike socks", []string{"Cycling"}, nil),
+	plib.NewBasicItem("bike gloves", []string{"Cycling"}, nil),
 	plib.NewBasicItem("water bottles", []string{"Cycling"}, nil),
 	plib.NewBasicItem("mini bike kit", []string{"Cycling"}, nil),
 	plib.NewBasicItem("ankle straps", []string{"Cycling"}, nil),
