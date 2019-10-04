@@ -29,6 +29,7 @@ var allProperties = map[Property]string{
 	"CarRide":          "includes a long drive",
 	"Con":              "convention of any sort",
 	"Climbing":         "",
+	"LeadClimbing":     "Extra gear for lead",
 	"Cycling":          "moderate amount of biking",
 	"CyclingLongRide":  "biking a long distance",
 	"Dark":             "mostly for camping, but anytime you'll be wandering in the dark",

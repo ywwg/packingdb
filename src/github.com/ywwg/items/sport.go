@@ -27,6 +27,8 @@ var climbing = []plib.Item{
 	plib.NewBasicItem("chalk bag", []string{"Climbing"}, nil),
 	plib.NewBasicItem("climbing shirts", []string{"Climbing"}, nil),
 	plib.NewBasicItem("climbing pants", []string{"Climbing"}, nil),
+	plib.NewBasicItem("climbing helmet", []string{"LeadClimbing"}, nil),
+	plib.NewBasicItem("belay device", []string{"LeadClimbing"}, nil),
 }
 
 func init() {
