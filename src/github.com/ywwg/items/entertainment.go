@@ -30,6 +30,7 @@ var entertainment = []plib.Item{
 	}, plib.NoUnits, []string{"Tiny House", "International"}, nil),
 	plib.NewBasicItem("music ear plugs", []string{"Performing", "Partying", "Loud"}, nil),
 	plib.NewBasicItem("Mixxx stickers", []string{"Performing"}, nil),
+	plib.NewBasicItem("Nintendo Switch", []string{"Tiny House"}, nil),
 }
 
 func init() {
