@@ -6,13 +6,12 @@ import (
 
 var entertainment = []plib.Item{
 	plib.NewConsumableMaxItem("books", 1.0, 3.0, plib.NoUnits, nil, nil),
-	plib.NewBasicItem("35mm camera", nil, nil),
+	plib.NewBasicItem("35mm camera and/or polaroid", nil, nil),
 	plib.NewBasicItem("guidebooks", []string{"BigTrip"}, nil),
 	plib.NewBasicItem("earbuds", nil, nil),
 	plib.NewBasicItem("laptop and charger", nil, []string{"Insecure"}),
 	plib.NewBasicItem("USB-C breakout", nil, []string{"Insecure"}),
 	plib.NewBasicItem("HDMI cable", []string{"Lodging"}, []string{"Insecure"}),
-	plib.NewBasicItem("Chromecast", []string{"Lodging"}, []string{"Insecure"}),
 	plib.NewBasicItem("mouse and pad", []string{"Tiny House"}, nil),
 	plib.NewBasicItem("USB-A-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("USB-C-C cable", nil, []string{"Tiny House"}),
