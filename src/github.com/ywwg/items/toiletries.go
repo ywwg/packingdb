@@ -41,6 +41,7 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("contact Fluid", nil, []string{"Burn"}),
 	plib.NewConsumableItem("contacts", 1.0, "pairs", nil, []string{"Burn"}),
 	plib.NewBasicItem("epi pens", nil, nil),
+	plib.NewBasicItem("Dramamine", []string{"CarRide"}, nil),
 }
 
 func init() {
