@@ -21,6 +21,7 @@ type PropertySet map[Property]bool
 var allProperties = map[Property]string{
 	"Art":              "gonna do some drawing",
 	"BigTrip":          "this is a big deal",
+	"Boat":             "on a boat!",
 	"Bright":           "sun, and therefore sunscreen.",
 	"Burn":             "",
 	"Business":         "some work happening.",

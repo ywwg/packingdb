@@ -36,8 +36,13 @@ var skiing = []plib.Item{
 	plib.NewBasicItem("warm balaklava", []string{"Skiing"}, nil),
 }
 
+var boating = []plib.Item{
+	plib.NewBasicItem("phone dry bag", []string{"Boat"}, nil),
+}
+
 func init() {
 	plib.RegisterItems("Bicycling", bicycling)
 	plib.RegisterItems("Climbing", climbing)
 	plib.RegisterItems("Skiing", skiing)
+	plib.RegisterItems("Boat", boating)
 }
