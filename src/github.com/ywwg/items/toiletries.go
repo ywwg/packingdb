@@ -8,7 +8,7 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("sleep earplugs", nil, nil),
 	plib.NewBasicItem("eye mask", nil, nil),
 	plib.NewBasicItem("deoderant", nil, nil),
-	plib.NewBasicItem("wet wipes", []string{"Camping", "Tiny House"}, nil),
+	plib.NewBasicItem("wet wipes", []string{"Camping", "Tiny House", "Playtime"}, nil),
 	plib.NewBasicItem("hand sanitizer", []string{"Camping", "Dirt"}, nil),
 	plib.NewBasicItem("2 kitchen towels", []string{"Tiny House"}, nil),
 	plib.NewBasicItem("toothpaste", nil, nil),

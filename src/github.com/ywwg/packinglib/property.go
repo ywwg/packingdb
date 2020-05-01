@@ -53,6 +53,7 @@ var allProperties = map[Property]string{
 	"Speaker":          "Need to play some music",
 	"Suiting":          "",
 	"Partying":         "",
+	"Playtime":         "",
 	"Skiing":           "",
 	"Snow":             "",
 	"Sweat":            "are you gonna sweat up the car?",

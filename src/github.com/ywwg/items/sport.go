@@ -23,7 +23,7 @@ var bicycling = []plib.Item{
 
 var climbing = []plib.Item{
 	plib.NewBasicItem("climbing shoes", []string{"Climbing"}, nil),
-	plib.NewBasicItem("harness", []string{"Climbing"}, nil),
+	plib.NewBasicItem("climbing harness", []string{"Climbing"}, nil),
 	plib.NewBasicItem("chalk bag", []string{"Climbing"}, nil),
 	plib.NewBasicItem("climbing shirts", []string{"Climbing"}, nil),
 	plib.NewBasicItem("climbing pants", []string{"Climbing"}, nil),
