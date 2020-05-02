@@ -19,6 +19,12 @@ You'll need the promptui module: (TODO: make this versioned!)
 go get -v github.com/manifoldco/promptui
 ```
 
+Subsequently, if you want to update modules:
+
+```shell
+go get -u all
+```
+
 Then, you should be able to build and run the program:
 
 ```shell

@@ -40,6 +40,7 @@ var allProperties = map[Property]string{
 	"GrumpCamping":     "A special type of burn",
 	"Handy":            "need tools?",
 	"HasToiletries":    "",
+	"Hiking":           "tromping through the woods",
 	"Insecure":         "Don't bring valuables",
 	"International":    "",
 	"Lodging":          "Paid lodging like a hotel or airbnb",
