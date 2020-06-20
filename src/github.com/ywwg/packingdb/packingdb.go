@@ -338,9 +338,8 @@ func main() {
 				break
 			}
 		}
-	}
-
-	if err := t.SaveToFile(filename); err != nil {
-		log.Fatal(fmt.Sprintf("%v", err))
+		if err := t.SaveToFile(filename); err != nil {
+			log.Fatal(fmt.Sprintf("%v", err))
+		}
 	}
 }
