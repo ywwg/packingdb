@@ -19,6 +19,7 @@ var bicycling = []plib.Item{
 	plib.NewBasicItem("charge bike lights", []string{"Cycling"}, nil),
 	plib.NewBasicItem("GPS map", []string{"CyclingLongRide"}, nil),
 	plib.NewBasicItem("bike GPS", []string{"CyclingLongRide"}, nil),
+	plib.NewBasicItem("GPS Dongle", []string{"CyclingLongRide"}, nil),
 }
 
 var climbing = []plib.Item{

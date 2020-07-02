@@ -61,7 +61,7 @@ var flightSupplies = []plib.Item{
 }
 
 var conSupplies = []plib.Item{
-	plib.NewBasicItem("collapsible backpack", []string{"Con"}, nil),
+	plib.NewBasicItem("collapsible backpack", []string{"Con", "Tiny House"}, nil),
 }
 
 func init() {
