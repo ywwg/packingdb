@@ -89,6 +89,7 @@ var tinyhouseSummer = plib.Context{
 		"Dark":          true,
 		"Art":           true,
 		"Speaker":       true,
+		"Dog":           true,
 	},
 }
 
@@ -103,6 +104,7 @@ var tinyhouseFall = plib.Context{
 		"Handy":         true,
 		"Tiny House":    true,
 		"Speaker":       true,
+		"Dog":           true,
 	},
 }
 
@@ -116,6 +118,7 @@ var tinyhouseWinter = plib.Context{
 		"Handy":         true,
 		"Tiny House":    true,
 		"Speaker":       true,
+		"Dog":           true,
 	},
 }
 
