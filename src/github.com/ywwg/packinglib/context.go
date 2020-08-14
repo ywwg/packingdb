@@ -51,6 +51,14 @@ func (c *Context) addProperty(prop string) error {
 	if _, ok := allProperties[Property(prop)]; !ok {
 		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
+	// Recursively add contained properties that are actually also contexts.
+	if subContext, err := GetContext(prop); err == nil {
+		for p, inc := range subContext.Properties {
+			if _, ok := c.Properties[p]; inc && !ok {
+				c.addProperty(string(p))
+			}
+		}
+	}
 	c.Properties[Property(prop)] = true
 	return nil
 }

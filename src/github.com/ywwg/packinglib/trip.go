@@ -81,7 +81,7 @@ func RegisterContext(c Context) {
 	RegisterProperty(Property(c.Name), "")
 }
 
-// GetContext returns the context of the given name, or panics if not found.
+// GetContext returns the context of the given name, or returns error if not found.
 func GetContext(name string) (*Context, error) {
 	c := &Context{}
 	found, ok := contexts[name]
