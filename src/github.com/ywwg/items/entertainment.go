@@ -11,11 +11,11 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("earbuds", nil, nil),
 	plib.NewBasicItem("laptop and charger", nil, []string{"Insecure"}),
 	plib.NewBasicItem("USB-C breakout", nil, []string{"Insecure"}),
-	plib.NewBasicItem("HDMI cable", []string{"Lodging"}, []string{"Insecure"}),
+	plib.NewBasicItem("HDMI cable", []string{"Lodging", "Projector"}, []string{"Insecure"}),
 	plib.NewBasicItem("mouse and pad", []string{"Tiny House"}, nil),
 	plib.NewBasicItem("USB-A-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("USB-C-C cable", nil, []string{"Tiny House"}),
-	plib.NewBasicItem("jambox and charger", []string{"Speaker"}, []string{"International"}),
+	plib.NewBasicItem("jambox and charger", []string{"Speaker", "Projector"}, []string{"International"}),
 	plib.NewBasicItem("1/8 stereo cable", []string{"Speaker"}, []string{"International", "Tiny House"}),
 	plib.NewCustomConsumableItem("tv / movie", func(nights int, props plib.PropertySet) float64 {
 		if _, ok := props["Tiny House"]; ok {
@@ -29,6 +29,8 @@ var entertainment = []plib.Item{
 	}, plib.NoUnits, []string{"Tiny House", "International"}, nil),
 	plib.NewBasicItem("music ear plugs", []string{"Performing", "Partying", "Loud"}, nil),
 	plib.NewBasicItem("Mixxx stickers", []string{"Performing"}, nil),
+	plib.NewBasicItem("Projector", []string{"Projector"}, nil),
+	plib.NewBasicItem("Screen", []string{"Projector"}, nil),
 }
 
 func init() {

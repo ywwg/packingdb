@@ -1,6 +1,10 @@
-* add support for initial creation
+* Separate contexts and properties better
+ * they should have separate positions in the csv
+ * they should have separate divisions in the list of addable props
+ * no auto-add property with the name of a context
 * complete my stateful list change, try to upstream it
  * (scroll position changes unnecessarily so we need to persist it)
  * or include in my own tree
 * try to split checkboxes out from Strings()
 * pgup pgdn -- even possible?
+

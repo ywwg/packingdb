@@ -52,6 +52,7 @@ var allProperties = map[Property]string{
 	"NYC":              "New York City???",
 	"PaidEvent":        "Concerts, shows, cons, etc",
 	"PaidTravel":       "Paying to travel (Flight, rail, bus, etc)",
+	"Projector":        "Movies on the big screen",
 	"Speaker":          "Need to play some music",
 	"Suiting":          "",
 	"Partying":         "",
