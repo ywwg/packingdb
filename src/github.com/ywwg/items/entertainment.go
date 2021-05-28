@@ -31,6 +31,12 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("Mixxx stickers", []string{"Performing"}, nil),
 	plib.NewBasicItem("Projector", []string{"Projector"}, nil),
 	plib.NewBasicItem("Screen", []string{"Projector"}, nil),
+	plib.NewBasicItem("JBL Speakers", []string{"Projector", "PA System"}, nil),
+	plib.NewBasicItem("Speaker Stands", []string{"Projector", "PA System"}, nil),
+	plib.NewBasicItem("Mixer", []string{"Projector", "PA System"}, nil),
+	plib.NewBasicItem("long XLR cables", []string{"Projector", "PA System"}, nil),
+	plib.NewBasicItem("Karaoke hard drive", []string{"Karaoke"}, nil),
+	plib.NewBasicItem("Extra Mic and XLR", []string{"Karaoke"}, nil),
 }
 
 func init() {

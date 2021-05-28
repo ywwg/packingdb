@@ -21,7 +21,6 @@ var fireflyContext = plib.Context{
 		"Modular":      true,
 		"DJing":        true,
 		"Partying":     true,
-		"Firefly2018":  true,
 		"Suiting":      true,
 		"Swimming":     true,
 	},
@@ -69,7 +68,6 @@ var berlin = plib.Context{
 		"International": true,
 		"Partying":      true,
 		"Lodging":       true,
-		"Berlin2017":    true,
 		"Flight":        true,
 		"DiningOut":     true,
 		"BigTrip":       true,
@@ -144,19 +142,6 @@ var sustainRelease = plib.Context{
 		"Swimming":  true,
 		"PaidEvent": true,
 		"Speaker":   true,
-	},
-}
-
-var offsiteContext = plib.Context{
-	Name:           "Offsite",
-	TemperatureMin: 65,
-	TemperatureMax: 120,
-	Properties: plib.PropertySet{
-		"Bright":        true,
-		"Sweat":         true,
-		"Swimming":      true,
-		"HasToiletries": true,
-		"Lodging":       true,
 	},
 }
 
@@ -238,7 +223,6 @@ var japan = plib.Context{
 		"Flight":        true,
 		"HasToiletries": true,
 		"International": true,
-		"Japan2018":     true,
 		"Lodging":       true,
 		"Loud":          true,
 		"PaidEvent":     true,
@@ -249,48 +233,32 @@ var japan = plib.Context{
 	},
 }
 
+var quillHill = plib.Context{
+	Name:           "Quill Hill",
+	TemperatureMin: 60,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Tiny House Summer": true,
+		"Projector":         true,
+		"PA System":         true,
+		"Karaoke":           true,
+	},
+}
+
 func init() {
-	firefly2017 := fireflyContext
-	firefly2017.Name = "Firefly2017"
-
-	firefly2018 := fireflyContext
-	firefly2018.Name = "Firefly2018"
-
-	// retreat2017 := capeContext
-	// retreat2017.Name = "Retreat2017"
-	// retreat2017.Properties["Retreat2017"] = true
-
-	berlin2017 := berlin
-	berlin2017.Name = "Berlin2017"
-
-	offsite2017 := offsiteContext
-
 	nectr2017 := nectrContext
 	nectr2017.Name = "Nectr2017"
 
 	fancon := fanconContext
 
-	japan2018 := japan
-	japan2018.Name = "Japan2018"
-
 	plib.RegisterContext(fireflyContext)
-	plib.RegisterContext(firefly2017)
-	plib.RegisterContext(firefly2018)
 	plib.RegisterContext(capeContext)
-	// plib.RegisterContext(retreat2017)
-	plib.RegisterContext(berlin)
-	plib.RegisterContext(berlin2017)
 	plib.RegisterContext(tinyhouseSummer)
 	plib.RegisterContext(tinyhouseFall)
 	plib.RegisterContext(tinyhouseWinter)
-	plib.RegisterContext(sustainRelease)
-	plib.RegisterContext(offsite2017)
-	plib.RegisterContext(nectr2017)
-	plib.RegisterContext(paxUnpluggedContext)
 	plib.RegisterContext(daytrip)
 	plib.RegisterContext(blanktrip)
-	plib.RegisterContext(florida)
 	plib.RegisterContext(fancon)
 	plib.RegisterContext(japan)
-	plib.RegisterContext(japan2018)
+	plib.RegisterContext(quillHill)
 }

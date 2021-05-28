@@ -7,6 +7,5 @@ import (
 var toBuy = []plib.Item{}
 
 func init() {
-	plib.RegisterProperty("Firefly2017", "")
 	plib.RegisterItems("To Buy", toBuy)
 }
