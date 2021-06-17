@@ -245,6 +245,25 @@ var quillHill = plib.Context{
 	},
 }
 
+var tubing = plib.Context{
+	Name:           "Tubing",
+	TemperatureMin: 60,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Boat":          true,
+		"Bright":        true,
+		"Camping":       true,
+		"CarRide":       true,
+		"Dark":          true,
+		"Handy":         true,
+		"HasToiletries": true,
+		"Speaker":       true,
+		"Sweat":         true,
+		"Swimming":      true,
+		"PaidEvent":     true,
+	},
+}
+
 func init() {
 	nectr2017 := nectrContext
 	nectr2017.Name = "Nectr2017"
@@ -261,4 +280,5 @@ func init() {
 	plib.RegisterContext(fancon)
 	plib.RegisterContext(japan)
 	plib.RegisterContext(quillHill)
+	plib.RegisterContext(tubing)
 }
