@@ -12,6 +12,7 @@ var waterStuff = []plib.Item{
 
 var tubing = []plib.Item{
 	plib.NewBasicItem("innertube", []string{"Tubing"}, nil),
+	plib.NewBasicItem("air pump", []string{"Tubing"}, nil),
 }
 
 func init() {

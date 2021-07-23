@@ -90,6 +90,7 @@ var tinyhouseSummer = plib.Context{
 		"Dog":           true,
 		"CarRide":       true,
 		"Projector":     true,
+		"Swimming":      true,
 	},
 }
 

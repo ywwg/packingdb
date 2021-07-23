@@ -5,6 +5,9 @@ import (
 )
 
 var clothing = []plib.Item{
+	plib.NewBasicItem("sleep earplugs", nil, nil),
+	plib.NewBasicItem("eye mask", nil, nil),
+	plib.NewBasicItem("face masks", nil, nil),
 	plib.NewBasicItem("boots", []string{"Dirt", "Snow", "Tiny House", "Skiing", "Hiking"}, nil),
 	plib.NewConsumableItem("underwear", 1.0, "pair", nil, nil),
 	plib.NewConsumableMaxTemperatureItem("crew socks", 1.0, 4.0, "pair", 0, 65, nil, []string{"Camping"}),

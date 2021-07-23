@@ -12,7 +12,6 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("laptop and charger", nil, []string{"Insecure"}),
 	plib.NewBasicItem("USB-C breakout", nil, []string{"Insecure"}),
 	plib.NewBasicItem("HDMI cable", []string{"Lodging", "Projector"}, []string{"Insecure"}),
-	plib.NewBasicItem("mouse and pad", []string{"Tiny House"}, nil),
 	plib.NewBasicItem("USB-A-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("USB-C-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("jambox and charger", []string{"Speaker", "Projector"}, []string{"International"}),
@@ -37,6 +36,7 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("long XLR cables", []string{"Projector", "PA System"}, nil),
 	plib.NewBasicItem("Karaoke hard drive", []string{"Karaoke"}, nil),
 	plib.NewBasicItem("Extra Mic and XLR", []string{"Karaoke"}, nil),
+	plib.NewBasicItem("Party Laser", []string{"Karaoke"}, nil),
 }
 
 func init() {
