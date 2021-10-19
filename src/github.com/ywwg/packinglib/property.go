@@ -65,10 +65,12 @@ var allProperties = map[Property]string{
 	"Tarping":          "Putting up tarps",
 	"Tiny House":       "",
 	"UltraFormal":      "do you need to *really* dress up?",
+	"Vax Proof":        "proof of vaccination needed?",
 	"PA System":        "Need the PA",
 	"Performing":       "Use this for all music, and then add the specific ones",
 	"Modular":          "",
 	"DJing":            "",
+	"MiniMixxx":        "",
 }
 
 // RegisterProperty adds a new Property to the database so it can be used.

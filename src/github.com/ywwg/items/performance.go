@@ -29,16 +29,24 @@ var performing = []plib.Item{
 	// TODO: Create a cumulative item for 1/4in adapters
 	plib.NewBasicItem("2x 1/4in adapter for zoom", []string{"Performing"}, nil),
 	plib.NewBasicItem("microphone", []string{"Performing"}, nil),
-	plib.NewBasicItem("VCI400", []string{"DJing"}, nil),
-	plib.NewBasicItem("VCI400 Power", []string{"DJing"}, nil),
-	plib.NewBasicItem("canvas bag for VCI400", []string{"DJing"}, nil),
+	plib.NewBasicItem("DJ Controller", []string{"DJing"}, nil),
+	plib.NewBasicItem("DJ Controller Power", []string{"DJing"}, nil),
+	plib.NewBasicItem("bag for DJ controller", []string{"DJing"}, nil),
 	plib.NewBasicItem("usb-C to usb-B cable", []string{"DJing"}, nil),
-	plib.NewBasicItem("RCA to 1/4 for VCI400", []string{"Performing"}, nil),
+	plib.NewBasicItem("RCA to 1/4 for DJ audio", []string{"Performing"}, nil),
 	plib.NewBasicItem("laptop", []string{"DJing", "Karaoke", "Projector"}, nil),
 	plib.NewBasicItem("keyboard cover", []string{"DJing"}, nil),
 	plib.NewBasicItem("laptop stand", []string{"DJing"}, nil),
 	plib.NewBasicItem("little usb audio", []string{"DJing"}, nil),
+	plib.NewBasicItem("MiniMixxx", []string{"MiniMixxx"}, nil),
+	plib.NewBasicItem("small philips", []string{"MiniMixxx"}, nil),
+	plib.NewBasicItem("needlenose pliers", []string{"MiniMixxx"}, nil),
+	plib.NewBasicItem("mini bt keyboard", []string{"MiniMixxx"}, nil),
+	plib.NewBasicItem("MiniMixxx", []string{"MiniMixxx"}, nil),
 	plib.NewBasicItem("Mixxx stickers", []string{"Performing"}, nil),
+	plib.NewBasicItem("2x USB-A to square", []string{"MiniMixxx"}, nil),
+	plib.NewBasicItem("Traktor Audio10", []string{"MiniMixxx"}, nil),
+	plib.NewBasicItem("Spare USB-C charger", []string{"MiniMixxx"}, nil),
 }
 
 func init() {

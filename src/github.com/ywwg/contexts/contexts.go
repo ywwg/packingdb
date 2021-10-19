@@ -18,7 +18,6 @@ var fireflyContext = plib.Context{
 		"Dark":         true,
 		"Burn":         true,
 		"Performing":   true,
-		"Modular":      true,
 		"DJing":        true,
 		"Partying":     true,
 		"Suiting":      true,
