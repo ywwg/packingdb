@@ -56,7 +56,6 @@ var clothing = []plib.Item{
 
 var flightSupplies = []plib.Item{
 	plib.NewBasicItem("turtl pillow", []string{"Flight"}, nil),
-	plib.NewBasicItem("foot sling", []string{"International"}, nil),
 	plib.NewBasicItem("compression socks in carryon", []string{"Flight"}, nil),
 }
 

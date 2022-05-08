@@ -222,7 +222,7 @@ func (t *Trip) Pack(i string, pack bool) {
 		}
 	}
 	if !found {
-		panic(fmt.Sprintf("tried to pack nonexistant item: %s", i))
+		fmt.Printf("tried to pack nonexistant item, ignoring: %s\n", i)
 	}
 }
 

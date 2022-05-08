@@ -12,7 +12,6 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("laptop and charger", nil, []string{"Insecure"}),
 	plib.NewBasicItem("USB-C breakout", nil, []string{"Insecure"}),
 	plib.NewBasicItem("HDMI cable", []string{"Lodging", "Projector"}, []string{"Insecure"}),
-	plib.NewBasicItem("USB-A-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("USB-C-C cable", nil, []string{"Tiny House"}),
 	plib.NewBasicItem("jambox and charger", []string{"Speaker", "Projector"}, []string{"International"}),
 	plib.NewBasicItem("1/8 stereo cable", []string{"Speaker"}, []string{"International", "Tiny House"}),
