@@ -42,6 +42,7 @@ var clothing = []plib.Item{
 	plib.NewBasicItem("snow pants", []string{"Snow", "Skiing"}, nil),
 	plib.NewBasicItem("umbrella", nil, nil),
 	plib.NewTemperatureItem("warm hat", 0, 50, nil, nil),
+	plib.NewTemperatureItem("scarf", 0, 40, nil, nil),
 	plib.NewTemperatureItem("gloves", 0, 50, nil, nil),
 	plib.NewTemperatureItem("tevas", 70, 120, nil, []string{"International"}),
 	plib.NewBasicItem("nice dinner clothes", []string{"DiningOut"}, nil),
@@ -55,8 +56,8 @@ var clothing = []plib.Item{
 }
 
 var flightSupplies = []plib.Item{
-	plib.NewBasicItem("turtl pillow", []string{"Flight"}, nil),
-	plib.NewBasicItem("compression socks in carryon", []string{"Flight"}, nil),
+	plib.NewBasicItem("turtl pillow", []string{"Flight", "International"}, nil),
+	plib.NewBasicItem("compression socks in carryon", []string{"Flight", "International"}, nil),
 }
 
 var conSupplies = []plib.Item{
