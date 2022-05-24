@@ -73,22 +73,42 @@ var berlin = plib.Context{
 	},
 }
 
+var tinyhouseSpring = plib.Context{
+	Name:           "Tiny House Spring",
+	TemperatureMin: 40,
+	TemperatureMax: 120,
+	Properties: plib.PropertySet{
+		"Art":           true,
+		"Bright":        true,
+		"CarRide":       true,
+		"Dark":          true,
+		"Dog":           true,
+		"Handy":         true,
+		"HasToiletries": true,
+		"Hiking":        true,
+		"Speaker":       true,
+		"Sweat":         true,
+		"Tiny House":    true,
+	},
+}
+
 var tinyhouseSummer = plib.Context{
 	Name:           "Tiny House Summer",
 	TemperatureMin: 60,
 	TemperatureMax: 120,
 	Properties: plib.PropertySet{
-		"Bright":        true,
-		"Sweat":         true,
-		"HasToiletries": true,
-		"Handy":         true,
-		"Tiny House":    true,
-		"Dark":          true,
 		"Art":           true,
-		"Speaker":       true,
-		"Dog":           true,
+		"Bright":        true,
 		"CarRide":       true,
+		"Dark":          true,
+		"Dog":           true,
+		"Handy":         true,
+		"HasToiletries": true,
+		"Hiking":        true,
+		"Speaker":       true,
+		"Sweat":         true,
 		"Swimming":      true,
+		"Tiny House":    true,
 	},
 }
 
@@ -102,6 +122,7 @@ var tinyhouseFall = plib.Context{
 		"HasToiletries": true,
 		"Handy":         true,
 		"Tiny House":    true,
+		"Hiking":        true,
 		"Speaker":       true,
 		"Dog":           true,
 		"CarRide":       true,
@@ -114,12 +135,13 @@ var tinyhouseWinter = plib.Context{
 	TemperatureMax: 50,
 	Properties: plib.PropertySet{
 		"Bright":        true,
-		"HasToiletries": true,
-		"Handy":         true,
-		"Tiny House":    true,
-		"Speaker":       true,
-		"Dog":           true,
 		"CarRide":       true,
+		"Dog":           true,
+		"Handy":         true,
+		"HasToiletries": true,
+		"Hiking":        true,
+		"Speaker":       true,
+		"Tiny House":    true,
 	},
 }
 
@@ -269,6 +291,7 @@ func init() {
 
 	plib.RegisterContext(fireflyContext)
 	plib.RegisterContext(capeContext)
+	plib.RegisterContext(tinyhouseSpring)
 	plib.RegisterContext(tinyhouseSummer)
 	plib.RegisterContext(tinyhouseFall)
 	plib.RegisterContext(tinyhouseWinter)
