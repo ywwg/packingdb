@@ -68,7 +68,6 @@ var allProperties = map[Property]string{
 	"Vax Proof":        "proof of vaccination needed?",
 	"PA System":        "Need the PA",
 	"Performing":       "Use this for all music, and then add the specific ones",
-	"Modular":          "",
 	"DJing":            "",
 	"MiniMixxx":        "",
 }

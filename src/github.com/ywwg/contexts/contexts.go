@@ -9,6 +9,8 @@ var fireflyContext = plib.Context{
 	TemperatureMin: 55,
 	TemperatureMax: 95,
 	Properties: plib.PropertySet{
+		"BYOB":         true,
+		"CarRide":      true,
 		"Dirt":         true,
 		"Loud":         true,
 		"Bright":       true,
@@ -16,12 +18,15 @@ var fireflyContext = plib.Context{
 		"Camping":      true,
 		"GrumpCamping": true,
 		"Dark":         true,
+		"Nevermore":    true,
 		"Burn":         true,
 		"Performing":   true,
 		"DJing":        true,
 		"Partying":     true,
 		"Suiting":      true,
 		"Swimming":     true,
+		"Speaker":      true,
+		"Tarping":      true,
 	},
 }
 
