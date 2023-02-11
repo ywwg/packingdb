@@ -2,7 +2,7 @@
 
 set -e
 export GOPATH="$(pwd)"
-go install github.com/ywwg/packingcli
+go install github.com/ywwg/cmd/packingcli
 #./bin/packingcli "$@" | less -X -F
 ./bin/packingcli "$@"
 

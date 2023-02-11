@@ -117,14 +117,10 @@ ENV/
 .glide/
 
 bin/*
-pkg/*
 *~
 *.csv
-src/github.com/*
-!src/github.com/ywwg
-src/golang.org/*
 .cproject
 .project
 packingdb.code-workspace
 # lol
-src/github.com/ywwg/items/unmentionables.go
+pkg/items/unmentionables.go

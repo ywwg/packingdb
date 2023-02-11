@@ -12,11 +12,11 @@ import (
 	"strconv"
 
 	"github.com/manifoldco/promptui"
-	"github.com/ywwg/packinglib"
+	"github.com/ywwg/packingdb/pkg/packinglib"
 	"golang.org/x/crypto/ssh/terminal"
 
-	_ "github.com/ywwg/contexts"
-	_ "github.com/ywwg/items"
+	_ "github.com/ywwg/packingdb/pkg/contexts"
+	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
 func mainMenu(t *packinglib.Trip) (string, error) {

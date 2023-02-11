@@ -1,7 +1,7 @@
 package items
 
 import (
-	plib "github.com/ywwg/packinglib"
+	plib "github.com/ywwg/packingdb/pkg/packinglib"
 )
 
 var waterStuff = []plib.Item{

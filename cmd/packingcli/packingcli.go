@@ -12,10 +12,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ywwg/packinglib"
+	"github.com/ywwg/packingdb/pkg/packinglib"
 
-	_ "github.com/ywwg/contexts"
-	_ "github.com/ywwg/items"
+	_ "github.com/ywwg/packingdb/pkg/contexts"
+	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
 var (
