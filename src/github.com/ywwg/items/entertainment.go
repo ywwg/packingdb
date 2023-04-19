@@ -26,7 +26,6 @@ var entertainment = []plib.Item{
 		return 0.0
 	}, plib.NoUnits, []string{"Tiny House", "International"}, nil),
 	plib.NewBasicItem("music ear plugs", []string{"Performing", "Partying", "Loud"}, nil),
-	plib.NewBasicItem("Mixxx stickers", []string{"Performing"}, nil),
 	plib.NewBasicItem("Projector", []string{"Projector"}, nil),
 	plib.NewBasicItem("Screen", []string{"Projector"}, nil),
 	plib.NewBasicItem("JBL Speakers", []string{"Projector", "PA System"}, nil),
