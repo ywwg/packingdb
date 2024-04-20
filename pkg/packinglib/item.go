@@ -7,34 +7,6 @@ import (
 // NoUnits is used when an item isn't counted by a unit word.
 const NoUnits = "nounits"
 
-// // Item represents a thing that gets packed for a trip.
-// type Item interface {
-// 	// Name returns the name of the item
-// 	Name() string
-
-// 	// Satisfies returns true if the item belongs in the given context
-// 	Satisfies(*Context) bool
-
-// 	// AdjustCount tells the item to calculate how much of itself is needed given the
-// 	// context.
-// 	AdjustCount(*Context)
-
-// 	// Count returns the number of this item that got packed
-// 	Count() float64
-
-// 	// String prints out a string representation of the packed item(s)
-// 	String() string
-
-// 	// Pack set the packed value to whatever is passed in
-// 	Pack(bool)
-
-// 	// Packed returns true if the item has been packed
-// 	Packed() bool
-
-// 	// Prerequisites returns the PropertySet of prereqs for this item
-// 	Prerequisites() PropertySet
-// }
-
 // Item
 type Item struct {
 	// Name of the item.
@@ -49,7 +21,7 @@ type Item struct {
 	// Prerequisites is a set of all properties that the context must have for this item to appear.
 	prerequisites PropertySet
 
-	mutators []PackMutator
+	mutators []packMutator
 }
 
 // NewItem creates a Basic Item with the provided allow and disallow property prerequisites.
@@ -76,7 +48,7 @@ func (i *Item) Satisfies(c *Context) bool {
 	// denials were activated (no need for a positive requirement).
 	allDenies := true
 	for p, allow := range i.prerequisites {
-		if allow == true {
+		if allow {
 			allDenies = false
 		}
 		// Any item that has a disallowing prerequisite immediately dissatisfies.
@@ -97,6 +69,11 @@ func (i *Item) Satisfies(c *Context) bool {
 // context and returns the item. Mutators multiply together I guess???
 func (i *Item) AdjustCount(c *Context) {
 	i.count = 1.0
+	// First check is always Satisfies
+	if !i.Satisfies(c) {
+		i.count = 0.0
+		return
+	}
 	for _, t := range i.mutators {
 		// this makes it feel like satisfies should be a mutator. how do we deal with
 		// iterating through... maybe any time something returns zero we stop
@@ -141,21 +118,14 @@ func (i *Item) Prerequisites() PropertySet {
 	return i.prerequisites
 }
 
-type PackMutator interface {
-	// // Satisfies returns true if the current context satisfies any constraints
-	// // this mutator might have.
-	// Satisfies(*Context) bool
-
-	// AdjustCount takes a count and adjusts it for what this mutator does.
-	// so ALL adjustments should be operations on this number.  satisfies should
-	// be an adjustment maybe???
-	// number of nights is an adjustment.
-	// returns 0.0 if unsatisifed, I guess
+type packMutator interface {
+	// AdjustCount takes a count and adjusts it for what this mutator does. If the
+	// mutator has certain requirements, it should adjust the count to 0.
 	AdjustCount(c *Context, count float64) float64
 }
 
-// TemperatureMutator represents an item that only applies in a certain temperature range.
-type TemperatureMutator struct {
+// temperatureMutator represents an item that only applies in a certain temperature range.
+type temperatureMutator struct {
 	// TemperatureMin is the anticipated minimum temperature.
 	TemperatureMin int
 
@@ -163,7 +133,12 @@ type TemperatureMutator struct {
 	TemperatureMax int
 }
 
-func (i *TemperatureMutator) AdjustCount(c *Context, count float64) float64 {
+func (i *Item) TemperatureRange(tMin, tMax int) *Item {
+	i.mutators = append(i.mutators, &temperatureMutator{tMin, tMax})
+	return i
+}
+
+func (i *temperatureMutator) AdjustCount(c *Context, count float64) float64 {
 	if i.TemperatureMax < c.TemperatureMin {
 		return 0.0
 	}
@@ -175,21 +150,24 @@ func (i *TemperatureMutator) AdjustCount(c *Context, count float64) float64 {
 }
 
 // ConsumableItem is an item where a certain number will be used every day.
-type ConsumableMutator struct {
+type consumableMutator struct {
 	// DailyRate is how much the thing gets used per day.
 	DailyRate float64
 
-	// What units the rate is in.  Use NoUnits for things without "of" qualifiers. ("1 car")
+	// What units the rate is in.  Use NoUnits for things without "of" qualifiers.
+	// ("1 car")
 	Units string
+}
 
-	// prerequisites is a set of all properties that the context must have for this item to appear.
-	prerequisites map[Property]bool
+func (i *Item) Consumable(rate float64, units string) *Item {
+	i.mutators = append(i.mutators, &consumableMutator{rate, units})
+	return i
 }
 
 // AdjustCount tells the item to calculate how much of itself is needed given
 // the context and returns the item
-func (i *ConsumableMutator) AdjustCount(t *Trip, count float64) float64 {
-	return count * math.Ceil(i.DailyRate*float64(t.C.Nights))
+func (i *consumableMutator) AdjustCount(c *Context, count float64) float64 {
+	return count * math.Ceil(i.DailyRate*float64(c.Nights))
 }
 
 // // String constructs a pretty string for printing this item, including a checkbox
@@ -211,15 +189,20 @@ func (i *ConsumableMutator) AdjustCount(t *Trip, count float64) float64 {
 // 	return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
 // }
 
-// ConsumableMaxMutator represents an item that you may need multiple of, but at some
+// maxCountMutator represents an item that you may need multiple of, but at some
 // point it maxes out and there's no point bringing more.
-type ConsumableMaxMutator struct {
+type maxCountMutator struct {
 	// Max is the most of these you'll ever need.
 	Max float64
 }
 
+func (i *Item) Max(max float64) *Item {
+	i.mutators = append(i.mutators, &maxCountMutator{max})
+	return i
+}
+
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableMaxMutator) AdjustCount(t *Trip, count float64) float64 {
+func (i *maxCountMutator) AdjustCount(c *Context, count float64) float64 {
 	return math.Min(count, i.Max)
 }
 
@@ -231,6 +214,6 @@ type CustomConsumableMutator struct {
 }
 
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *CustomConsumableMutator) AdjustCount(count float64, nights int, props PropertySet) float64 {
-	return i.RateFunc(count, nights, props)
+func (i *CustomConsumableMutator) AdjustCount(c *Context, count float64) float64 {
+	return i.RateFunc(count, c.Nights, c.Properties)
 }

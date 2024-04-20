@@ -11,7 +11,7 @@ import (
 )
 
 // PackList is a map from category name to slice of items
-type PackList map[Category][]Item
+type PackList map[Category][]*Item
 
 // AllItems is a convenience map of all items that packingdb knows about.
 var AllItems = make(PackList)
@@ -25,9 +25,9 @@ type Trip struct {
 	// packList is a map of all the items in the trip.
 	packList PackList
 	// codeToItem is a map from a string code to the Item it corresponds to
-	codeToItem map[string]Item
+	codeToItem map[string]*Item
 	// itemToCode is the reverse.
-	itemToCode map[Item]string
+	itemToCode map[*Item]string
 }
 
 // dupeChecker is a map to track all of the item names and make sure we don't
@@ -38,7 +38,7 @@ var dupeChecker = make(map[string]bool)
 // the given category.  Duplicate categories will be appended.  Items
 // with duplicate case-insensitive names, even across categories,
 // cause a panic.
-func RegisterItems(category Category, items []Item) {
+func RegisterItems(category Category, items []*Item) {
 	for _, i := range items {
 		if _, ok := dupeChecker[strings.ToLower(i.Name())]; ok {
 			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
@@ -92,9 +92,9 @@ func GetContext(name string) (*Context, error) {
 	return c, nil
 }
 
-// GetContextWithTemperature loads the given context and substitutes the provided
+// GetContextTemperatureRange loads the given context and substitutes the provided
 // temperature range.
-func GetContextWithTemperature(name string, tmin, tmax int) (*Context, error) {
+func GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error) {
 	c, err := GetContext(name)
 	if err != nil {
 		return nil, err
@@ -108,8 +108,8 @@ func getCode(idx int) string {
 	code := ""
 	adjust := 0
 	for {
-		codeVal := idx%26 - adjust
-		code = string('a'+codeVal) + code
+		codeVal := int32(idx%26 - adjust)
+		code = string(rune('a')+codeVal) + code
 		idx -= idx % 26
 		idx /= 26
 		if idx == 0 {
@@ -128,8 +128,8 @@ func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 		contextName: context.Name,
 	}
 	t.packList = t.makeList()
-	t.codeToItem = make(map[string]Item)
-	t.itemToCode = make(map[Item]string)
+	t.codeToItem = make(map[string]*Item)
+	t.itemToCode = make(map[*Item]string)
 	idx := 0
 	keys := t.SortedCategories()
 
@@ -177,10 +177,10 @@ func (t *Trip) HasProperty(p Property) bool {
 func (t *Trip) makeList() PackList {
 	packlist := make(PackList)
 	for category, items := range AllItems {
-		var toPack []Item
+		var toPack []*Item
 		for _, i := range items {
 			calced := i
-			calced.Itemize(t.C)
+			calced.AdjustCount(t.C)
 			toPack = append(toPack, calced)
 		}
 		packlist[category] = toPack
@@ -189,7 +189,7 @@ func (t *Trip) makeList() PackList {
 	return packlist
 }
 
-// updateList reitemizes the packing list, changing the Count for each item.
+// updateList reAdjustCounts the packing list, changing the Count for each item.
 // This can cause some items to go to Count of zero, but retain their packed
 // state.  This allows users to remove and readd properties in one session
 // and the packing state will be maintained. Once the list is written to disk
@@ -197,7 +197,7 @@ func (t *Trip) makeList() PackList {
 func (t *Trip) updateList() {
 	for _, items := range t.packList {
 		for _, i := range items {
-			i.Itemize(t.C)
+			i.AdjustCount(t.C)
 		}
 	}
 }
@@ -257,7 +257,7 @@ func (t *Trip) SortedCategories() []Category {
 
 // itemsNonEmpty returns true if at least one item in the list has a non-zero
 // Count.
-func itemsNonEmpty(items []Item) bool {
+func itemsNonEmpty(items []*Item) bool {
 	for _, i := range items {
 		if i.Count() > 0 {
 			return true
@@ -407,7 +407,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 				}
 				var context *Context
 				if _, ok := contexts[toks[4]]; ok {
-					context, err = GetContextWithTemperature(toks[4], tmin, tmax)
+					context, err = GetContextTemperatureRange(toks[4], tmin, tmax)
 				} else {
 					context, err = NewContext(toks[4], tmin, tmax, nil)
 				}

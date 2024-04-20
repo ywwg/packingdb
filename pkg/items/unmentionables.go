@@ -4,46 +4,46 @@ import (
 	plib "github.com/ywwg/packingdb/pkg/packinglib"
 )
 
-var unmentionables = []plib.Item{
+var unmentionables = []*plib.Item{
 	plib.NewConsumableItem("con-dams", 1.0, plib.NoUnits, nil, nil),
-	plib.NewBasicItem("lube", nil, nil),
-	plib.NewBasicItem("trees", []string{"Burn", "Camping", "Con", "Tiny House", "NYC"}, []string{"Flight"}),
-	plib.NewBasicItem("tape head cleaner", []string{"Burn", "Camping", "Con", "Tiny House", "NYC"}, []string{"Flight"}),
-	plib.NewBasicItem("pretrip shave", nil, nil),
-	plib.NewBasicItem("sleep meds", nil, nil),
-	plib.NewBasicItem("diprolene", nil, nil),
+	plib.NewItem("lube", nil, nil),
+	plib.NewItem("trees", []string{"Burn", "Camping", "Con", "Tiny House", "NYC"}, []string{"Flight"}),
+	plib.NewItem("tape head cleaner", []string{"Burn", "Camping", "Con", "Tiny House", "NYC"}, []string{"Flight"}),
+	plib.NewItem("pretrip shave", nil, nil),
+	plib.NewItem("sleep meds", nil, nil),
+	plib.NewItem("diprolene", nil, nil),
 	plib.NewConsumableMaxItem("late nite viewing", 1.0, 4.0, "videos", nil, nil),
-	plib.NewBasicItem("late nite viewing HD", []string{"Tiny House"}, nil),
+	plib.NewItem("late nite viewing HD", []string{"Tiny House"}, nil),
 }
 
-var playtime = []plib.Item{
-	plib.NewBasicItem("harness", []string{"Playtime"}, nil),
-	plib.NewBasicItem("collar and leash", []string{"Playtime"}, nil),
-	plib.NewBasicItem("poppers", []string{"Playtime"}, []string{"Flight"}),
-	plib.NewBasicItem("ring vibe", []string{"Playtime"}, nil),
-	plib.NewBasicItem("dildoes", []string{"Playtime"}, nil),
-	plib.NewBasicItem("toy cleaner", []string{"Playtime"}, nil),
+var playtime = []*plib.Item{
+	plib.NewItem("harness", []string{"Playtime"}, nil),
+	plib.NewItem("collar and leash", []string{"Playtime"}, nil),
+	plib.NewItem("poppers", []string{"Playtime"}, []string{"Flight"}),
+	plib.NewItem("ring vibe", []string{"Playtime"}, nil),
+	plib.NewItem("dildoes", []string{"Playtime"}, nil),
+	plib.NewItem("toy cleaner", []string{"Playtime"}, nil),
 }
 
-var suiting = []plib.Item{
-	plib.NewBasicItem("head", []string{"Suiting"}, nil),
-	plib.NewBasicItem("stuffing sock", []string{"Suiting"}, nil),
-	plib.NewBasicItem("paws", []string{"Suiting"}, nil),
-	plib.NewBasicItem("arm sleeves", []string{"Suiting"}, nil),
-	plib.NewBasicItem("arm sleeve elastic thing", []string{"Suiting"}, nil),
-	plib.NewBasicItem("tail", []string{"Suiting", "Tiny House"}, nil),
-	plib.NewBasicItem("badges", []string{"fancon"}, nil),
-	plib.NewBasicItem("lanyard", []string{"Con"}, nil),
-	plib.NewBasicItem("cool balaklava", []string{"Suiting"}, nil),
-	plib.NewBasicItem("in-ear earbuds", []string{"fancon"}, nil),
-	plib.NewBasicItem("games", []string{"Con"}, nil),
-	plib.NewBasicItem("sewing kit", []string{"Suiting", "BigTrip"}, nil),
-	plib.NewBasicItem("grooming brush", []string{"Suiting"}, nil),
-	plib.NewBasicItem("lint roller", []string{"Suiting"}, nil),
-	plib.NewBasicItem("glue gun", []string{"Suiting"}, nil),
-	plib.NewBasicItem("dryer sheets", []string{"Suiting"}, nil),
-	plib.NewBasicItem("suiting outfit", []string{"Suiting"}, nil),
-	plib.NewBasicItem("fake headphones", []string{"Suiting"}, nil),
+var suiting = []*plib.Item{
+	plib.NewItem("head", []string{"Suiting"}, nil),
+	plib.NewItem("stuffing sock", []string{"Suiting"}, nil),
+	plib.NewItem("paws", []string{"Suiting"}, nil),
+	plib.NewItem("arm sleeves", []string{"Suiting"}, nil),
+	plib.NewItem("arm sleeve elastic thing", []string{"Suiting"}, nil),
+	plib.NewItem("tail", []string{"Suiting", "Tiny House"}, nil),
+	plib.NewItem("badges", []string{"fancon"}, nil),
+	plib.NewItem("lanyard", []string{"Con"}, nil),
+	plib.NewItem("cool balaklava", []string{"Suiting"}, nil),
+	plib.NewItem("in-ear earbuds", []string{"fancon"}, nil),
+	plib.NewItem("games", []string{"Con"}, nil),
+	plib.NewItem("sewing kit", []string{"Suiting", "BigTrip"}, nil),
+	plib.NewItem("grooming brush", []string{"Suiting"}, nil),
+	plib.NewItem("lint roller", []string{"Suiting"}, nil),
+	plib.NewItem("glue gun", []string{"Suiting"}, nil),
+	plib.NewItem("dryer sheets", []string{"Suiting"}, nil),
+	plib.NewItem("suiting outfit", []string{"Suiting"}, nil),
+	plib.NewItem("fake headphones", []string{"Suiting"}, nil),
 }
 
 func init() {

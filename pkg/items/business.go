@@ -4,10 +4,12 @@ import (
 	plib "github.com/ywwg/packingdb/pkg/packinglib"
 )
 
-var business = []plib.Item{
-	plib.NewConsumableMaxItem("business shirts", 0.50, 3.0, plib.NoUnits, []string{"Business"}, nil),
-	plib.NewBasicItem("work laptop", []string{"Business"}, nil),
-	plib.NewBasicItem("work laptop power", []string{"Business"}, nil),
+var business = []*plib.Item{
+	plib.NewItem("business shirts", []string{"Business"}, nil).
+		Consumable(0.50, plib.NoUnits).
+		Max(3.0),
+	plib.NewItem("work laptop", []string{"Business"}, nil),
+	plib.NewItem("work laptop power", []string{"Business"}, nil),
 }
 
 func init() {
