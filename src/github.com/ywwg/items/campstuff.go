@@ -8,7 +8,7 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("windshield sun shade", []string{"Camping"}, nil),
 	plib.NewBasicItem("tent", []string{"Camping"}, nil),
 	plib.NewBasicItem("sleeping bag", []string{"Camping"}, nil),
-	plib.NewBasicItem("sleeping pad", []string{"Camping"}, nil),
+	plib.NewBasicItem("camping cot", []string{"Camping"}, nil),
 	plib.NewTemperatureItem("wool blanket", 0, 44, []string{"Camping"}, nil),
 	plib.NewBasicItem("2 pillow cases", []string{"Camping"}, nil),
 	plib.NewBasicItem("tent light", []string{"Camping"}, nil),
@@ -23,7 +23,8 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("shims", []string{"Burn", "Tarping"}, nil),
 	plib.NewBasicItem("2x battery string lights", []string{"Burn", "Con"}, nil),
 	plib.NewBasicItem("camp chair", []string{"Camping"}, nil),
-	plib.NewBasicItem("camp table", []string{"Camping"}, nil),
+	plib.NewBasicItem("small camp table", []string{"Camping"}, nil),
+	plib.NewBasicItem("4x8 camp table", []string{"Burn"}, nil),
 	plib.NewBasicItem("camp stove", []string{"GrumpCamping"}, []string{"NoFire"}),
 	plib.NewBasicItem("propane", []string{"GrumpCamping"}, []string{"NoFire"}),
 	plib.NewBasicItem("saucepan", []string{"GrumpCamping"}, nil),
@@ -46,6 +47,7 @@ var campStuff = []plib.Item{
 	plib.NewBasicItem("gear ties", []string{"Burn", "Tarping"}, nil),
 	plib.NewBasicItem("first aid kit", []string{"Hiking"}, nil),
 	plib.NewBasicItem("sheet set", []string{"Tiny House"}, nil),
+	plib.NewBasicItem("hammock", []string{"Burn", "Camping"}, nil),
 }
 
 func init() {

@@ -13,7 +13,8 @@ var entertainment = []plib.Item{
 	plib.NewBasicItem("USB-C breakout", nil, []string{"Insecure"}),
 	plib.NewBasicItem("HDMI cable", []string{"Lodging", "Projector"}, []string{"Insecure"}),
 	plib.NewBasicItem("USB-C-C cable", nil, []string{"Tiny House"}),
-	plib.NewBasicItem("jambox and charger", []string{"Speaker", "Projector"}, []string{"International"}),
+	plib.NewBasicItem("USB-A-C cable", []string{"International", "Flight", "Lodging"}, nil),
+	plib.NewBasicItem("bluetooth speaker and charger", []string{"Speaker", "Projector"}, []string{"International"}),
 	plib.NewBasicItem("1/8 stereo cable", []string{"Speaker"}, []string{"International", "Tiny House"}),
 	plib.NewCustomConsumableItem("tv / movie", func(nights int, props plib.PropertySet) float64 {
 		if _, ok := props["Tiny House"]; ok {
