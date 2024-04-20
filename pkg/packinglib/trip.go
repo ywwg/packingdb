@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -16,9 +16,21 @@ type PackList map[Category][]*Item
 // AllItems is a convenience map of all items that packingdb knows about.
 var AllItems = make(PackList)
 
+// XXXXXXXXXXXXXXXX OK the main thing we want to do is make this more of an API
+// -- a trip is a thing we modify and then something about can ask questions
+// about it or make mutations.
+//
+// And for fuck's sake it shouldn't have the styling as part of the data model,
+// yikes. So we rip out all of the list and strings shit -- an individual packed
+// item knows how to stringify itself but that's it.
+
 // Trip describes a trip, which includes a length and a context
 type Trip struct {
-	// list???
+	// list??? XXXX this happens because we build a big context out of little
+	// ones... but basically what we should do is give the trip a context and a
+	// property list I guess????  right now a trip is just a big context with a
+	// bunch of bullshit convenience functions and a list of what is actually
+	// packed (which itself is a convenience list).
 	C           *Context
 	contextName string
 
@@ -49,10 +61,6 @@ func RegisterItems(category Category, items []*Item) {
 				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
 			}
 		}
-	}
-	if existing, ok := AllItems[category]; ok {
-		existing = append(existing, items...)
-		return
 	}
 	AllItems[category] = items
 }
@@ -86,7 +94,7 @@ func GetContext(name string) (*Context, error) {
 	c := &Context{}
 	found, ok := contexts[name]
 	if !ok {
-		return nil, fmt.Errorf("Unknown context: %s", name)
+		return nil, fmt.Errorf("unknown context: %s", name)
 	}
 	*c = found
 	return c, nil
@@ -214,7 +222,7 @@ func (t *Trip) Pack(i string, pack bool) {
 	found := false
 	for _, items := range t.packList {
 		for _, item := range items {
-			if strings.ToLower(item.Name()) == strings.ToLower(i) {
+			if strings.EqualFold(item.Name(), i) {
 				item.Pack(pack)
 				found = true
 			}
@@ -229,7 +237,7 @@ func (t *Trip) Pack(i string, pack bool) {
 func (t *Trip) PackCategory(cat string) {
 	found := false
 	for category := range t.packList {
-		if strings.ToLower(cat) == strings.ToLower(string(category)) {
+		if strings.EqualFold(cat, string(category)) {
 			found = true
 			for _, i := range t.packList[category] {
 				i.Pack(true)
@@ -275,7 +283,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	foundCat := false
 	for _, category := range keys {
 		if showCat != "" {
-			if strings.ToLower(string(category)) != strings.ToLower(showCat) {
+			if strings.EqualFold(string(category), showCat) {
 				continue
 			}
 			foundCat = true
@@ -363,7 +371,7 @@ func (t *Trip) ToggleItemPacked(code string) error {
 	// Only works with codes
 	item, ok := t.codeToItem[code]
 	if !ok {
-		return fmt.Errorf("Couldn't find item to pack with code %s", code)
+		return fmt.Errorf("couldn't find item to pack with code %s", code)
 	}
 
 	item.Pack(!item.Packed())
@@ -379,7 +387,7 @@ func (t *Trip) ToggleItemPacked(code string) error {
 // first line: "V2", number of nights, tmin, tmax, context name, contexts...
 // if context_name is known, other contexts are added to it.
 func (t *Trip) LoadFromFile(nights int, f string) error {
-	dat, err := ioutil.ReadFile(f)
+	dat, err := os.ReadFile(f)
 	if err != nil {
 		return err
 	}
@@ -388,6 +396,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 	for i := 0; scanner.Scan(); i++ {
 		if i == 0 {
 			toks := strings.Split(scanner.Text(), ",")
+			// V3 needs to store context names explicitly different from property names.
 			if toks[0] == "V2" {
 				var err error
 				fileNights, err := strconv.Atoi(toks[1])
@@ -467,5 +476,5 @@ func (t *Trip) SaveToFile(f string) error {
 			}
 		}
 	}
-	return ioutil.WriteFile(f, []byte(packedcsv), 0644)
+	return os.WriteFile(f, []byte(packedcsv), 0644)
 }

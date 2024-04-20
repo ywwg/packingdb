@@ -33,6 +33,7 @@ var clothing = []*plib.Item{
 	plib.NewItem("underlayer bottom", []string{"Camping", "Skiing", "Hiking"}, nil).TemperatureRange(0, 50).Consumable(0.5, plib.NoUnits),
 	plib.NewItem("fun outfits", []string{"Partying"}, nil).Consumable(0.75, plib.NoUnits).Max(3.0),
 	plib.NewItem("shirt for flight", []string{"Flight"}, nil),
+	// XXXX here is an example of a "property" that is actually a context.
 	plib.NewItem("kigarumi", []string{"Burn", "fancon"}, nil),
 	plib.NewItem("sweaty shirts", []string{"Dirt", "Handy"}, nil).TemperatureRange(65, 120).Consumable(0.5, plib.NoUnits).Max(3.0),
 	plib.NewItem("light jacket", nil, nil).TemperatureRange(51, 60),

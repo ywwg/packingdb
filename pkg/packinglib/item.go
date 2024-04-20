@@ -52,6 +52,11 @@ func (i *Item) Satisfies(c *Context) bool {
 			allDenies = false
 		}
 		// Any item that has a disallowing prerequisite immediately dissatisfies.
+		// XXXXXX I think we also have to check contexts??? The problem here is
+		// Things Are Just Strings.  I *guess* it might still be ok that a context
+		// provides a property of itself as well??
+
+		//
 		if c.Properties[p] {
 			if !allow {
 				return false

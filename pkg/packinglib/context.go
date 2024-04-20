@@ -53,14 +53,22 @@ func (c *Context) addProperty(prop string) error {
 	if _, ok := allProperties[Property(prop)]; !ok {
 		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
-	// Recursively add contained properties that are actually also contexts.
-	if subContext, err := GetContext(prop); err == nil {
-		for p, inc := range subContext.Properties {
-			if _, ok := c.Properties[p]; inc && !ok {
-				c.addProperty(string(p))
-			}
-		}
-	}
+	// Recursively add contained properties that are actually also contexts. XXXXX
+	// this is horrible! we should definitely not do this.
+	//  Iguess we just remove this and then see what breaks... and then those things
+	// should be contexts that optionally contain subcontexts for clarity. I think
+	// we did this because the saved file only lists properties. Therefore we
+	// should have the file save both, but disambiguate which is which.
+
+	// That means a schema change... but that seems fine.
+
+	// if subContext, err := GetContext(prop); err == nil {
+	// 	for p, inc := range subContext.Properties {
+	// 		if _, ok := c.Properties[p]; inc && !ok {
+	// 			c.addProperty(string(p))
+	// 		}
+	// 	}
+	// }
 	c.Properties[Property(prop)] = true
 	return nil
 }
