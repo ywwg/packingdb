@@ -9,6 +9,8 @@ type Context struct {
 	// Name of the context ("The Cape", "The Tiny House", "Firefly")
 	Name string
 
+	Nights int
+
 	// TemperatureMin is the anticipated minimum temperature.
 	TemperatureMin int
 

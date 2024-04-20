@@ -1,43 +1,42 @@
 package packinglib
 
 import (
-	"fmt"
 	"math"
 )
 
 // NoUnits is used when an item isn't counted by a unit word.
 const NoUnits = "nounits"
 
-// Item represents a thing that gets packed for a trip.
-type Item interface {
-	// Name returns the name of the item
-	Name() string
+// // Item represents a thing that gets packed for a trip.
+// type Item interface {
+// 	// Name returns the name of the item
+// 	Name() string
 
-	// Satisfies returns true if the item belongs in the given context
-	Satisfies(*Context) bool
+// 	// Satisfies returns true if the item belongs in the given context
+// 	Satisfies(*Context) bool
 
-	// Itemize tells the item to calculate how much of itself is needed given the
-	// context.
-	Itemize(*Trip)
+// 	// AdjustCount tells the item to calculate how much of itself is needed given the
+// 	// context.
+// 	AdjustCount(*Context)
 
-	// Count returns the number of this item that got packed
-	Count() float64
+// 	// Count returns the number of this item that got packed
+// 	Count() float64
 
-	// String prints out a string representation of the packed item(s)
-	String() string
+// 	// String prints out a string representation of the packed item(s)
+// 	String() string
 
-	// Pack set the packed value to whatever is passed in
-	Pack(bool)
+// 	// Pack set the packed value to whatever is passed in
+// 	Pack(bool)
 
-	// Packed returns true if the item has been packed
-	Packed() bool
+// 	// Packed returns true if the item has been packed
+// 	Packed() bool
 
-	// Prerequisites returns the PropertySet of prereqs for this item
-	Prerequisites() PropertySet
-}
+// 	// Prerequisites returns the PropertySet of prereqs for this item
+// 	Prerequisites() PropertySet
+// }
 
-// BasicItem is the simplest item -- just prerequisites and no count, like "tent"
-type BasicItem struct {
+// Item
+type Item struct {
 	// Name of the item.
 	name string
 
@@ -49,23 +48,25 @@ type BasicItem struct {
 
 	// Prerequisites is a set of all properties that the context must have for this item to appear.
 	prerequisites PropertySet
+
+	mutators []PackMutator
 }
 
-// NewBasicItem creates a Basic Item with the provided allow and disallow property prerequisites.
-func NewBasicItem(name string, allow, disallow []string) *BasicItem {
-	return &BasicItem{
+// NewItem creates a Basic Item with the provided allow and disallow property prerequisites.
+func NewItem(name string, allow, disallow []string) *Item {
+	return &Item{
 		name:          name,
 		prerequisites: buildPropertySet(allow, disallow),
 	}
 }
 
 // Name returns the name of the item
-func (i *BasicItem) Name() string {
+func (i *Item) Name() string {
 	return i.name
 }
 
 // Satisfies returns true if the context satisfies the item's requirements.
-func (i *BasicItem) Satisfies(c *Context) bool {
+func (i *Item) Satisfies(c *Context) bool {
 	// Any property satisfies (OR)
 	if len(i.prerequisites) == 0 {
 		return true
@@ -92,49 +93,69 @@ func (i *BasicItem) Satisfies(c *Context) bool {
 	return found
 }
 
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *BasicItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.count = 1.0
-	} else {
-		i.count = 0.0
+// AdjustCount tells the item to calculate how much of itself is needed given the
+// context and returns the item. Mutators multiply together I guess???
+func (i *Item) AdjustCount(c *Context) {
+	i.count = 1.0
+	for _, t := range i.mutators {
+		// this makes it feel like satisfies should be a mutator. how do we deal with
+		// iterating through... maybe any time something returns zero we stop
+		// processing?  i.e., any mutator can only adjust a number from 1.0, never
+		// down to zero unless it means
+		i.count = t.AdjustCount(c, i.count)
+		if i.count == 0.0 {
+			return
+		}
 	}
 }
 
 // Count returns the number of this item should be packed.
-func (i *BasicItem) Count() float64 {
+func (i *Item) Count() float64 {
 	return i.count
 }
 
 // String constructs a pretty string for printing this item, including a checkbox
 // for its packed status
-func (i *BasicItem) String() string {
-	checkbox := "○"
-	if i.packed {
-		checkbox = "●"
-	}
-	return fmt.Sprintf("%s %s", checkbox, i.name)
+// XXXX yikes we should not be decorating here
+func (i *Item) String() string {
+	// checkbox := "○"
+	// if i.packed {
+	// 	checkbox = "●"
+	// }
+	// return fmt.Sprintf("%s %s", checkbox, i.name)
+	return i.name
 }
 
 // Pack logs the item as packed.
-func (i *BasicItem) Pack(p bool) {
+func (i *Item) Pack(p bool) {
 	i.packed = p
 }
 
 // Packed returns true if the item has been packed
-func (i *BasicItem) Packed() bool {
+func (i *Item) Packed() bool {
 	return i.packed
 }
 
 // Prerequisites returns the PropertySet of prereqs for this item
-func (i *BasicItem) Prerequisites() PropertySet {
+func (i *Item) Prerequisites() PropertySet {
 	return i.prerequisites
 }
 
-// TemperatureItem represents an item that only applies in a certain temperature range.
-type TemperatureItem struct {
-	BasicItem
+type PackMutator interface {
+	// // Satisfies returns true if the current context satisfies any constraints
+	// // this mutator might have.
+	// Satisfies(*Context) bool
 
+	// AdjustCount takes a count and adjusts it for what this mutator does.
+	// so ALL adjustments should be operations on this number.  satisfies should
+	// be an adjustment maybe???
+	// number of nights is an adjustment.
+	// returns 0.0 if unsatisifed, I guess
+	AdjustCount(c *Context, count float64) float64
+}
+
+// TemperatureMutator represents an item that only applies in a certain temperature range.
+type TemperatureMutator struct {
 	// TemperatureMin is the anticipated minimum temperature.
 	TemperatureMin int
 
@@ -142,40 +163,19 @@ type TemperatureItem struct {
 	TemperatureMax int
 }
 
-// NewTemperatureItem constructs an item given the temperature range and prereqs.
-func NewTemperatureItem(name string, min, max int, allow, disallow []string) *TemperatureItem {
-	return &TemperatureItem{
-		BasicItem:      *NewBasicItem(name, allow, disallow),
-		TemperatureMin: min,
-		TemperatureMax: max,
-	}
-}
-
-// Satisfies returns true if the context satisfies the item's requirements.
-func (i *TemperatureItem) Satisfies(c *Context) bool {
+func (i *TemperatureMutator) AdjustCount(c *Context, count float64) float64 {
 	if i.TemperatureMax < c.TemperatureMin {
-		return false
+		return 0.0
 	}
 	if i.TemperatureMin > c.TemperatureMax {
-		return false
+		return 0.0
 	}
 
-	return i.BasicItem.Satisfies(c)
-}
-
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *TemperatureItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.count = 1.0
-	} else {
-		i.count = 0.0
-	}
+	return 1.0
 }
 
 // ConsumableItem is an item where a certain number will be used every day.
-type ConsumableItem struct {
-	BasicItem
-
+type ConsumableMutator struct {
 	// DailyRate is how much the thing gets used per day.
 	DailyRate float64
 
@@ -186,214 +186,51 @@ type ConsumableItem struct {
 	prerequisites map[Property]bool
 }
 
-// NewConsumableItem constructs an item with the given rate of usage and other prereqs.
-func NewConsumableItem(name string, rate float64, units string, allow, disallow []string) *ConsumableItem {
-	return &ConsumableItem{
-		BasicItem: *NewBasicItem(name, allow, disallow),
-		DailyRate: rate,
-		Units:     units,
-	}
+// AdjustCount tells the item to calculate how much of itself is needed given
+// the context and returns the item
+func (i *ConsumableMutator) AdjustCount(t *Trip, count float64) float64 {
+	return count * math.Ceil(i.DailyRate*float64(t.C.Nights))
 }
 
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.count = math.Ceil(i.DailyRate * float64(t.Nights))
-	} else {
-		i.count = 0.0
-	}
-}
+// // String constructs a pretty string for printing this item, including a checkbox
+// // for its packed status
+// func (i *ConsumableItem) String() string {
+// 	checkbox := "○"
+// 	if i.packed {
+// 		checkbox = "●"
+// 	}
+// 	if i.Units == NoUnits {
+// 		if i.count == float64(int(i.count)) {
+// 			return fmt.Sprintf("%s %d %s", checkbox, int(i.count), i.name)
+// 		}
+// 		return fmt.Sprintf("%s %.1f %s", checkbox, i.count, i.name)
+// 	}
+// 	if i.count == float64(int(i.count)) {
+// 		return fmt.Sprintf("%s %d %s of %s", checkbox, int(i.count), i.Units, i.name)
+// 	}
+// 	return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
+// }
 
-// String constructs a pretty string for printing this item, including a checkbox
-// for its packed status
-func (i *ConsumableItem) String() string {
-	checkbox := "○"
-	if i.packed {
-		checkbox = "●"
-	}
-	if i.Units == NoUnits {
-		if i.count == float64(int(i.count)) {
-			return fmt.Sprintf("%s %d %s", checkbox, int(i.count), i.name)
-		}
-		return fmt.Sprintf("%s %.1f %s", checkbox, i.count, i.name)
-	}
-	if i.count == float64(int(i.count)) {
-		return fmt.Sprintf("%s %d %s of %s", checkbox, int(i.count), i.Units, i.name)
-	}
-	return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
-}
-
-// ConsumableMaxItem represents an item that you may need multiple of, but at some
+// ConsumableMaxMutator represents an item that you may need multiple of, but at some
 // point it maxes out and there's no point bringing more.
-type ConsumableMaxItem struct {
-	ConsumableItem
-
+type ConsumableMaxMutator struct {
 	// Max is the most of these you'll ever need.
 	Max float64
 }
 
-// NewConsumableMaxItem constructs an item with the given rate of usage, maximum, and other prereqs.
-func NewConsumableMaxItem(name string, rate float64, max float64, units string, allow, disallow []string) *ConsumableMaxItem {
-	return &ConsumableMaxItem{
-		ConsumableItem: *NewConsumableItem(name, rate, units, allow, disallow),
-		Max:            max,
-	}
+// AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
+func (i *ConsumableMaxMutator) AdjustCount(t *Trip, count float64) float64 {
+	return math.Min(count, i.Max)
 }
 
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableMaxItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), i.Max)
-	} else {
-		i.count = 0.0
-	}
-}
-
-// CustomConsumableItem is a consumable item that takes a function to determine how many
-// are needed, instead of a simple float rate.
-type CustomConsumableItem struct {
-	ConsumableItem
-
+// CustomConsumableMutator is a consumable item that takes a function to
+// determine how many are needed, instead of a simple float rate.
+type CustomConsumableMutator struct {
 	// DailyRate is how much the thing gets used per day.
-	RateFunc func(nights int, props PropertySet) float64
+	RateFunc func(count float64, nights int, props PropertySet) float64
 }
 
-// NewCustomConsumableItem constructs an item with the given rate function and other prereqs.
-func NewCustomConsumableItem(name string, rateFunc func(nights int, props PropertySet) float64, units string, allow, disallow []string) *CustomConsumableItem {
-	return &CustomConsumableItem{
-		ConsumableItem: *NewConsumableItem(name, 0, units, allow, disallow),
-		RateFunc:       rateFunc,
-	}
-}
-
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *CustomConsumableItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.count = i.RateFunc(t.Nights, t.C.Properties)
-	} else {
-		i.count = 0.0
-	}
-}
-
-// ConsumableTemperatureItem is both consumable and only applies for a given temperature range.
-// Diamond pattern in action!
-type ConsumableTemperatureItem struct {
-	ConsumableItem
-	TemperatureItem
-}
-
-// NewConsumableTemperatureItem constructs the item with the given settings.
-func NewConsumableTemperatureItem(name string, rate float64, units string, min, max int, allow, disallow []string) *ConsumableTemperatureItem {
-	return &ConsumableTemperatureItem{
-		ConsumableItem:  *NewConsumableItem(name, rate, units, allow, disallow),
-		TemperatureItem: *NewTemperatureItem(name, min, max, allow, disallow),
-	}
-}
-
-// Satisfies returns true if the item belongs in the given context
-func (i *ConsumableTemperatureItem) Satisfies(c *Context) bool {
-	if !i.TemperatureItem.Satisfies(c) {
-		return false
-	}
-
-	return i.ConsumableItem.Satisfies(c)
-}
-
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableTemperatureItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.ConsumableItem.count = math.Ceil(i.DailyRate * float64(t.Nights))
-	} else {
-		i.ConsumableItem.count = 0.0
-	}
-}
-
-// Name returns the name of the item
-func (i *ConsumableTemperatureItem) Name() string {
-	return i.ConsumableItem.Name()
-}
-
-// Count returns the number of this item that got packed
-func (i *ConsumableTemperatureItem) Count() float64 {
-	return i.ConsumableItem.count
-}
-
-// String constructs a pretty string for printing this item, including a checkbox
-// for its packed status
-func (i *ConsumableTemperatureItem) String() string {
-	return i.ConsumableItem.String()
-}
-
-// Packed returns true if the item has been packed
-func (i *ConsumableTemperatureItem) Packed() bool {
-	return i.ConsumableItem.Packed()
-}
-
-// Pack logs the item as packed.
-func (i *ConsumableTemperatureItem) Pack(p bool) {
-	i.ConsumableItem.Pack(p)
-}
-
-// Prerequisites returns the PropertySet of prereqs for this item
-func (i *ConsumableTemperatureItem) Prerequisites() PropertySet {
-	return i.ConsumableItem.Prerequisites()
-}
-
-// ConsumableMaxTemperatureItem is both consumable, with a maximum amount, and has a temperature range.
-// Diamond pattern again!
-type ConsumableMaxTemperatureItem struct {
-	ConsumableMaxItem
-	TemperatureItem
-}
-
-// NewConsumableMaxTemperatureItem constructs the item with the many varied requirements.
-func NewConsumableMaxTemperatureItem(name string, rate float64, maxNum float64, units string, min, max int, allow, disallow []string) *ConsumableMaxTemperatureItem {
-	return &ConsumableMaxTemperatureItem{
-		ConsumableMaxItem: *NewConsumableMaxItem(name, rate, maxNum, units, allow, disallow),
-		TemperatureItem:   *NewTemperatureItem(name, min, max, allow, disallow),
-	}
-}
-
-// Satisfies returns true if the item belongs in the given context
-func (i *ConsumableMaxTemperatureItem) Satisfies(c *Context) bool {
-	if !i.TemperatureItem.Satisfies(c) {
-		return false
-	}
-
-	return i.ConsumableMaxItem.Satisfies(c)
-}
-
-// Itemize tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *ConsumableMaxTemperatureItem) Itemize(t *Trip) {
-	if i.Satisfies(t.C) {
-		i.ConsumableMaxItem.count = math.Min(math.Ceil(i.DailyRate*float64(t.Nights)), i.Max)
-	} else {
-		i.ConsumableMaxItem.count = 0.0
-	}
-}
-
-// Name returns the name of the item
-func (i *ConsumableMaxTemperatureItem) Name() string {
-	return i.ConsumableMaxItem.Name()
-}
-
-// Count returns the number of this item that got packed
-func (i *ConsumableMaxTemperatureItem) Count() float64 {
-	return i.ConsumableMaxItem.count
-}
-
-// String constructs a pretty string for printing this item, including a checkbox
-// for its packed status
-func (i *ConsumableMaxTemperatureItem) String() string {
-	return i.ConsumableMaxItem.String()
-}
-
-// Packed returns true if the item has been packed
-func (i *ConsumableMaxTemperatureItem) Packed() bool {
-	return i.ConsumableMaxItem.Packed()
-}
-
-// Pack logs the item as packed.
-func (i *ConsumableMaxTemperatureItem) Pack(p bool) {
-	i.ConsumableMaxItem.Pack(p)
+// AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
+func (i *CustomConsumableMutator) AdjustCount(count float64, nights int, props PropertySet) float64 {
+	return i.RateFunc(count, nights, props)
 }

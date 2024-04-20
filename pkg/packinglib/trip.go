@@ -18,7 +18,7 @@ var AllItems = make(PackList)
 
 // Trip describes a trip, which includes a length and a context
 type Trip struct {
-	Nights      int
+	// list???
 	C           *Context
 	contextName string
 
@@ -124,7 +124,6 @@ func getCode(idx int) string {
 // constructed context and number of nights.
 func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 	t := &Trip{
-		Nights:      nights,
 		C:           context,
 		contextName: context.Name,
 	}
@@ -181,7 +180,7 @@ func (t *Trip) makeList() PackList {
 		var toPack []Item
 		for _, i := range items {
 			calced := i
-			calced.Itemize(t)
+			calced.Itemize(t.C)
 			toPack = append(toPack, calced)
 		}
 		packlist[category] = toPack
@@ -198,7 +197,7 @@ func (t *Trip) makeList() PackList {
 func (t *Trip) updateList() {
 	for _, items := range t.packList {
 		for _, i := range items {
-			i.Itemize(t)
+			i.Itemize(t.C)
 		}
 	}
 }
@@ -454,7 +453,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 
 // SaveToFile saves the trip to the provided filename.
 func (t *Trip) SaveToFile(f string) error {
-	packedcsv := fmt.Sprintf("V2,%d,%d,%d,%s,", t.Nights, t.C.TemperatureMin, t.C.TemperatureMax, t.contextName)
+	packedcsv := fmt.Sprintf("V2,%d,%d,%d,%s,", t.C.Nights, t.C.TemperatureMin, t.C.TemperatureMax, t.contextName)
 	for p, val := range t.C.Properties {
 		if val {
 			packedcsv += fmt.Sprintf("%s,", string(p))

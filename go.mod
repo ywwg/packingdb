@@ -1,3 +1,3 @@
-module github.com/ywwg/packingdb/v2
+module github.com/ywwg/packingdb
 
-go 1.21.1
+go 1.21

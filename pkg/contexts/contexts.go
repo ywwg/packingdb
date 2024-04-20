@@ -1,7 +1,7 @@
 package contexts
 
 import (
-	plib "github.com/ywwg/packinglib"
+	plib "github.com/ywwg/packingdb/pkg/packinglib"
 )
 
 var fireflyContext = plib.Context{

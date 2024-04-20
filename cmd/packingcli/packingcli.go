@@ -12,10 +12,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ywwg/packinglib"
+	"github.com/ywwg/packingdb/pkg/packinglib"
 
-	_ "github.com/ywwg/contexts"
-	_ "github.com/ywwg/items"
+	_ "github.com/ywwg/packingdb/pkg/contexts"
+	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
 var (
@@ -126,7 +126,7 @@ func main() {
 
 	// Print out trip context and information
 	fmt.Printf("Context: %s\n", t.C.Name)
-	fmt.Printf("Nights: %d\n", t.Nights)
+	fmt.Printf("Nights: %d\n", t.C.Nights)
 	fmt.Printf("Properties: ")
 	var plist []string
 	for p, val := range t.C.Properties {

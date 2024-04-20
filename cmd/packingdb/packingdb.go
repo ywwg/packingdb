@@ -12,11 +12,11 @@ import (
 	"strconv"
 
 	"github.com/manifoldco/promptui"
-	"github.com/ywwg/packinglib"
+	"github.com/ywwg/packingdb/pkg/packinglib"
 	"golang.org/x/crypto/ssh/terminal"
 
-	_ "github.com/ywwg/contexts"
-	_ "github.com/ywwg/items"
+	_ "github.com/ywwg/packingdb/pkg/contexts"
+	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
 func mainMenu(t *packinglib.Trip) (string, error) {
@@ -290,7 +290,7 @@ func main() {
 	for {
 		fmt.Printf("\033[1m")
 		fmt.Printf("\n\nName: %s\n", t.C.Name)
-		fmt.Printf("Nights: %d\n", t.Nights)
+		fmt.Printf("Nights: %d\n", t.C.Nights)
 		fmt.Printf("Temperatures: %d - %d\n", t.C.TemperatureMin, t.C.TemperatureMax)
 		fmt.Printf("Properties: ")
 		var plist []string
@@ -321,8 +321,8 @@ func main() {
 		case "Configure Trip Properties":
 			propertyMenu(t)
 		case "Set Nights":
-			if nights, err := nightsEntry(t.Nights); err == nil {
-				t.Nights = nights
+			if nights, err := nightsEntry(t.C.Nights); err == nil {
+				t.C.Nights = nights
 			}
 		case "Set Min Temperature":
 			if temp, err := temperatureEntry("Minimum", t.C.TemperatureMin); err == nil {
