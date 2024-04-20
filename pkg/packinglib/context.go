@@ -18,16 +18,19 @@ type Context struct {
 	TemperatureMax int
 
 	Properties PropertySet
+
+	registry Registry
 }
 
 // NewContext creates a new context with the given name, temperature range, and properties.
 // Returns nil if any of the properties is unknown.  Properties are optional.
-func NewContext(name string, tmin, tmax int, properties []string) (*Context, error) {
+func NewContext(r Registry, name string, tmin, tmax int, properties []string) (*Context, error) {
 	c := &Context{
 		Name:           name,
 		TemperatureMin: tmin,
 		TemperatureMax: tmax,
 		Properties:     make(PropertySet),
+		registry:       r,
 	}
 
 	// Register our own name as a property, this allows items to require that an
@@ -42,7 +45,7 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 		}
 	}
 
-	RegisterContext(*c)
+	r.RegisterContext(*c)
 	return c, nil
 }
 
@@ -52,7 +55,7 @@ func (c *Context) addProperty(prop string) error {
 	if prop == "" {
 		return nil
 	}
-	if _, ok := allProperties[Property(prop)]; !ok {
+	if !c.registry.HasProperty(Property(prop)) {
 		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
 	// Recursively add contained properties that are actually also contexts. XXXXX
@@ -81,7 +84,7 @@ func (c *Context) removeProperty(prop string) error {
 	if prop == "" {
 		return nil
 	}
-	if _, ok := allProperties[Property(prop)]; !ok {
+	if !c.registry.HasProperty(Property(prop)) {
 		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
 	c.Properties[Property(prop)] = false

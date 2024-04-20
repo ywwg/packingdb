@@ -14,7 +14,7 @@ import (
 type PackList map[Category][]*Item
 
 // AllItems is a convenience map of all items that packingdb knows about.
-var AllItems = make(PackList)
+// var AllItems = make(PackList)
 
 // XXXXXXXXXXXXXXXX OK the main thing we want to do is make this more of an API
 // -- a trip is a thing we modify and then something about can ask questions
@@ -45,77 +45,6 @@ type Trip struct {
 // dupeChecker is a map to track all of the item names and make sure we don't
 // have any duplicates.
 var dupeChecker = make(map[string]bool)
-
-// RegisterItems appends the given slice of Items to the registry under
-// the given category.  Duplicate categories will be appended.  Items
-// with duplicate case-insensitive names, even across categories,
-// cause a panic.
-func RegisterItems(category Category, items []*Item) {
-	for _, i := range items {
-		if _, ok := dupeChecker[strings.ToLower(i.Name())]; ok {
-			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
-		}
-		dupeChecker[i.Name()] = true
-		for p := range i.Prerequisites() {
-			if _, ok := allProperties[p]; !ok {
-				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
-			}
-		}
-	}
-	AllItems[category] = items
-}
-
-// what is this global bullshit -- registration should be on a registry object
-// that we can pass around as needed.
-//
-// For the API future, the registry should be an interface.  Local object is
-// fine for now but will eventually be more API calls.
-var contexts = make(map[string]Context)
-
-// ContextList returns a sorted slice of strings of the contexts.
-func ContextList() []string {
-	keys := make([]string, len(contexts))
-	i := 0
-	for k := range contexts {
-		keys[i] = k
-		i++
-	}
-	sort.Strings(keys)
-	return keys
-}
-
-// RegisterContext registers the given context with the system.
-// Also registers a property with the context name.
-func RegisterContext(c Context) {
-	if _, ok := contexts[c.Name]; ok {
-		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
-	}
-	contexts[c.Name] = c
-	RegisterProperty(Property(c.Name), "")
-}
-
-// GetContext returns the context of the given name, or returns error if not found.
-func GetContext(name string) (*Context, error) {
-	c := &Context{}
-	found, ok := contexts[name]
-	if !ok {
-		return nil, fmt.Errorf("unknown context: %s", name)
-	}
-	*c = found
-	return c, nil
-}
-
-// GetContextTemperatureRange loads the given context and substitutes the provided
-// temperature range.
-func GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error) {
-	c, err := GetContext(name)
-	if err != nil {
-		return nil, err
-	}
-	c.TemperatureMin = tmin
-	c.TemperatureMax = tmax
-	return c, nil
-}
 
 func getCode(idx int) string {
 	code := ""
