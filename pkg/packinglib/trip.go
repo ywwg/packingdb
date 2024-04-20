@@ -65,6 +65,11 @@ func RegisterItems(category Category, items []*Item) {
 	AllItems[category] = items
 }
 
+// what is this global bullshit -- registration should be on a registry object
+// that we can pass around as needed.
+//
+// For the API future, the registry should be an interface.  Local object is
+// fine for now but will eventually be more API calls.
 var contexts = make(map[string]Context)
 
 // ContextList returns a sorted slice of strings of the contexts.

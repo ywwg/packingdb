@@ -18,6 +18,7 @@ type Property string
 // disallowed Property causes the item to reject.
 type PropertySet map[Property]bool
 
+// XXXXXXXXXXXXXX more global crap!  lol.  no.
 var allProperties = map[Property]string{
 	"Art":              "gonna do some drawing",
 	"BigTrip":          "this is a big deal",

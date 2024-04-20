@@ -30,6 +30,8 @@ func NewContext(name string, tmin, tmax int, properties []string) (*Context, err
 		Properties:     make(PropertySet),
 	}
 
+	// Register our own name as a property, this allows items to require that an
+	// entire context exists (or not), which is useful.
 	RegisterProperty(Property(c.Name), "")
 	if err := c.addProperty(c.Name); err != nil {
 		return nil, err
