@@ -5,39 +5,39 @@ import (
 )
 
 var food = []*plib.Item{
-	plib.NewConsumableItem("booze", 0.25, plib.NoUnits, []string{"Burn", "BYOB"}, nil),
-	plib.NewConsumableItem("good beer", 0.25, "sixpacks", []string{"Burn", "BYOB"}, nil),
-	plib.NewConsumableItem("Drinking water", 0.5, "gallons", []string{"Burn"}, nil),
+	plib.NewItem("booze", []string{"Burn", "BYOB"}, nil).Consumable(0.25, plib.NoUnits),
+	plib.NewItem("good beer", []string{"Burn", "BYOB"}, nil).Consumable(0.25, "sixpacks"),
+	plib.NewItem("Drinking water", []string{"Burn"}, nil).Consumable(0.5, "gallons"),
 	// Burns use a camelbak
 	plib.NewItem("zojirushi bottle", nil, []string{"Burn"}),
-	plib.NewConsumableItem("cooking water", 0.25, "gallons", []string{"Burn"}, nil),
+	plib.NewItem("cooking water", []string{"Burn"}, nil).Consumable(0.25, "gallons"),
 	plib.NewItem("cooler", []string{"Camping"}, nil),
 	plib.NewItem("spatula", []string{"Camping"}, nil),
 	plib.NewItem("tongs", []string{"Camping"}, nil),
 	plib.NewItem("wood spoon", []string{"Camping"}, nil),
-	plib.NewConsumableItem("tasty bites", 0.75, plib.NoUnits, []string{"Burn"}, nil),
+	plib.NewItem("tasty bites", []string{"Burn"}, nil).Consumable(0.75, plib.NoUnits),
 	plib.NewItem("plates", []string{"Con"}, nil),
 	plib.NewItem("plastic cutlery", []string{"Con"}, nil),
-	plib.NewConsumableItem("energy bars", 1.5, plib.NoUnits, []string{"Camping", "Con", "Cycling", "Hiking"}, nil),
-	plib.NewConsumableItem("nuun", .333, "tubes", []string{"Camping", "Cycling", "Hiking"}, nil),
-	plib.NewCustomConsumableItem("eggs", func(nights int, _ plib.PropertySet) float64 {
+	plib.NewItem("energy bars", []string{"Camping", "Con", "Cycling", "Hiking"}, nil).Consumable(1.5, plib.NoUnits),
+	plib.NewItem("nuun", []string{"Camping", "Cycling", "Hiking"}, nil).Consumable(.333, "tubes"),
+	plib.NewItem("eggs", []string{"Burn"}, nil).Custom(func(_ float64, nights int, _ plib.PropertySet) float64 {
 		// 2 Eggs for each morning that I'm there.
 		return float64((nights - 1) * 2)
-	}, plib.NoUnits, []string{"Burn"}, nil),
+	}, plib.NoUnits),
 	plib.NewItem("junk food?", []string{"Camping"}, nil),
 	plib.NewItem("salt and pepper", []string{"Camping"}, nil),
 	plib.NewItem("box soup", []string{"Camping"}, []string{"NoFire"}),
 	plib.NewItem("hot sauce", []string{"Camping"}, nil),
-	plib.NewConsumableItem("frozen grillables", 0.75, "servings", []string{"Camping"}, []string{"NoFire"}),
-	plib.NewConsumableItem("buns", 0.75, "servings", []string{"Camping"}, []string{"NoFire"}),
+	plib.NewItem("frozen grillables", []string{"Camping"}, []string{"NoFire"}).Consumable(0.75, "servings"),
+	plib.NewItem("buns", []string{"Camping"}, []string{"NoFire"}).Consumable(0.75, "servings"),
 
 	// Tiny House food
-	plib.NewConsumableItem("breakfasts", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
-	plib.NewConsumableItem("lunches", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
-	plib.NewConsumableItem("dinners", 1.0, plib.NoUnits, []string{"Tiny House"}, nil),
+	plib.NewItem("breakfasts", []string{"Tiny House"}, nil).Consumable(1.0, plib.NoUnits),
+	plib.NewItem("lunches", []string{"Tiny House"}, nil).Consumable(1.0, plib.NoUnits),
+	plib.NewItem("dinners", []string{"Tiny House"}, nil).Consumable(1.0, plib.NoUnits),
 	plib.NewItem("all non-freezable ingredients", []string{"Tiny House"}, nil),
 
-	plib.NewConsumableMaxItem("green tea", 1.0, 6.0, "bags", []string{"Lodging", "Con"}, nil),
+	plib.NewItem("green tea", []string{"Lodging", "Con"}, nil).Consumable(1.0, "bags").Max(6.0),
 	plib.NewItem("no-think food for drive", []string{"Tiny House", "CarRide"}, nil),
 	plib.NewItem("liquid for drive", []string{"Tiny House", "CarRide"}, nil),
 }

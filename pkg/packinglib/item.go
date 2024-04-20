@@ -206,14 +206,21 @@ func (i *maxCountMutator) AdjustCount(c *Context, count float64) float64 {
 	return math.Min(count, i.Max)
 }
 
-// CustomConsumableMutator is a consumable item that takes a function to
+// customConsumableMutator is a consumable item that takes a function to
 // determine how many are needed, instead of a simple float rate.
-type CustomConsumableMutator struct {
+type customConsumableMutator struct {
 	// DailyRate is how much the thing gets used per day.
 	RateFunc func(count float64, nights int, props PropertySet) float64
+
+	Units string
+}
+
+func (i *Item) Custom(f func(count float64, nights int, props PropertySet) float64, units string) *Item {
+	i.mutators = append(i.mutators, &customConsumableMutator{f, units})
+	return i
 }
 
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *CustomConsumableMutator) AdjustCount(c *Context, count float64) float64 {
+func (i *customConsumableMutator) AdjustCount(c *Context, count float64) float64 {
 	return i.RateFunc(count, c.Nights, c.Properties)
 }

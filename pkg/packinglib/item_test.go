@@ -106,7 +106,7 @@ func TestItemAdjustCount(t *testing.T) {
 			Name:          "Custom Func",
 			Prerequisites: PropertySet{},
 			Mutators: []packMutator{
-				&CustomConsumableMutator{
+				&customConsumableMutator{
 					RateFunc: func(count float64, nights int, props PropertySet) float64 {
 						return count + float64(nights)
 					},

@@ -13,10 +13,10 @@ var dog = []*plib.Item{
 	plib.NewItem("Dog towel", []string{"Dog"}, nil),
 	plib.NewItem("Dog water bowl", []string{"Dog"}, nil),
 	plib.NewItem("Dog food bowl", []string{"Dog"}, nil),
-	plib.NewConsumableItem("Dog food dry", 2.0, "servings", []string{"Dog"}, nil),
-	plib.NewConsumableItem("Dog food wet", 2.0, "servings", []string{"Dog"}, nil),
-	plib.NewConsumableItem("Dog treats", 1.0, "days worth", []string{"Dog"}, nil),
-	plib.NewConsumableItem("rawhide", 1.0, "sticks", []string{"Dog"}, nil),
+	plib.NewItem("Dog food dry", []string{"Dog"}, nil).Consumable(2.0, "servings"),
+	plib.NewItem("Dog food wet", []string{"Dog"}, nil).Consumable(2.0, "servings"),
+	plib.NewItem("Dog treats", []string{"Dog"}, nil).Consumable(1.0, "days worth"),
+	plib.NewItem("rawhide", []string{"Dog"}, nil).Consumable(1.0, "sticks"),
 	plib.NewItem("Dog food bag in car", []string{"Dog"}, nil),
 }
 

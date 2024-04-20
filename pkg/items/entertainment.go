@@ -5,7 +5,7 @@ import (
 )
 
 var entertainment = []*plib.Item{
-	plib.NewConsumableMaxItem("books", 1.0, 3.0, plib.NoUnits, nil, nil),
+	plib.NewItem("books", nil, nil).Consumable(1.0, plib.NoUnits).Max(3.0),
 	plib.NewItem("35mm camera and/or polaroid", nil, nil),
 	plib.NewItem("guidebooks", []string{"BigTrip"}, nil),
 	plib.NewItem("earbuds", nil, nil),
@@ -16,7 +16,7 @@ var entertainment = []*plib.Item{
 	plib.NewItem("USB-A-C cable", []string{"International", "Flight", "Lodging"}, nil),
 	plib.NewItem("bluetooth speaker and charger", []string{"Speaker", "Projector"}, []string{"International"}),
 	plib.NewItem("1/8 stereo cable", []string{"Speaker"}, []string{"International", "Tiny House"}),
-	plib.NewCustomConsumableItem("tv / movie", func(nights int, props plib.PropertySet) float64 {
+	plib.NewItem("tv / movie", []string{"Tiny House", "International"}, nil).Custom(func(_ float64, nights int, props plib.PropertySet) float64 {
 		if _, ok := props["Tiny House"]; ok {
 			return float64(nights)
 		}
@@ -25,7 +25,7 @@ var entertainment = []*plib.Item{
 			return 4.0
 		}
 		return 0.0
-	}, plib.NoUnits, []string{"Tiny House", "International"}, nil),
+	}, plib.NoUnits),
 	plib.NewItem("music ear plugs", []string{"Performing", "Partying", "Loud"}, nil),
 	plib.NewItem("Projector", []string{"Projector"}, nil),
 	plib.NewItem("Screen", []string{"Projector"}, nil),

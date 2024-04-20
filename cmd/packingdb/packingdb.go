@@ -19,7 +19,7 @@ import (
 	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
-func mainMenu(t *packinglib.Trip) (string, error) {
+func mainMenu() (string, error) {
 	items := []string{
 		"↩ Quit",
 		"Pack",
@@ -43,7 +43,7 @@ func mainMenu(t *packinglib.Trip) (string, error) {
 func nameEntry() (string, error) {
 	validate := func(input string) error {
 		if len(input) == 0 {
-			return errors.New("Must provide a name for this trip")
+			return errors.New("must provide a name for this trip")
 		}
 		return nil
 	}
@@ -62,7 +62,7 @@ func nightsEntry(current int) (int, error) {
 		}
 		_, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
-			return errors.New("Invalid number")
+			return errors.New("invalid number")
 		}
 		return nil
 	}
@@ -93,7 +93,7 @@ func temperatureEntry(help string, current int) (int, error) {
 		}
 		_, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
-			return errors.New("Invalid number")
+			return errors.New("invalid number")
 		}
 		return nil
 	}
@@ -139,7 +139,7 @@ func packMenu(t *packinglib.Trip) error {
 		items = append(items, t.PackingMenuItems(hiddenCats, hidePacked)...)
 		_, height, err := terminal.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
-			log.Fatal(fmt.Sprintf("couldn't get terminal size %v", err))
+			log.Fatalf("couldn't get terminal size %v", err)
 		}
 		// Take off 10 lines to account for bits of ui (history, etc)
 		if height > 10 {
@@ -199,7 +199,7 @@ func propertyMenu(t *packinglib.Trip) error {
 		items = append(items, t.PropertyMenuItems()...)
 		_, height, err := terminal.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
-			log.Fatal(fmt.Sprintf("couldn't get terminal size %v", err))
+			log.Fatalf("couldn't get terminal size %v", err)
 		}
 		// Take off 10 lines to account for bits of ui (history, etc)
 		if height > 10 {
@@ -252,7 +252,7 @@ func main() {
 	t := &packinglib.Trip{}
 	if _, err := os.Stat(filename); !os.IsNotExist(err) {
 		if err2 := t.LoadFromFile(0, filename); err2 != nil {
-			log.Fatal(fmt.Sprintf("%v", err2))
+			log.Fatalf("%v", err2)
 		}
 	} else {
 		title, err := nameEntry()
@@ -287,6 +287,7 @@ func main() {
 	}
 
 	// Main Menu
+LOOP:
 	for {
 		fmt.Printf("\033[1m")
 		fmt.Printf("\n\nName: %s\n", t.C.Name)
@@ -310,7 +311,7 @@ func main() {
 		fmt.Printf("\n")
 		fmt.Printf("\033[0m")
 
-		result, err := mainMenu(t)
+		result, err := mainMenu()
 		if err != nil {
 			break
 		}
@@ -335,11 +336,11 @@ func main() {
 		case "Pack":
 			err := packMenu(t)
 			if err != nil {
-				break
+				break LOOP
 			}
 		}
 		if err := t.SaveToFile(filename); err != nil {
-			log.Fatal(fmt.Sprintf("%v", err))
+			log.Fatalf("%v", err)
 		}
 	}
 }

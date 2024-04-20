@@ -5,7 +5,7 @@ import (
 )
 
 var waterStuff = []*plib.Item{
-	plib.NewConsumableMaxItem("swim suit", 0.25, 2.0, plib.NoUnits, []string{"Swimming", "Lodging"}, nil),
+	plib.NewItem("swim suit", []string{"Swimming", "Lodging"}, nil).Consumable(0.25, plib.NoUnits).Max(2.0),
 	plib.NewItem("swim towel", []string{"Swimming"}, nil),
 	plib.NewItem("drybag", []string{"Swimming", "Dirt"}, nil),
 }
