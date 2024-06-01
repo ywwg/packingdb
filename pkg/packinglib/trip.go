@@ -40,6 +40,8 @@ type Trip struct {
 	codeToItem map[string]*Item
 	// itemToCode is the reverse.
 	itemToCode map[*Item]string
+
+	registry Registry
 }
 
 // dupeChecker is a map to track all of the item names and make sure we don't
@@ -64,10 +66,11 @@ func getCode(idx int) string {
 
 // NewTripFromCustomContext returns a constructed trip for the given
 // constructed context and number of nights.
-func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
+func NewTripFromCustomContext(registry Registry, nights int, context *Context) (*Trip, error) {
 	t := &Trip{
 		C:           context,
 		contextName: context.Name,
+		registry:    registry,
 	}
 	t.packList = t.makeList()
 	t.codeToItem = make(map[string]*Item)
@@ -87,12 +90,12 @@ func NewTripFromCustomContext(nights int, context *Context) (*Trip, error) {
 
 // NewTrip returns a constructed trip for the given named context and
 // number of nights.
-func NewTrip(nights int, cname string) (*Trip, error) {
-	c, err := GetContext(cname)
+func NewTrip(registry Registry, nights int, cname string) (*Trip, error) {
+	c, err := registry.GetContext(cname)
 	if err != nil {
 		return nil, err
 	}
-	return NewTripFromCustomContext(nights, c)
+	return NewTripFromCustomContext(registry, nights, c)
 }
 
 func (t *Trip) AddProperty(p string) error {
@@ -118,7 +121,7 @@ func (t *Trip) HasProperty(p Property) bool {
 // makeList returns a map of category to slice of PackedItems for the given trip
 func (t *Trip) makeList() PackList {
 	packlist := make(PackList)
-	for category, items := range AllItems {
+	for category, items := range t.registry.AllItems() {
 		var toPack []*Item
 		for _, i := range items {
 			calced := i
@@ -274,9 +277,9 @@ func (t *Trip) PackingMenuItems(hiddenCategories map[Category]bool, hidePacked b
 
 func (t *Trip) styleProperty(p Property) string {
 	if t.HasProperty(p) {
-		return fmt.Sprintf("● %-20s %s", string(p), allProperties[p])
+		return fmt.Sprintf("● %-20s %s", string(p), t.registry.GetDescription(p))
 	}
-	return fmt.Sprintf("○ %-20s %s", string(p), allProperties[p])
+	return fmt.Sprintf("○ %-20s %s", string(p), t.registry.GetDescription(p))
 }
 
 // PropertyMenuItems returns a list of PackPackingMenuItems for the given trip.
@@ -284,7 +287,7 @@ func (t *Trip) styleProperty(p Property) string {
 // all packed items.
 func (t *Trip) PropertyMenuItems() []PackMenuItem {
 	var l []Property
-	for name := range allProperties {
+	for name := range t.registry.AllProperties() {
 		l = append(l, name)
 	}
 	less := func(i, j int) bool {
@@ -320,6 +323,7 @@ func (t *Trip) ToggleItemPacked(code string) error {
 // New file format:
 // first line: "V2", number of nights, tmin, tmax, context name, contexts...
 // if context_name is known, other contexts are added to it.
+// XXXXXX this should not be a method on Trip
 func (t *Trip) LoadFromFile(nights int, f string) error {
 	dat, err := os.ReadFile(f)
 	if err != nil {
@@ -348,11 +352,11 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 				if err != nil {
 					return err
 				}
-				var context *Context
-				if _, ok := contexts[toks[4]]; ok {
-					context, err = GetContextTemperatureRange(toks[4], tmin, tmax)
+				context, err := t.registry.Context(toks[4])
+				if err != nil {
+					context, err = NewContext(t.registry, toks[4], tmin, tmax, nil)
 				} else {
-					context, err = NewContext(toks[4], tmin, tmax, nil)
+					context, err = t.registry.GetContextTemperatureRange(toks[4], tmin, tmax)
 				}
 				if err != nil {
 					panic(fmt.Sprintf("Error while building context for trip: %s", err.Error()))
@@ -362,7 +366,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 						panic(fmt.Sprintf("Error adding property while building trip: %s", err.Error()))
 					}
 				}
-				loaded, err := NewTripFromCustomContext(nights, context)
+				loaded, err := NewTripFromCustomContext(t.registry, nights, context)
 				if err != nil {
 					panic(err.Error())
 				}
@@ -375,7 +379,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 				if err != nil {
 					return err
 				}
-				loaded, err := NewTrip(nights, toks[1])
+				loaded, err := NewTrip(t.registry, nights, toks[1])
 				if err != nil {
 					panic(err.Error())
 				}

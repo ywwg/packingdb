@@ -9,6 +9,10 @@ import (
 // ContextRegistry is a generic interface for uhhh doing things with contexts.
 type Registry interface {
 	ContextList() []string
+	AllItems() PackList
+	AllProperties() map[Property]string
+	GetDescription(p Property) string
+	Context(name string) (*Context, error)
 
 	// Not clear how registration should work... probably just "add"
 	RegisterContext(c Context)
@@ -22,14 +26,14 @@ type Registry interface {
 type StructRegistry struct {
 	contexts      map[string]Context
 	allProperties map[Property]string
-	AllItems      PackList
+	allItems      PackList
 }
 
 // ContextList returns a sorted slice of strings of the contexts.
-func (t *StructRegistry) ContextList() []string {
-	keys := make([]string, len(t.contexts))
+func (r *StructRegistry) ContextList() []string {
+	keys := make([]string, len(r.contexts))
 	i := 0
-	for k := range t.contexts {
+	for k := range r.contexts {
 		keys[i] = k
 		i++
 	}
@@ -37,20 +41,36 @@ func (t *StructRegistry) ContextList() []string {
 	return keys
 }
 
+func (r *StructRegistry) Context(name string) (*Context, error) {
+	c, ok := r.contexts[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown context: %s", name)
+	}
+	return &c, nil
+}
+
+func (r *StructRegistry) AllItems() PackList {
+	return r.allItems
+}
+
+func (r *StructRegistry) AllProperties() map[Property]string {
+	return r.allProperties
+}
+
 // RegisterContext registers the given context with the system.
 // Also registers a property with the context name.
-func (t *StructRegistry) RegisterContext(c Context) {
-	if _, ok := t.contexts[c.Name]; ok {
+func (r *StructRegistry) RegisterContext(c Context) {
+	if _, ok := r.contexts[c.Name]; ok {
 		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
 	}
-	t.contexts[c.Name] = c
+	r.contexts[c.Name] = c
 	RegisterProperty(Property(c.Name), "")
 }
 
 // GetContext returns the context of the given name, or returns error if not found.
-func (t *StructRegistry) GetContext(name string) (*Context, error) {
+func (r *StructRegistry) GetContext(name string) (*Context, error) {
 	c := &Context{}
-	found, ok := t.contexts[name]
+	found, ok := r.contexts[name]
 	if !ok {
 		return nil, fmt.Errorf("unknown context: %s", name)
 	}
@@ -60,8 +80,8 @@ func (t *StructRegistry) GetContext(name string) (*Context, error) {
 
 // GetContextTemperatureRange loads the given context and substitutes the provided
 // temperature range.
-func (t *StructRegistry) GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error) {
-	c, err := t.GetContext(name)
+func (r *StructRegistry) GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error) {
+	c, err := r.GetContext(name)
 	if err != nil {
 		return nil, err
 	}
@@ -74,19 +94,19 @@ func (t *StructRegistry) GetContextTemperatureRange(name string, tmin, tmax int)
 // the given category.  Duplicate categories will be appended.  Items
 // with duplicate case-insensitive names, even across categories,
 // cause a panic.
-func (t *StructRegistry) RegisterItems(category Category, items []*Item) {
+func (r *StructRegistry) RegisterItems(category Category, items []*Item) {
 	for _, i := range items {
 		if _, ok := dupeChecker[strings.ToLower(i.Name())]; ok {
 			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
 		}
 		dupeChecker[i.Name()] = true
 		for p := range i.Prerequisites() {
-			if _, ok := t.allProperties[p]; !ok {
+			if _, ok := r.allProperties[p]; !ok {
 				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
 			}
 		}
 	}
-	t.AllItems[category] = items
+	r.allItems[category] = items
 }
 
 func (r *StructRegistry) HasProperty(p Property) bool {
