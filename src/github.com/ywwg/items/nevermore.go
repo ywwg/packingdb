@@ -6,7 +6,7 @@ import (
 
 var nevermore = []plib.Item{
 	plib.NewBasicItem("Nevermore", []string{"Nevermore"}, nil),
-	plib.NewBasicItem("EZ Up", []string{"Nevermore", "Burn"}, nil),
+	plib.NewBasicItem("EZ Up", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("floor tarp", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("3way ext cord", []string{"Nevermore"}, nil),
 	plib.NewBasicItem("UPS", []string{"Nevermore"}, nil),

@@ -5,9 +5,9 @@ import (
 )
 
 var waterStuff = []plib.Item{
-	plib.NewConsumableMaxItem("swim suit", 0.25, 2.0, plib.NoUnits, []string{"Swimming", "Lodging"}, nil),
-	plib.NewBasicItem("swim towel", []string{"Swimming"}, nil),
-	plib.NewBasicItem("drybag", []string{"Swimming", "Dirt"}, nil),
+	plib.NewConsumableMaxItem("swim suit", 0.25, 2.0, plib.NoUnits, []string{"Swimming", "Lodging"}, []string{"Firefly"}),
+	plib.NewBasicItem("swim towel", []string{"Swimming"}, []string{"Firefly"}),
+	plib.NewBasicItem("drybag", []string{"Swimming", "Dirt"}, []string{"Firefly"}),
 }
 
 var tubing = []plib.Item{
