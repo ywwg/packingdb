@@ -2,8 +2,6 @@ package packinglib
 
 import (
 	"fmt"
-	"sort"
-	"strings"
 )
 
 // Property is used to describe an attribute of a context that should be
@@ -73,14 +71,6 @@ type PropertySet map[Property]bool
 // 	"MiniMixxx":        "",
 // }
 
-// RegisterProperty adds a new Property to the database so it can be used.
-// desc should be a user-visible description of the property.
-// Does not verify that all of the properties are in the allProperties map.
-func RegisterProperty(prop Property, desc string) {
-	// Don't worry if the property already exists.
-	allProperties[prop] = desc
-}
-
 func buildPropertySet(allow, disallow []string) PropertySet {
 	propSet := make(PropertySet)
 	for _, a := range allow {
@@ -93,17 +83,4 @@ func buildPropertySet(allow, disallow []string) PropertySet {
 		propSet[Property(d)] = false
 	}
 	return propSet
-}
-
-// ListProperties returns all of the registered properties as a slice of strings.
-func ListProperties() []Property {
-	var l []Property
-	for k := range allProperties {
-		l = append(l, k)
-	}
-	less := func(i, j int) bool {
-		return strings.ToLower(string(l[i])) < strings.ToLower(string(l[j]))
-	}
-	sort.Slice(l, less)
-	return l
 }

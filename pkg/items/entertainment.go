@@ -37,7 +37,3 @@ var entertainment = []*plib.Item{
 	plib.NewItem("Extra Mic and XLR", []string{"Karaoke"}, nil),
 	plib.NewItem("Party Laser", []string{"Karaoke"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Entertainment", entertainment)
-}

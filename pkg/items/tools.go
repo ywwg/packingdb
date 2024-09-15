@@ -12,7 +12,3 @@ var tools = []*plib.Item{
 	plib.NewItem("5 gallon water jug", []string{"Tiny House"}, nil),
 	plib.NewItem("UDC", []string{"Tiny House"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Tools", tools)
-}

@@ -16,7 +16,3 @@ var documents = []*plib.Item{
 	plib.NewItem("Tile in suitcase", []string{"PaidTravel"}, []string{"NoCheckedLuggage"}),
 	plib.NewItem("COVID tests", []string{"Vax Proof"}, nil).Consumable(0.5, plib.NoUnits),
 }
-
-func init() {
-	plib.RegisterItems("Documents", documents)
-}

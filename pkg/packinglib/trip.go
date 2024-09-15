@@ -296,7 +296,7 @@ func (t *Trip) PropertyMenuItems() []PackMenuItem {
 	sort.Slice(l, less)
 
 	var items []PackMenuItem
-	for _, prop := range ListProperties() {
+	for _, prop := range t.registry.ListProperties() {
 		displayProp := t.styleProperty(prop)
 		items = append(items, NewMenuItem(displayProp, MenuProperty, string(prop)))
 	}

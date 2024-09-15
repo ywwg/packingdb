@@ -14,8 +14,3 @@ var tubing = []*plib.Item{
 	plib.NewItem("innertube", []string{"Tubing"}, nil),
 	plib.NewItem("air pump", []string{"Tubing"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Swim", waterStuff)
-	plib.RegisterItems("Tubing", tubing)
-}

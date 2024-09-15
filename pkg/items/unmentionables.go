@@ -45,9 +45,3 @@ var suiting = []*plib.Item{
 	plib.NewItem("suiting outfit", []string{"Suiting"}, nil),
 	plib.NewItem("fake headphones", []string{"Suiting"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Unmentionables", unmentionables)
-	plib.RegisterItems("Suiting", suiting)
-	plib.RegisterItems("Playtime", playtime)
-}

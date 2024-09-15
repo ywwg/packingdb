@@ -27,7 +27,3 @@ var performing = []*plib.Item{
 	plib.NewItem("Traktor Audio10", []string{"MiniMixxx"}, nil),
 	plib.NewItem("Spare USB-C charger", []string{"MiniMixxx"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Performing", performing)
-}

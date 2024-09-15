@@ -49,7 +49,3 @@ var campStuff = []*plib.Item{
 	plib.NewItem("sheet set", []string{"Tiny House"}, nil),
 	plib.NewItem("hammock", []string{"Burn", "Camping"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Camping", campStuff)
-}

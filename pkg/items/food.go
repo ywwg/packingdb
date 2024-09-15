@@ -41,7 +41,3 @@ var food = []*plib.Item{
 	plib.NewItem("no-think food for drive", []string{"Tiny House", "CarRide"}, nil),
 	plib.NewItem("liquid for drive", []string{"Tiny House", "CarRide"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Food", food)
-}

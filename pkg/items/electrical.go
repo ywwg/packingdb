@@ -17,7 +17,3 @@ var electrical = []*plib.Item{
 	plib.NewItem("Plug Adapters", []string{"International"}, nil),
 	plib.NewItem("Disco laser", []string{"Con"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Electrical", electrical)
-}

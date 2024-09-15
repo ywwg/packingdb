@@ -5,7 +5,3 @@ import (
 )
 
 var toBuy = []*plib.Item{}
-
-func init() {
-	plib.RegisterItems("To Buy", toBuy)
-}

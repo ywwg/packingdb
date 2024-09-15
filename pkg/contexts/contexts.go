@@ -30,25 +30,6 @@ var fireflyContext = plib.Context{
 	},
 }
 
-var nectrContext = plib.Context{
-	Name:           "Nectr",
-	TemperatureMin: 40,
-	TemperatureMax: 80,
-	Properties: plib.PropertySet{
-		"Dirt":         true,
-		"Loud":         true,
-		"Bright":       true,
-		"Sweat":        true,
-		"Camping":      true,
-		"Dark":         true,
-		"Burn":         true,
-		"Performing":   true,
-		"Partying":     true,
-		"Speaker":      true,
-		"GrumpCamping": true,
-	},
-}
-
 var capeContext = plib.Context{
 	Name:           "Cape",
 	TemperatureMin: 69,
@@ -58,23 +39,6 @@ var capeContext = plib.Context{
 		"Sweat":         true,
 		"Swimming":      true,
 		"HasToiletries": true,
-	},
-}
-
-var berlin = plib.Context{
-	Name:           "Berlin",
-	TemperatureMin: 53,
-	TemperatureMax: 80,
-	Properties: plib.PropertySet{
-		"Bright":        true,
-		"Sweat":         true,
-		"HasToiletries": true,
-		"International": true,
-		"Partying":      true,
-		"Lodging":       true,
-		"Flight":        true,
-		"DiningOut":     true,
-		"BigTrip":       true,
 	},
 }
 
@@ -150,38 +114,6 @@ var tinyhouseWinter = plib.Context{
 	},
 }
 
-var sustainRelease = plib.Context{
-	Name:           "Sustain-Release",
-	TemperatureMin: 56,
-	TemperatureMax: 76,
-	Properties: plib.PropertySet{
-		"Bright":    true,
-		"Sweat":     true,
-		"Partying":  true,
-		"Camping":   true,
-		"Dark":      true,
-		"Loud":      true,
-		"NoFire":    true,
-		"Insecure":  true,
-		"Swimming":  true,
-		"PaidEvent": true,
-		"Speaker":   true,
-	},
-}
-
-var paxUnpluggedContext = plib.Context{
-	Name:           "PAX Unplugged",
-	TemperatureMin: 35,
-	TemperatureMax: 56,
-	Properties: plib.PropertySet{
-		"Con":           true,
-		"Lodging":       true,
-		"PaidEvent":     true,
-		"PaidTravel":    true,
-		"HasToiletries": true,
-	},
-}
-
 var daytrip = plib.Context{
 	Name:           "daytrip",
 	TemperatureMin: 25,
@@ -197,21 +129,6 @@ var blanktrip = plib.Context{
 	TemperatureMin: 0,
 	TemperatureMax: 120,
 	Properties:     plib.PropertySet{},
-}
-
-var florida = plib.Context{
-	Name:           "Florida",
-	TemperatureMin: 64,
-	TemperatureMax: 82,
-	Properties: plib.PropertySet{
-		"Bright":        true,
-		"Sweat":         true,
-		"Swimming":      true,
-		"HasToiletries": true,
-		"Lodging":       true,
-		"Flight":        true,
-		"DiningOut":     true,
-	},
 }
 
 var fanconContext = plib.Context{
@@ -288,22 +205,19 @@ var tubing = plib.Context{
 	},
 }
 
-func init() {
-	nectr2017 := nectrContext
-	nectr2017.Name = "Nectr2017"
-
+func Register(r plib.Registry) {
 	fancon := fanconContext
 
-	plib.RegisterContext(fireflyContext)
-	plib.RegisterContext(capeContext)
-	plib.RegisterContext(tinyhouseSpring)
-	plib.RegisterContext(tinyhouseSummer)
-	plib.RegisterContext(tinyhouseFall)
-	plib.RegisterContext(tinyhouseWinter)
-	plib.RegisterContext(daytrip)
-	plib.RegisterContext(blanktrip)
-	plib.RegisterContext(fancon)
-	plib.RegisterContext(japan)
-	plib.RegisterContext(quillHill)
-	plib.RegisterContext(tubing)
+	r.RegisterContext(fireflyContext)
+	r.RegisterContext(capeContext)
+	r.RegisterContext(tinyhouseSpring)
+	r.RegisterContext(tinyhouseSummer)
+	r.RegisterContext(tinyhouseFall)
+	r.RegisterContext(tinyhouseWinter)
+	r.RegisterContext(daytrip)
+	r.RegisterContext(blanktrip)
+	r.RegisterContext(fancon)
+	r.RegisterContext(japan)
+	r.RegisterContext(quillHill)
+	r.RegisterContext(tubing)
 }

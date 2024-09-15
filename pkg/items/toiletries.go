@@ -43,7 +43,3 @@ var toiletries = []*plib.Item{
 	plib.NewItem("Dramamine", []string{"CarRide", "Boat"}, nil),
 	plib.NewItem("anti-nausea patches", []string{"Boat"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Toiletries", toiletries)
-}

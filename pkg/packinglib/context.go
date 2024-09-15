@@ -35,7 +35,7 @@ func NewContext(r Registry, name string, tmin, tmax int, properties []string) (*
 
 	// Register our own name as a property, this allows items to require that an
 	// entire context exists (or not), which is useful.
-	RegisterProperty(Property(c.Name), "")
+	r.RegisterProperty(Property(c.Name), "")
 	if err := c.addProperty(c.Name); err != nil {
 		return nil, err
 	}

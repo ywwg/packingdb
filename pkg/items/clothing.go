@@ -60,8 +60,3 @@ var flightSupplies = []*plib.Item{
 	plib.NewItem("turtl pillow", []string{"Flight", "International"}, nil),
 	plib.NewItem("compression socks in carryon", []string{"Flight", "International"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Clothing", clothing)
-	plib.RegisterItems("Flight Stuff", flightSupplies)
-}

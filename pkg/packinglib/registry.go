@@ -16,7 +16,9 @@ type Registry interface {
 
 	// Not clear how registration should work... probably just "add"
 	RegisterContext(c Context)
+	RegisterProperty(prop Property, desc string)
 	RegisterItems(category Category, items []*Item)
+	ListProperties() []Property
 	GetContext(name string) (*Context, error)
 	GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error)
 	HasProperty(p Property) bool
@@ -57,6 +59,13 @@ func (r *StructRegistry) AllProperties() map[Property]string {
 	return r.allProperties
 }
 
+func (r *StructRegistry) GetDescription(p Property) string {
+	if desc, ok := r.allProperties[p]; ok {
+		return desc
+	}
+	return "no description what now"
+}
+
 // RegisterContext registers the given context with the system.
 // Also registers a property with the context name.
 func (r *StructRegistry) RegisterContext(c Context) {
@@ -64,7 +73,14 @@ func (r *StructRegistry) RegisterContext(c Context) {
 		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
 	}
 	r.contexts[c.Name] = c
-	RegisterProperty(Property(c.Name), "")
+	r.RegisterProperty(Property(c.Name), "")
+}
+
+// RegisterProperty adds a new Property to the database so it can be used.
+// desc should be a user-visible description of the property.
+// Does not verify that all of the properties are in the allProperties map.
+func (r *StructRegistry) RegisterProperty(prop Property, desc string) {
+	r.allProperties[prop] = desc
 }
 
 // GetContext returns the context of the given name, or returns error if not found.
@@ -107,6 +123,19 @@ func (r *StructRegistry) RegisterItems(category Category, items []*Item) {
 		}
 	}
 	r.allItems[category] = items
+}
+
+// ListProperties returns all of the registered properties as a slice of strings.
+func (r *StructRegistry) ListProperties() []Property {
+	var l []Property
+	for k := range r.AllProperties() {
+		l = append(l, k)
+	}
+	less := func(i, j int) bool {
+		return strings.ToLower(string(l[i])) < strings.ToLower(string(l[j]))
+	}
+	sort.Slice(l, less)
+	return l
 }
 
 func (r *StructRegistry) HasProperty(p Property) bool {

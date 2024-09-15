@@ -19,7 +19,3 @@ var dog = []*plib.Item{
 	plib.NewItem("rawhide", []string{"Dog"}, nil).Consumable(1.0, "sticks"),
 	plib.NewItem("Dog food bag in car", []string{"Dog"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Dog", dog)
-}

@@ -11,7 +11,3 @@ var business = []*plib.Item{
 	plib.NewItem("work laptop", []string{"Business"}, nil),
 	plib.NewItem("work laptop power", []string{"Business"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Business", business)
-}

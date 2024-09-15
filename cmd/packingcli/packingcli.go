@@ -12,10 +12,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ywwg/packingdb/pkg/items"
 	"github.com/ywwg/packingdb/pkg/packinglib"
 
 	_ "github.com/ywwg/packingdb/pkg/contexts"
-	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
 var (
@@ -37,15 +37,18 @@ var (
 func main() {
 	flag.Parse()
 
+	var r packinglib.Registry = &packinglib.StructRegistry{}
+	items.RegisterAllItems(r)
+
 	var t *packinglib.Trip
 	if *flagListContexts {
-		for _, c := range packinglib.ContextList() {
+		for _, c := range r.ContextList() {
 			fmt.Println(c)
 		}
 		return
 	}
 	if *flagListProperties {
-		for _, p := range packinglib.ListProperties() {
+		for _, p := range r.ListProperties() {
 			fmt.Println(p)
 		}
 		return
@@ -59,7 +62,7 @@ func main() {
 		if *flagNights == 0 {
 			panic("Need a number of nights")
 		}
-		t, err := packinglib.NewTrip(*flagNights, *flagContext)
+		t, err := packinglib.NewTrip(r, *flagNights, *flagContext)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -86,14 +89,14 @@ func main() {
 			panic("Need a number of nights")
 		}
 		var err error
-		t, err = packinglib.NewTrip(*flagNights, *flagContext)
+		t, err = packinglib.NewTrip(r, *flagNights, *flagContext)
 		if err != nil {
 			fmt.Printf("Context %s not found, creating empty context\n", *flagContext)
-			c, err := packinglib.NewContext(*flagContext, -120, 120, nil)
+			c, err := packinglib.NewContext(r, *flagContext, -120, 120, nil)
 			if err != nil {
 				panic(err.Error())
 			}
-			t, err = packinglib.NewTripFromCustomContext(*flagNights, c)
+			t, err = packinglib.NewTripFromCustomContext(r, *flagNights, c)
 			if err != nil {
 				panic(err.Error())
 			}

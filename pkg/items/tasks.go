@@ -15,7 +15,3 @@ var tasks = []*plib.Item{
 	plib.NewItem("sync music", nil, nil),
 	plib.NewItem("thermostat on hold", nil, nil),
 }
-
-func init() {
-	plib.RegisterItems("Tasks", tasks)
-}

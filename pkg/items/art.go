@@ -11,7 +11,3 @@ var art = []*plib.Item{
 	plib.NewItem("apple pencil coupler", []string{"Art"}, nil),
 	plib.NewItem("ipad cable", []string{"Art"}, nil),
 }
-
-func init() {
-	plib.RegisterItems("Art", art)
-}

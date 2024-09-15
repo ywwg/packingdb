@@ -12,11 +12,11 @@ import (
 	"strconv"
 
 	"github.com/manifoldco/promptui"
+	"github.com/ywwg/packingdb/pkg/items"
 	"github.com/ywwg/packingdb/pkg/packinglib"
 	"golang.org/x/crypto/ssh/terminal"
 
 	_ "github.com/ywwg/packingdb/pkg/contexts"
-	_ "github.com/ywwg/packingdb/pkg/items"
 )
 
 func mainMenu() (string, error) {
@@ -248,6 +248,10 @@ func main() {
 	}
 	filename := args[0]
 
+	// XXXXX we should find a better way to register items (but need to avoid an
+	// import cycle.)
+	var r packinglib.Registry = &packinglib.StructRegistry{}
+	items.RegisterAllItems(r)
 	// File mode: load if the file already exists or create new if not
 	t := &packinglib.Trip{}
 	if _, err := os.Stat(filename); !os.IsNotExist(err) {
@@ -278,7 +282,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		t, err = packinglib.NewTripFromCustomContext(nights, context)
+		t, err = packinglib.NewTripFromCustomContext(r, nights, context)
 		if err != nil {
 			log.Fatal(err)
 		}
