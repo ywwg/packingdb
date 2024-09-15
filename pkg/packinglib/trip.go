@@ -44,10 +44,6 @@ type Trip struct {
 	registry Registry
 }
 
-// dupeChecker is a map to track all of the item names and make sure we don't
-// have any duplicates.
-var dupeChecker = make(map[string]bool)
-
 func getCode(idx int) string {
 	code := ""
 	adjust := 0
@@ -267,12 +263,20 @@ func (t *Trip) PackingMenuItems(hiddenCategories map[Category]bool, hidePacked b
 					continue
 				}
 				if i.Count() > 0 {
-					items = append(items, NewMenuItem(i.String(), MenuPackable, t.itemToCode[i]))
+					items = append(items, NewMenuItem(styleItem(i), MenuPackable, t.itemToCode[i]))
 				}
 			}
 		}
 	}
 	return items
+}
+
+func styleItem(i *Item) string {
+	checkbox := "○"
+	if i.Packed() {
+		checkbox = "●"
+	}
+	return fmt.Sprintf("%s %s", checkbox, i.String())
 }
 
 func (t *Trip) styleProperty(p Property) string {
@@ -323,11 +327,13 @@ func (t *Trip) ToggleItemPacked(code string) error {
 // New file format:
 // first line: "V2", number of nights, tmin, tmax, context name, contexts...
 // if context_name is known, other contexts are added to it.
-// XXXXXX this should not be a method on Trip
-func (t *Trip) LoadFromFile(nights int, f string) error {
+func LoadFromFile(r Registry, nights int, f string) (*Trip, error) {
 	dat, err := os.ReadFile(f)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	t := &Trip{
+		registry: r,
 	}
 	buf := bytes.NewBuffer(dat)
 	scanner := bufio.NewScanner(buf)
@@ -339,25 +345,24 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 				var err error
 				fileNights, err := strconv.Atoi(toks[1])
 				if err != nil {
-					return err
+					return nil, err
 				}
 				if nights == 0 {
 					nights = fileNights
 				}
 				tmin, err := strconv.Atoi(toks[2])
 				if err != nil {
-					return err
+					return nil, err
 				}
 				tmax, err := strconv.Atoi(toks[3])
 				if err != nil {
-					return err
+					return nil, err
 				}
-				context, err := t.registry.Context(toks[4])
+				context, err := t.registry.GetContextTemperatureRange(toks[4], tmin, tmax)
 				if err != nil {
 					context, err = NewContext(t.registry, toks[4], tmin, tmax, nil)
-				} else {
-					context, err = t.registry.GetContextTemperatureRange(toks[4], tmin, tmax)
 				}
+				context.Nights = nights
 				if err != nil {
 					panic(fmt.Sprintf("Error while building context for trip: %s", err.Error()))
 				}
@@ -377,7 +382,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 				}
 				nights, err := strconv.Atoi(toks[0])
 				if err != nil {
-					return err
+					return nil, err
 				}
 				loaded, err := NewTrip(t.registry, nights, toks[1])
 				if err != nil {
@@ -395,7 +400,7 @@ func (t *Trip) LoadFromFile(nights int, f string) error {
 	if err := scanner.Err(); err != nil {
 		panic(fmt.Sprintf("reading file: %s", err))
 	}
-	return nil
+	return t, nil
 }
 
 // SaveToFile saves the trip to the provided filename.

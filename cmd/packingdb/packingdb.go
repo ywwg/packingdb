@@ -12,11 +12,9 @@ import (
 	"strconv"
 
 	"github.com/manifoldco/promptui"
-	"github.com/ywwg/packingdb/pkg/items"
+	"github.com/ywwg/packingdb/pkg/contexts"
 	"github.com/ywwg/packingdb/pkg/packinglib"
 	"golang.org/x/crypto/ssh/terminal"
-
-	_ "github.com/ywwg/packingdb/pkg/contexts"
 )
 
 func mainMenu() (string, error) {
@@ -150,7 +148,7 @@ func packMenu(t *packinglib.Trip) error {
 			Items: items,
 			Templates: &promptui.SelectTemplates{
 				Label:    "  {{ .Name }}",
-				Active:   "▸ {{ .Name | underline}}",
+				Active:   "▸ {{ .Name | underline }}",
 				Inactive: "  {{ .Name }}",
 				Selected: "{{ .Name }}",
 			},
@@ -170,7 +168,6 @@ func packMenu(t *packinglib.Trip) error {
 			return err
 		}
 		selected := items[i]
-		// TODO: I forget, does go have operator overriding? Probs not.
 		if selected.Equals(BackMenuItem) {
 			return nil
 		} else if selected.Equals(HidePackedMenuItem) {
@@ -210,7 +207,7 @@ func propertyMenu(t *packinglib.Trip) error {
 			Items: items,
 			Size:  height,
 			Templates: &promptui.SelectTemplates{
-				Label:    "  {{ .Name }}",
+				Label:    "  {{ .Name | }}",
 				Active:   "▸ {{ .Name | underline}}",
 				Inactive: "  {{ .Name }}",
 				Selected: "{{ .Name }}",
@@ -248,15 +245,14 @@ func main() {
 	}
 	filename := args[0]
 
-	// XXXXX we should find a better way to register items (but need to avoid an
-	// import cycle.)
-	var r packinglib.Registry = &packinglib.StructRegistry{}
-	items.RegisterAllItems(r)
+	var r packinglib.Registry = packinglib.NewStructRegistry()
+	contexts.PopulateRegistry(r)
+	var t *packinglib.Trip
 	// File mode: load if the file already exists or create new if not
-	t := &packinglib.Trip{}
 	if _, err := os.Stat(filename); !os.IsNotExist(err) {
-		if err2 := t.LoadFromFile(0, filename); err2 != nil {
-			log.Fatalf("%v", err2)
+		t, err = packinglib.LoadFromFile(r, 0, filename)
+		if err != nil {
+			log.Fatalf("%v", err)
 		}
 	} else {
 		title, err := nameEntry()

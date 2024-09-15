@@ -2,35 +2,37 @@ package items
 
 import "github.com/ywwg/packingdb/pkg/packinglib"
 
-func RegisterAllItems(r packinglib.Registry) {
-	r.RegisterItems("Art", art)
-	r.RegisterItems("Business", business)
-	r.RegisterItems("Camping", campStuff)
-	r.RegisterItems("Clothing", clothing)
-	r.RegisterItems("Documents", documents)
-	r.RegisterItems("Dog", dog)
-	r.RegisterItems("Electrical", electrical)
-	r.RegisterItems("Entertainment", entertainment)
-	r.RegisterItems("Flight Stuff", flightSupplies)
-	r.RegisterItems("Food", food)
-	r.RegisterItems("Performing", performing)
+func AllItems() []packinglib.ItemList {
+	return []packinglib.ItemList{
+		{Name: "Art", Items: art},
+		{Name: "Business", Items: business},
+		{Name: "Camping", Items: campStuff},
+		{Name: "Clothing", Items: clothing},
+		{Name: "Documents", Items: documents},
+		{Name: "Dog", Items: dog},
+		{Name: "Electrical", Items: electrical},
+		{Name: "Entertainment", Items: entertainment},
+		{Name: "Flight Stuff", Items: flightSupplies},
+		{Name: "Food", Items: food},
+		{Name: "Performing", Items: performing},
 
-	// Sport
-	r.RegisterItems("Bicycling", bicycling)
-	r.RegisterItems("Climbing", climbing)
-	r.RegisterItems("Skiing", skiing)
-	r.RegisterItems("Boat", boating)
+		// Sport
+		{Name: "Bicycling", Items: bicycling},
+		{Name: "Climbing", Items: climbing},
+		{Name: "Skiing", Items: skiing},
+		{Name: "Boat", Items: boating},
 
-	// Swim
-	r.RegisterItems("Swim", waterStuff)
-	r.RegisterItems("Tubing", tubing)
+		// Swim
+		{Name: "Swim", Items: waterStuff},
+		{Name: "Tubing", Items: tubing},
 
-	r.RegisterItems("To Buy", toBuy)
-	r.RegisterItems("Tasks", tasks)
-	r.RegisterItems("Toiletries", toiletries)
-	r.RegisterItems("Tools", tools)
+		{Name: "To Buy", Items: toBuy},
+		{Name: "Tasks", Items: tasks},
+		{Name: "Toiletries", Items: toiletries},
+		{Name: "Tools", Items: tools},
 
-	r.RegisterItems("Unmentionables", unmentionables)
-	r.RegisterItems("Suiting", suiting)
-	r.RegisterItems("Playtime", playtime)
+		{Name: "Unmentionables", Items: unmentionables},
+		{Name: "Suiting", Items: suiting},
+		{Name: "Playtime", Items: playtime},
+	}
 }

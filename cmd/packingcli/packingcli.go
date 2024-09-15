@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ywwg/packingdb/pkg/items"
+	"github.com/ywwg/packingdb/pkg/contexts"
 	"github.com/ywwg/packingdb/pkg/packinglib"
 
 	_ "github.com/ywwg/packingdb/pkg/contexts"
@@ -37,8 +37,7 @@ var (
 func main() {
 	flag.Parse()
 
-	var r packinglib.Registry = &packinglib.StructRegistry{}
-	items.RegisterAllItems(r)
+	var r packinglib.Registry = packinglib.NewStructRegistry()
 
 	var t *packinglib.Trip
 	if *flagListContexts {
@@ -66,6 +65,7 @@ func main() {
 		if err != nil {
 			panic(err.Error())
 		}
+		contexts.PopulateRegistry(r)
 		for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 			fmt.Println(l)
 		}
@@ -78,8 +78,9 @@ func main() {
 		if len(*flagContext) != 0 {
 			fmt.Println("(Ignoring context when loading file)")
 		}
-		if err2 := t.LoadFromFile(*flagNights, *flagPackingFile); err2 != nil {
-			panic(fmt.Sprintf("%v", err2))
+		t, err = packinglib.LoadFromFile(r, *flagNights, *flagPackingFile)
+		if err != nil {
+			panic(fmt.Sprintf("%v", err))
 		}
 	} else {
 		if len(*flagContext) == 0 {

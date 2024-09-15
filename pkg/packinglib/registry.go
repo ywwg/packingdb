@@ -31,6 +31,15 @@ type StructRegistry struct {
 	allItems      PackList
 }
 
+func NewStructRegistry() Registry {
+	r := &StructRegistry{
+		contexts:      make(map[string]Context),
+		allProperties: make(map[Property]string),
+		allItems:      make(PackList),
+	}
+	return r
+}
+
 // ContextList returns a sorted slice of strings of the contexts.
 func (r *StructRegistry) ContextList() []string {
 	keys := make([]string, len(r.contexts))
@@ -142,3 +151,7 @@ func (r *StructRegistry) HasProperty(p Property) bool {
 	_, ok := r.allProperties[p]
 	return ok
 }
+
+// dupeChecker is a map to track all of the item names and make sure we don't
+// have any duplicates.
+var dupeChecker = make(map[string]bool)

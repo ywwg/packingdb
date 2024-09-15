@@ -1,6 +1,7 @@
 package contexts
 
 import (
+	"github.com/ywwg/packingdb/pkg/items"
 	plib "github.com/ywwg/packingdb/pkg/packinglib"
 )
 
@@ -205,19 +206,31 @@ var tubing = plib.Context{
 	},
 }
 
-func Register(r plib.Registry) {
-	fancon := fanconContext
+func AllContexts() []plib.Context {
+	return []plib.Context{
+		fireflyContext,
+		capeContext,
+		tinyhouseSpring,
+		tinyhouseSummer,
+		tinyhouseFall,
+		tinyhouseWinter,
+		daytrip,
+		blanktrip,
+		fanconContext,
+		japan,
+		quillHill,
+		tubing,
+	}
+}
 
-	r.RegisterContext(fireflyContext)
-	r.RegisterContext(capeContext)
-	r.RegisterContext(tinyhouseSpring)
-	r.RegisterContext(tinyhouseSummer)
-	r.RegisterContext(tinyhouseFall)
-	r.RegisterContext(tinyhouseWinter)
-	r.RegisterContext(daytrip)
-	r.RegisterContext(blanktrip)
-	r.RegisterContext(fancon)
-	r.RegisterContext(japan)
-	r.RegisterContext(quillHill)
-	r.RegisterContext(tubing)
+func PopulateRegistry(r plib.Registry) {
+	for name, desc := range plib.AllProperties() {
+		r.RegisterProperty(name, desc)
+	}
+	for _, c := range AllContexts() {
+		r.RegisterContext(c)
+	}
+	for _, i := range items.AllItems() {
+		r.RegisterItems(plib.Category(i.Name), i.Items)
+	}
 }

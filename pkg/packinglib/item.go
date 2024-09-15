@@ -1,6 +1,7 @@
 package packinglib
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -22,6 +23,11 @@ type Item struct {
 	prerequisites PropertySet
 
 	mutators []packMutator
+}
+
+type ItemList struct {
+	Name  string
+	Items []*Item
 }
 
 // NewItem creates a Basic Item with the provided allow and disallow property prerequisites.
@@ -96,16 +102,14 @@ func (i *Item) Count() float64 {
 	return i.count
 }
 
-// String constructs a pretty string for printing this item, including a checkbox
-// for its packed status
-// XXXX yikes we should not be decorating here
+// String constructs a pretty string for printing this item
 func (i *Item) String() string {
-	// checkbox := "○"
-	// if i.packed {
-	// 	checkbox = "●"
-	// }
-	// return fmt.Sprintf("%s %s", checkbox, i.name)
-	return i.name
+	// XXXX need to check for consumable, etc
+	s := i.name
+	for _, m := range i.mutators {
+		s = m.AdjustString(i, s)
+	}
+	return s
 }
 
 // Pack logs the item as packed.
@@ -127,6 +131,7 @@ type packMutator interface {
 	// AdjustCount takes a count and adjusts it for what this mutator does. If the
 	// mutator has certain requirements, it should adjust the count to 0.
 	AdjustCount(c *Context, count float64) float64
+	AdjustString(i *Item, s string) string
 }
 
 // temperatureMutator represents an item that only applies in a certain temperature range.
@@ -143,15 +148,19 @@ func (i *Item) TemperatureRange(tMin, tMax int) *Item {
 	return i
 }
 
-func (i *temperatureMutator) AdjustCount(c *Context, count float64) float64 {
-	if i.TemperatureMax < c.TemperatureMin {
+func (m *temperatureMutator) AdjustCount(c *Context, count float64) float64 {
+	if m.TemperatureMax < c.TemperatureMin {
 		return 0.0
 	}
-	if i.TemperatureMin > c.TemperatureMax {
+	if m.TemperatureMin > c.TemperatureMax {
 		return 0.0
 	}
 
 	return 1.0
+}
+
+func (m *temperatureMutator) AdjustString(i *Item, s string) string {
+	return s
 }
 
 // ConsumableItem is an item where a certain number will be used every day.
@@ -171,28 +180,22 @@ func (i *Item) Consumable(rate float64, units string) *Item {
 
 // AdjustCount tells the item to calculate how much of itself is needed given
 // the context and returns the item
-func (i *consumableMutator) AdjustCount(c *Context, count float64) float64 {
-	return count * math.Ceil(i.DailyRate*float64(c.Nights))
+func (m *consumableMutator) AdjustCount(c *Context, count float64) float64 {
+	return count * math.Ceil(m.DailyRate*float64(c.Nights))
 }
 
-// // String constructs a pretty string for printing this item, including a checkbox
-// // for its packed status
-// func (i *ConsumableItem) String() string {
-// 	checkbox := "○"
-// 	if i.packed {
-// 		checkbox = "●"
-// 	}
-// 	if i.Units == NoUnits {
-// 		if i.count == float64(int(i.count)) {
-// 			return fmt.Sprintf("%s %d %s", checkbox, int(i.count), i.name)
-// 		}
-// 		return fmt.Sprintf("%s %.1f %s", checkbox, i.count, i.name)
-// 	}
-// 	if i.count == float64(int(i.count)) {
-// 		return fmt.Sprintf("%s %d %s of %s", checkbox, int(i.count), i.Units, i.name)
-// 	}
-// 	return fmt.Sprintf("%s %.1f %s of %s", checkbox, i.count, i.Units, i.name)
-// }
+func (m *consumableMutator) AdjustString(i *Item, s string) string {
+	if m.Units == NoUnits {
+		if i.count == float64(int(i.count)) {
+			return fmt.Sprintf("%d %s", int(i.count), i.name)
+		}
+		return fmt.Sprintf("%.1f %s", i.count, i.name)
+	}
+	if i.count == float64(int(i.count)) {
+		return fmt.Sprintf("%d %s of %s", int(i.count), m.Units, i.name)
+	}
+	return fmt.Sprintf("%.1f %s of %s", i.count, m.Units, i.name)
+}
 
 // maxCountMutator represents an item that you may need multiple of, but at some
 // point it maxes out and there's no point bringing more.
@@ -207,8 +210,12 @@ func (i *Item) Max(max float64) *Item {
 }
 
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *maxCountMutator) AdjustCount(c *Context, count float64) float64 {
-	return math.Min(count, i.Max)
+func (m *maxCountMutator) AdjustCount(c *Context, count float64) float64 {
+	return math.Min(count, m.Max)
+}
+
+func (m *maxCountMutator) AdjustString(i *Item, s string) string {
+	return s
 }
 
 // customConsumableMutator is a consumable item that takes a function to
@@ -226,6 +233,10 @@ func (i *Item) Custom(f func(count float64, nights int, props PropertySet) float
 }
 
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
-func (i *customConsumableMutator) AdjustCount(c *Context, count float64) float64 {
-	return i.RateFunc(count, c.Nights, c.Properties)
+func (m *customConsumableMutator) AdjustCount(c *Context, count float64) float64 {
+	return m.RateFunc(count, c.Nights, c.Properties)
+}
+
+func (m *customConsumableMutator) AdjustString(i *Item, s string) string {
+	return s
 }
