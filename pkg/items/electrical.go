@@ -7,7 +7,7 @@ import (
 var electrical = []*plib.Item{
 	plib.NewItem("Generator", []string{"Burn", "Tiny House"}, nil),
 	plib.NewItem("Fire extinguisher for genny", []string{"Burn"}, nil),
-	plib.NewItem("Gas", []string{"Burn"}, nil).Consumable(1.0, "gallons"),
+	plib.NewItem("Gas", []string{"Burn"}, nil).Units("gallons").Consumable(1.0),
 	plib.NewItem("Kill-A-Watt", []string{"Burn"}, nil),
 	plib.NewItem("long extension cord", []string{"Burn"}, nil),
 	plib.NewItem("cell phone fast charger", nil, []string{"Tiny House"}),

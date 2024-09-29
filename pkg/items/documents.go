@@ -14,5 +14,5 @@ var documents = []*plib.Item{
 	plib.NewItem("AAA card", []string{"Tiny House", "CarRide"}, nil),
 	plib.NewItem("VAX card", []string{"Vax Proof"}, nil),
 	plib.NewItem("Tile in suitcase", []string{"PaidTravel"}, []string{"NoCheckedLuggage"}),
-	plib.NewItem("COVID tests", []string{"Vax Proof"}, nil).Consumable(0.5, plib.NoUnits),
+	plib.NewItem("COVID tests", []string{"Vax Proof"}, nil).Consumable(0.5),
 }

@@ -5,14 +5,14 @@ import (
 )
 
 var unmentionables = []*plib.Item{
-	plib.NewItem("con-dams", nil, nil).Consumable(1.0, plib.NoUnits),
+	plib.NewItem("con-dams", nil, nil).Consumable(1.0),
 	plib.NewItem("lube", nil, nil),
 	plib.NewItem("trees", []string{"Burn", "Camping", "Con", "Tiny House", "NYC"}, []string{"Flight"}),
 	plib.NewItem("tape head cleaner", []string{"Burn", "Camping", "Con", "Tiny House", "NYC"}, []string{"Flight"}),
 	plib.NewItem("pretrip shave", nil, nil),
 	plib.NewItem("sleep meds", nil, nil),
 	plib.NewItem("diprolene", nil, nil),
-	plib.NewItem("late nite viewing", nil, nil).Consumable(1.0, "videos").Max(4.0),
+	plib.NewItem("late nite viewing", nil, nil).Units("videos").Consumable(1.0).Max(4.0),
 	plib.NewItem("late nite viewing HD", []string{"Tiny House"}, nil),
 }
 

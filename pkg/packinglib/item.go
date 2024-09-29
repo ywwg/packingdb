@@ -3,10 +3,8 @@ package packinglib
 import (
 	"fmt"
 	"math"
+	"sort"
 )
-
-// NoUnits is used when an item isn't counted by a unit word.
-const NoUnits = "nounits"
 
 // Item
 type Item struct {
@@ -15,6 +13,8 @@ type Item struct {
 
 	// count is the number of this thing that should get packed.
 	count float64
+
+	units string
 
 	// packed is true if the item has been packed.
 	packed bool
@@ -36,6 +36,11 @@ func NewItem(name string, allow, disallow []string) *Item {
 		name:          name,
 		prerequisites: buildPropertySet(allow, disallow),
 	}
+}
+
+func (i *Item) Units(u string) *Item {
+	i.units = u
+	return i
 }
 
 // Name returns the name of the item
@@ -85,6 +90,9 @@ func (i *Item) AdjustCount(c *Context) {
 		i.count = 0.0
 		return
 	}
+	sort.Slice(i.mutators, func(x, y int) bool {
+		return i.mutators[y].Priority() < i.mutators[x].Priority()
+	})
 	for _, t := range i.mutators {
 		// this makes it feel like satisfies should be a mutator. how do we deal with
 		// iterating through... maybe any time something returns zero we stop
@@ -95,6 +103,7 @@ func (i *Item) AdjustCount(c *Context) {
 			return
 		}
 	}
+	i.count = math.Ceil(i.count)
 }
 
 // Count returns the number of this item should be packed.
@@ -104,12 +113,21 @@ func (i *Item) Count() float64 {
 
 // String constructs a pretty string for printing this item
 func (i *Item) String() string {
-	// XXXX need to check for consumable, etc
-	s := i.name
-	for _, m := range i.mutators {
-		s = m.AdjustString(i, s)
+	if i.units == "" {
+		if i.count == 1 {
+			return i.name
+		}
+		if i.count == float64(int(i.count)) {
+			return fmt.Sprintf("%d %s", int(i.count), i.name)
+		}
+		// Currently we always round up so this is not covered.
+		return fmt.Sprintf("%.1f %s", i.count, i.name)
 	}
-	return s
+	if i.count == float64(int(i.count)) {
+		return fmt.Sprintf("%d %s of %s", int(i.count), i.units, i.name)
+	}
+	// Currently we always round up so this is not covered.
+	return fmt.Sprintf("%.1f %s of %s", i.count, i.units, i.name)
 }
 
 // Pack logs the item as packed.
@@ -131,7 +149,9 @@ type packMutator interface {
 	// AdjustCount takes a count and adjusts it for what this mutator does. If the
 	// mutator has certain requirements, it should adjust the count to 0.
 	AdjustCount(c *Context, count float64) float64
-	AdjustString(i *Item, s string) string
+
+	// Priority returns the mutator priority. Mutators will be sorted by priority.
+	Priority() int
 }
 
 // temperatureMutator represents an item that only applies in a certain temperature range.
@@ -156,45 +176,32 @@ func (m *temperatureMutator) AdjustCount(c *Context, count float64) float64 {
 		return 0.0
 	}
 
-	return 1.0
+	return 1.0 * count
 }
 
-func (m *temperatureMutator) AdjustString(i *Item, s string) string {
-	return s
+func (m *temperatureMutator) Priority() int {
+	return 2
 }
 
 // ConsumableItem is an item where a certain number will be used every day.
 type consumableMutator struct {
 	// DailyRate is how much the thing gets used per day.
 	DailyRate float64
-
-	// What units the rate is in.  Use NoUnits for things without "of" qualifiers.
-	// ("1 car")
-	Units string
 }
 
-func (i *Item) Consumable(rate float64, units string) *Item {
-	i.mutators = append(i.mutators, &consumableMutator{rate, units})
+func (i *Item) Consumable(rate float64) *Item {
+	i.mutators = append(i.mutators, &consumableMutator{rate})
 	return i
 }
 
 // AdjustCount tells the item to calculate how much of itself is needed given
 // the context and returns the item
 func (m *consumableMutator) AdjustCount(c *Context, count float64) float64 {
-	return count * math.Ceil(m.DailyRate*float64(c.Nights))
+	return count * m.DailyRate * float64(c.Nights)
 }
 
-func (m *consumableMutator) AdjustString(i *Item, s string) string {
-	if m.Units == NoUnits {
-		if i.count == float64(int(i.count)) {
-			return fmt.Sprintf("%d %s", int(i.count), i.name)
-		}
-		return fmt.Sprintf("%.1f %s", i.count, i.name)
-	}
-	if i.count == float64(int(i.count)) {
-		return fmt.Sprintf("%d %s of %s", int(i.count), m.Units, i.name)
-	}
-	return fmt.Sprintf("%.1f %s of %s", i.count, m.Units, i.name)
+func (m *consumableMutator) Priority() int {
+	return 1
 }
 
 // maxCountMutator represents an item that you may need multiple of, but at some
@@ -214,8 +221,8 @@ func (m *maxCountMutator) AdjustCount(c *Context, count float64) float64 {
 	return math.Min(count, m.Max)
 }
 
-func (m *maxCountMutator) AdjustString(i *Item, s string) string {
-	return s
+func (m *maxCountMutator) Priority() int {
+	return 0
 }
 
 // customConsumableMutator is a consumable item that takes a function to
@@ -223,12 +230,10 @@ func (m *maxCountMutator) AdjustString(i *Item, s string) string {
 type customConsumableMutator struct {
 	// DailyRate is how much the thing gets used per day.
 	RateFunc func(count float64, nights int, props PropertySet) float64
-
-	Units string
 }
 
-func (i *Item) Custom(f func(count float64, nights int, props PropertySet) float64, units string) *Item {
-	i.mutators = append(i.mutators, &customConsumableMutator{f, units})
+func (i *Item) Custom(f func(count float64, nights int, props PropertySet) float64) *Item {
+	i.mutators = append(i.mutators, &customConsumableMutator{f})
 	return i
 }
 
@@ -237,6 +242,6 @@ func (m *customConsumableMutator) AdjustCount(c *Context, count float64) float64
 	return m.RateFunc(count, c.Nights, c.Properties)
 }
 
-func (m *customConsumableMutator) AdjustString(i *Item, s string) string {
-	return s
+func (m *customConsumableMutator) Priority() int {
+	return 1
 }

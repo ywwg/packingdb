@@ -26,7 +26,7 @@ var toiletries = []*plib.Item{
 			return 1
 		}
 		return 0
-	}, plib.NoUnits),
+	}),
 	plib.NewItem("travel hair stuff", []string{"NoCheckedLuggage"}, nil),
 	plib.NewItem("electric razor", []string{"Burn", "Tiny House"}, nil),
 	plib.NewItem("razor", nil, []string{"Burn"}),
@@ -38,7 +38,7 @@ var toiletries = []*plib.Item{
 	plib.NewItem("sunglasses", nil, nil),
 	plib.NewItem("oakleys", nil, []string{"Burn"}),
 	plib.NewItem("contact Fluid", nil, []string{"Burn"}),
-	plib.NewItem("contacts", nil, []string{"Burn"}).Consumable(1.0, "pairs"),
+	plib.NewItem("contacts", nil, []string{"Burn"}).Units("pairs").Consumable(1.0),
 	plib.NewItem("epi pens", nil, nil),
 	plib.NewItem("Dramamine", []string{"CarRide", "Boat"}, nil),
 	plib.NewItem("anti-nausea patches", []string{"Boat"}, nil),

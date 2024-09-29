@@ -130,24 +130,169 @@ func TestItemAdjustCount(t *testing.T) {
 	}
 }
 
-// func TestItemString(t *testing.T) {
-// 	// Create a test item
-// 	item := &Item{
-// 		name:          "Test Item",
-// 		count:         2.5,
-// 		packed:        true,
-// 		prerequisites: make(PropertySet),
-// 		mutators:      []PackMutator{},
-// 	}
+func TestItemString(t *testing.T) {
+	// Create a test item
+	tests := []struct {
+		Name     string
+		Item     *Item
+		Expected string
+	}{
+		{
+			Name:     "empty does not really make sense",
+			Item:     &Item{},
+			Expected: "",
+		},
+		{
+			Name: "minimal",
+			Item: &Item{
+				name: "Test Item",
+			},
+			Expected: "Test Item",
+		},
+		{
+			Name: "simple",
+			Item: &Item{
+				name:          "Test Item",
+				packed:        true,
+				prerequisites: make(PropertySet),
+				mutators:      []packMutator{},
+			},
+			Expected: "Test Item",
+		},
+		{
+			Name: "consumable fraction rounds up",
+			Item: &Item{
+				name:          "consumable",
+				units:         "instances",
+				packed:        true,
+				prerequisites: make(PropertySet),
+				mutators: []packMutator{
+					&consumableMutator{1.5},
+				},
+			},
+			Expected: "5 instances of consumable",
+		},
+		{
+			Name: "maxconsumable fraction rounds up",
+			Item: &Item{
+				name:          "consumable",
+				units:         "instances",
+				packed:        true,
+				prerequisites: make(PropertySet),
+				mutators: []packMutator{
+					&consumableMutator{1},
+					&maxCountMutator{2.5},
+				},
+			},
+			Expected: "3 instances of consumable",
+		},
+		{
+			Name: "temperature (noop)",
+			Item: &Item{
+				name:          "temperature item",
+				units:         "instances",
+				packed:        true,
+				prerequisites: make(PropertySet),
+				mutators: []packMutator{
+					&consumableMutator{1},
+					&temperatureMutator{0, 100},
+				},
+			},
+			Expected: "3 instances of temperature item",
+		},
+		{
+			Name: "consumable nounits",
+			Item: &Item{
+				name:          "nounits item",
+				units:         "",
+				packed:        true,
+				prerequisites: make(PropertySet),
+				mutators: []packMutator{
+					&temperatureMutator{0, 100},
+					&consumableMutator{2},
+				},
+			},
+			Expected: "6 nounits item",
+		},
+		{
+			Name: "custom consumable",
+			Item: &Item{
+				name:          "doohickey",
+				packed:        true,
+				prerequisites: make(PropertySet),
+				mutators: []packMutator{
+					&customConsumableMutator{func(count float64, nights int, props PropertySet) float64 {
+						return 10.0
+					}},
+				},
+			},
+			Expected: "10 doohickey",
+		},
+	}
 
-// 	// Call the String method
-// 	result := item.String()
+	for _, tc := range tests {
+		t.Run(tc.Name, func(t *testing.T) {
+			tc.Item.AdjustCount(&basicContext)
+			got := tc.Item.String()
+			require.Equal(t, tc.Expected, got)
+		})
+	}
+}
 
-// 	// Check if the string representation is correct
-// 	expectedString := "● 2.5 Test Item"
-// 	if result != expectedString {
-// 		t.Errorf("String failed, expected: %s, got: %s", expectedString, result)
-// 	}
-// }
+func TestItemConstruction(t *testing.T) {
+	t.Run("basic item", func(t *testing.T) {
+		i := NewItem("myitem", []string{"prop1"}, []string{"prop3"})
+		i.Units("pounds")
+		i.Pack(true)
+		i.AdjustCount(&basicContext)
+		require.Equal(t, "myitem", i.Name())
+		require.Equal(t, "1 pounds of myitem", i.String())
+		require.Equal(t, 1.0, i.Count())
+		require.Equal(t, true, i.Packed())
+		require.Equal(t, PropertySet{"prop1": true, "prop3": false}, i.Prerequisites())
+	})
 
-// // Add more tests for other methods as needed
+	t.Run("mutators item", func(t *testing.T) {
+		i := NewItem("mytempitem", []string{"prop1"}, []string{"prop3"})
+		i.TemperatureRange(0, 100)
+		i.Consumable(2)
+		i.Max(5)
+		i.Pack(false)
+		i.AdjustCount(&basicContext)
+		require.Equal(t, "mytempitem", i.Name())
+		require.Equal(t, "5 mytempitem", i.String())
+		require.Equal(t, 5.0, i.Count())
+		require.Equal(t, false, i.Packed())
+		require.Equal(t, PropertySet{"prop1": true, "prop3": false}, i.Prerequisites())
+	})
+
+	t.Run("order irrelevant", func(t *testing.T) {
+		i := NewItem("mytempitem", []string{"prop1"}, []string{"prop3"})
+		i.Max(5)
+		i.Pack(false)
+		i.Consumable(2)
+		i.TemperatureRange(0, 100)
+		i.AdjustCount(&basicContext)
+		require.Equal(t, "mytempitem", i.Name())
+		require.Equal(t, "5 mytempitem", i.String())
+		require.Equal(t, 5.0, i.Count())
+		require.Equal(t, false, i.Packed())
+		require.Equal(t, PropertySet{"prop1": true, "prop3": false}, i.Prerequisites())
+	})
+
+	t.Run("custom func", func(t *testing.T) {
+		i := NewItem("mycustom", []string{"prop1"}, []string{"prop3"})
+		i.Pack(true)
+		i.TemperatureRange(0, 100)
+		i.Custom(func(count float64, nights int, props PropertySet) float64 {
+			return 12.0
+		})
+		i.AdjustCount(&basicContext)
+		require.Equal(t, "mycustom", i.Name())
+		require.Equal(t, "12 mycustom", i.String())
+		require.Equal(t, 12.0, i.Count())
+		require.Equal(t, true, i.Packed())
+		require.Equal(t, PropertySet{"prop1": true, "prop3": false}, i.Prerequisites())
+	})
+
+}

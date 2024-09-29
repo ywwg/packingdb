@@ -5,7 +5,7 @@ import (
 )
 
 var entertainment = []*plib.Item{
-	plib.NewItem("books", nil, nil).Consumable(1.0, plib.NoUnits).Max(3.0),
+	plib.NewItem("books", nil, nil).Consumable(1.0).Max(3.0),
 	plib.NewItem("35mm camera and/or polaroid", nil, nil),
 	plib.NewItem("guidebooks", []string{"BigTrip"}, nil),
 	plib.NewItem("earbuds", nil, nil),
@@ -25,7 +25,7 @@ var entertainment = []*plib.Item{
 			return 4.0
 		}
 		return 0.0
-	}, plib.NoUnits),
+	}),
 	plib.NewItem("music ear plugs", []string{"Performing", "Partying", "Loud"}, nil),
 	plib.NewItem("Projector", []string{"Projector"}, nil),
 	plib.NewItem("Screen", []string{"Projector"}, nil),
