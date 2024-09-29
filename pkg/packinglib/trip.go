@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -25,6 +26,7 @@ type PackList map[Category][]*Item
 // item knows how to stringify itself but that's it.
 
 // Trip describes a trip, which includes a length and a context
+// XXX TODO this will need yaml markup
 type Trip struct {
 	// list??? XXXX this happens because we build a big context out of little
 	// ones... but basically what we should do is give the trip a context and a
@@ -328,6 +330,17 @@ func (t *Trip) ToggleItemPacked(code string) error {
 // first line: "V2", number of nights, tmin, tmax, context name, contexts...
 // if context_name is known, other contexts are added to it.
 func LoadFromFile(r Registry, nights int, f string) (*Trip, error) {
+	switch filepath.Ext(f) {
+	case "csv":
+		return LoadFromCSV(r, nights, f)
+	// case "yml", "yaml":
+	// 	return LoadFromYAML(r, nights, f)
+	default:
+		return nil, fmt.Errorf("extension not recognized")
+	}
+}
+
+func LoadFromCSV(r Registry, nights int, f string) (*Trip, error) {
 	dat, err := os.ReadFile(f)
 	if err != nil {
 		return nil, err
@@ -402,6 +415,18 @@ func LoadFromFile(r Registry, nights int, f string) (*Trip, error) {
 	}
 	return t, nil
 }
+
+// func LoadFromYAML(r Registry, nights int, f string) (*Trip, error) {
+// 	reader, err := os.Open(f)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	dec := yaml.NewDecoder(reader)
+// 	err = dec.Decode(thingy)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// }
 
 // SaveToFile saves the trip to the provided filename.
 func (t *Trip) SaveToFile(f string) error {
