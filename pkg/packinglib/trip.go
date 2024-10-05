@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	yaml "gopkg.in/yaml.v3"
 )
 
 // PackList is a map from category name to slice of items
@@ -64,7 +66,7 @@ func getCode(idx int) string {
 
 // NewTripFromCustomContext returns a constructed trip for the given
 // constructed context and number of nights.
-func NewTripFromCustomContext(registry Registry, nights int, context *Context) (*Trip, error) {
+func NewTripFromCustomContext(registry Registry, context *Context) (*Trip, error) {
 	t := &Trip{
 		C:           context,
 		contextName: context.Name,
@@ -93,7 +95,8 @@ func NewTrip(registry Registry, nights int, cname string) (*Trip, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewTripFromCustomContext(registry, nights, c)
+	c.Nights = nights
+	return NewTripFromCustomContext(registry, c)
 }
 
 func (t *Trip) AddProperty(p string) error {
@@ -331,12 +334,12 @@ func (t *Trip) ToggleItemPacked(code string) error {
 // if context_name is known, other contexts are added to it.
 func LoadFromFile(r Registry, nights int, f string) (*Trip, error) {
 	switch filepath.Ext(f) {
-	case "csv":
+	case ".csv":
 		return LoadFromCSV(r, nights, f)
-	// case "yml", "yaml":
-	// 	return LoadFromYAML(r, nights, f)
+	case ".yml", ".yaml":
+		return LoadFromYAML(r, nights, f)
 	default:
-		return nil, fmt.Errorf("extension not recognized")
+		return nil, fmt.Errorf("load extension not recognized: %s", filepath.Ext(f))
 	}
 }
 
@@ -371,11 +374,10 @@ func LoadFromCSV(r Registry, nights int, f string) (*Trip, error) {
 				if err != nil {
 					return nil, err
 				}
-				context, err := t.registry.GetContextTemperatureRange(toks[4], tmin, tmax)
+				context, err := t.registry.GetConcreteContext(toks[4], nights, tmin, tmax)
 				if err != nil {
-					context, err = NewContext(t.registry, toks[4], tmin, tmax, nil)
+					context, err = NewContext(t.registry, toks[4], nights, tmin, tmax, nil)
 				}
-				context.Nights = nights
 				if err != nil {
 					panic(fmt.Sprintf("Error while building context for trip: %s", err.Error()))
 				}
@@ -384,7 +386,7 @@ func LoadFromCSV(r Registry, nights int, f string) (*Trip, error) {
 						panic(fmt.Sprintf("Error adding property while building trip: %s", err.Error()))
 					}
 				}
-				loaded, err := NewTripFromCustomContext(t.registry, nights, context)
+				loaded, err := NewTripFromCustomContext(t.registry, context)
 				if err != nil {
 					panic(err.Error())
 				}
@@ -416,20 +418,39 @@ func LoadFromCSV(r Registry, nights int, f string) (*Trip, error) {
 	return t, nil
 }
 
-// func LoadFromYAML(r Registry, nights int, f string) (*Trip, error) {
-// 	reader, err := os.Open(f)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	dec := yaml.NewDecoder(reader)
-// 	err = dec.Decode(thingy)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// }
+func LoadFromYAML(r Registry, nights int, f string) (*Trip, error) {
+	reader, err := os.Open(f)
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+	dec := yaml.NewDecoder(reader)
+	var yt YamlTrip
+	err = dec.Decode(&yt)
+	if err != nil {
+		return nil, err
+	}
+	return yt.AsTrip(r)
+}
 
 // SaveToFile saves the trip to the provided filename.
 func (t *Trip) SaveToFile(f string) error {
+	switch filepath.Ext(f) {
+	case ".csv":
+		err := t.SaveToCSV(f)
+		if err != nil {
+			return err
+		}
+		return t.SaveToYAML(f + ".yml")
+		// return t.SaveToCSV(f)
+	case ".yml", ".yaml":
+		return t.SaveToYAML(f)
+	default:
+		return fmt.Errorf("save extension not recognized")
+	}
+}
+
+func (t *Trip) SaveToCSV(f string) error {
 	packedcsv := fmt.Sprintf("V2,%d,%d,%d,%s,", t.C.Nights, t.C.TemperatureMin, t.C.TemperatureMax, t.contextName)
 	for p, val := range t.C.Properties {
 		if val {
@@ -445,4 +466,18 @@ func (t *Trip) SaveToFile(f string) error {
 		}
 	}
 	return os.WriteFile(f, []byte(packedcsv), 0644)
+}
+
+func (t *Trip) SaveToYAML(f string) error {
+	var buf []byte
+	writer := bytes.NewBuffer(buf)
+	yt := FromTrip(t)
+
+	enc := yaml.NewEncoder(writer)
+	err := enc.Encode(yt)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(f, writer.Bytes(), 0644)
 }

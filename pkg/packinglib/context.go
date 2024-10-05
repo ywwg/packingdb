@@ -24,9 +24,10 @@ type Context struct {
 
 // NewContext creates a new context with the given name, temperature range, and properties.
 // Returns nil if any of the properties is unknown.  Properties are optional.
-func NewContext(r Registry, name string, tmin, tmax int, properties []string) (*Context, error) {
+func NewContext(r Registry, name string, nights, tmin, tmax int, properties []string) (*Context, error) {
 	c := &Context{
 		Name:           name,
+		Nights:         nights,
 		TemperatureMin: tmin,
 		TemperatureMax: tmax,
 		Properties:     make(PropertySet),

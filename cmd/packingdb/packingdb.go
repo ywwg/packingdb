@@ -267,6 +267,7 @@ func main() {
 
 		context := &packinglib.Context{
 			Name:       title,
+			Nights:     nights,
 			Properties: make(packinglib.PropertySet),
 		}
 		context.TemperatureMin, err = temperatureEntry("Minimum", -100)
@@ -278,7 +279,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		t, err = packinglib.NewTripFromCustomContext(r, nights, context)
+		t, err = packinglib.NewTripFromCustomContext(r, context)
 		if err != nil {
 			log.Fatal(err)
 		}

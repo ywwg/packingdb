@@ -20,7 +20,7 @@ type Registry interface {
 	RegisterItems(category Category, items []*Item)
 	ListProperties() []Property
 	GetContext(name string) (*Context, error)
-	GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error)
+	GetConcreteContext(name string, nights, tmin, tmax int) (*Context, error)
 	HasProperty(p Property) bool
 }
 
@@ -103,13 +103,14 @@ func (r *StructRegistry) GetContext(name string) (*Context, error) {
 	return c, nil
 }
 
-// GetContextTemperatureRange loads the given context and substitutes the provided
+// GetConcreteContext loads the given context and substitutes the provided
 // temperature range.
-func (r *StructRegistry) GetContextTemperatureRange(name string, tmin, tmax int) (*Context, error) {
+func (r *StructRegistry) GetConcreteContext(name string, nights, tmin, tmax int) (*Context, error) {
 	c, err := r.GetContext(name)
 	if err != nil {
 		return nil, err
 	}
+	c.Nights = nights
 	c.TemperatureMin = tmin
 	c.TemperatureMax = tmax
 	return c, nil

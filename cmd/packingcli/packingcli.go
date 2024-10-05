@@ -93,11 +93,11 @@ func main() {
 		t, err = packinglib.NewTrip(r, *flagNights, *flagContext)
 		if err != nil {
 			fmt.Printf("Context %s not found, creating empty context\n", *flagContext)
-			c, err := packinglib.NewContext(r, *flagContext, -120, 120, nil)
+			c, err := packinglib.NewContext(r, *flagContext, *flagNights, -120, 120, nil)
 			if err != nil {
 				panic(err.Error())
 			}
-			t, err = packinglib.NewTripFromCustomContext(r, *flagNights, c)
+			t, err = packinglib.NewTripFromCustomContext(r, c)
 			if err != nil {
 				panic(err.Error())
 			}
