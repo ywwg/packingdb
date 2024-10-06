@@ -115,7 +115,7 @@ pack_list:
 	require.NoError(t, dec.Decode(&yt))
 
 	var r Registry = NewStructRegistry()
-	PopulateRegistry(r)
+	populateRegistry(r)
 
 	got, err := yt.AsTrip(r)
 	require.NoError(t, err)
@@ -153,7 +153,7 @@ pack_list:
 	require.Equal(t, string(buf), writer.String())
 }
 
-func PopulateRegistry(r Registry) {
+func populateRegistry(r Registry) {
 	r.RegisterProperty("Business", "business cat")
 	r.RegisterProperty("Flight", "wheee")
 	r.RegisterProperty("International", "le whee")
