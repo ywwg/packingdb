@@ -16,19 +16,11 @@ import (
 // PackList is a map from category name to slice of items
 type PackList map[Category][]*Item
 
-// AllItems is a convenience map of all items that packingdb knows about.
-// var AllItems = make(PackList)
-
 // XXXXXXXXXXXXXXXX OK the main thing we want to do is make this more of an API
 // -- a trip is a thing we modify and then something about can ask questions
 // about it or make mutations.
 //
-// And for fuck's sake it shouldn't have the styling as part of the data model,
-// yikes. So we rip out all of the list and strings shit -- an individual packed
-// item knows how to stringify itself but that's it.
-
 // Trip describes a trip, which includes a length and a context
-// XXX TODO this will need yaml markup
 type Trip struct {
 	// list??? XXXX this happens because we build a big context out of little
 	// ones... but basically what we should do is give the trip a context and a
@@ -429,6 +421,9 @@ func LoadFromYAML(r Registry, nights int, f string) (*Trip, error) {
 	err = dec.Decode(&yt)
 	if err != nil {
 		return nil, err
+	}
+	if yt.Version != yaml_version {
+		return nil, fmt.Errorf("incorrect version in yaml, want %d, got %d", yaml_version, yt.Version)
 	}
 	return yt.AsTrip(r)
 }

@@ -3,7 +3,7 @@ package packinglib
 import "fmt"
 
 const (
-	fmt_version = 1
+	yaml_version = 1
 )
 
 type YamlTrip struct {
@@ -16,14 +16,9 @@ type YamlTrip struct {
 	PackList   []*YamlItem `yaml:"pack_list,omitempty"`
 }
 
-// // YamlPackItem is a minimal verison of YamlItem that only stores what
-// // is needed to log if it is packed.
-// type YamlPackItem struct {
-// }
-
 func FromTrip(t *Trip) *YamlTrip {
 	yt := &YamlTrip{
-		Version: fmt_version,
+		Version: yaml_version,
 		Name:    t.contextName,
 		Nights:  t.C.Nights,
 		TempMin: t.C.TemperatureMin,

@@ -146,6 +146,9 @@ func (i *Item) Prerequisites() PropertySet {
 }
 
 type packMutator interface {
+	// Name returns the human-readable name of this mutator.
+	Name() string
+
 	// AdjustCount takes a count and adjusts it for what this mutator does. If the
 	// mutator has certain requirements, it should adjust the count to 0.
 	AdjustCount(c *Context, count float64) float64
@@ -167,6 +170,8 @@ func (i *Item) TemperatureRange(tMin, tMax int) *Item {
 	i.mutators = append(i.mutators, &temperatureMutator{tMin, tMax})
 	return i
 }
+
+func (m *temperatureMutator) Name() string { return "temperatureMutator" }
 
 func (m *temperatureMutator) AdjustCount(c *Context, count float64) float64 {
 	if m.TemperatureMax < c.TemperatureMin {
@@ -194,6 +199,8 @@ func (i *Item) Consumable(rate float64) *Item {
 	return i
 }
 
+func (m *consumableMutator) Name() string { return "consumableMutator" }
+
 // AdjustCount tells the item to calculate how much of itself is needed given
 // the context and returns the item
 func (m *consumableMutator) AdjustCount(c *Context, count float64) float64 {
@@ -216,6 +223,8 @@ func (i *Item) Max(max float64) *Item {
 	return i
 }
 
+func (m *maxCountMutator) Name() string { return "maxCountMutator" }
+
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
 func (m *maxCountMutator) AdjustCount(c *Context, count float64) float64 {
 	return math.Min(count, m.Max)
@@ -236,6 +245,8 @@ func (i *Item) Custom(f func(count float64, nights int, props PropertySet) float
 	i.mutators = append(i.mutators, &customConsumableMutator{f})
 	return i
 }
+
+func (m *customConsumableMutator) Name() string { return "customConsumableMutator" }
 
 // AdjustCount tells the item to calculate how much of itself is needed given the context and returns the item
 func (m *customConsumableMutator) AdjustCount(c *Context, count float64) float64 {
