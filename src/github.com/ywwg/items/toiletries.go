@@ -6,6 +6,7 @@ import (
 
 var toiletries = []plib.Item{
 	plib.NewBasicItem("deoderant", nil, nil),
+	plib.NewBasicItem("shout wipes", nil, nil),
 	plib.NewBasicItem("wet wipes", []string{"Camping", "Tiny House", "Playtime"}, nil),
 	plib.NewBasicItem("hand sanitizer", []string{"Camping", "Dirt"}, nil),
 	plib.NewBasicItem("2 kitchen towels", []string{"Tiny House"}, nil),
@@ -36,9 +37,6 @@ var toiletries = []plib.Item{
 	plib.NewBasicItem("regular glasses", nil, nil),
 	plib.NewBasicItem("glasses cleaner", nil, nil),
 	plib.NewBasicItem("sunglasses", nil, nil),
-	plib.NewBasicItem("oakleys", nil, []string{"Burn"}),
-	plib.NewBasicItem("contact Fluid", nil, []string{"Burn"}),
-	plib.NewConsumableItem("contacts", 1.0, "pairs", nil, []string{"Burn"}),
 	plib.NewBasicItem("epi pens", nil, nil),
 	plib.NewBasicItem("Dramamine", []string{"CarRide", "Boat"}, nil),
 	plib.NewBasicItem("anti-nausea patches", []string{"Boat"}, nil),
