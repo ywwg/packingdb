@@ -35,7 +35,12 @@ var suiting = []plib.Item{
 	plib.NewBasicItem("badges", []string{"fancon"}, nil),
 	plib.NewBasicItem("lanyard", []string{"Con"}, nil),
 	plib.NewBasicItem("cool balaklava", []string{"Suiting"}, nil),
+	plib.NewBasicItem("cooling top", []string{"Suiting"}, nil),
+	plib.NewBasicItem("cooling bottom", []string{"Suiting"}, nil),
+	plib.NewBasicItem("head battery pack", []string{"Suiting"}, nil),
 	plib.NewBasicItem("in-ear earbuds", []string{"fancon"}, nil),
+	plib.NewBasicItem("daki", []string{"fancon"}, nil),
+	plib.NewBasicItem("extra blanket", nil, []string{"fancon"}, nil),
 	plib.NewBasicItem("games", []string{"Con"}, nil),
 	plib.NewBasicItem("sewing kit", []string{"Suiting", "BigTrip"}, nil),
 	plib.NewBasicItem("grooming brush", []string{"Suiting"}, nil),
@@ -43,7 +48,6 @@ var suiting = []plib.Item{
 	plib.NewBasicItem("glue gun", []string{"Suiting"}, nil),
 	plib.NewBasicItem("dryer sheets", []string{"Suiting"}, nil),
 	plib.NewBasicItem("suiting outfit", []string{"Suiting"}, nil),
-	plib.NewBasicItem("fake headphones", []string{"Suiting"}, nil),
 }
 
 func init() {
