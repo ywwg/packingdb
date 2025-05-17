@@ -226,7 +226,11 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 				continue
 			}
 			if i.Count() > 0 {
-				lines = append(lines, fmt.Sprintf("\t(%s) %s", t.itemToCode[i], i.String()))
+				packStr := "o"
+				if i.Packed() {
+					packStr = "*"
+				}
+				lines = append(lines, fmt.Sprintf("\t(%v) %s", packStr, i.String()))
 			}
 		}
 	}
@@ -236,9 +240,9 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 	return lines
 }
 
-// PackingMenuItems returns a list of PackPackingMenuItems for the given trip. Any categories
-// in hiddenCategories will be hidden, and hidePacked will hide all packed
-// items.
+// PackingMenuItems returns a list of PackMenuItems for the given trip. Any
+// categories in hiddenCategories will be hidden, and hidePacked will hide all
+// packed items.
 func (t *Trip) PackingMenuItems(hiddenCategories map[Category]bool, hidePacked bool) []PackMenuItem {
 	var items []PackMenuItem
 	keys := t.SortedCategories()
@@ -283,7 +287,7 @@ func (t *Trip) styleProperty(p Property) string {
 	return fmt.Sprintf("○ %-20s %s", string(p), t.registry.GetDescription(p))
 }
 
-// PropertyMenuItems returns a list of PackPackingMenuItems for the given trip.
+// PropertyMenuItems returns a list of PackMenuItems for the given trip.
 // Any categories in hiddenCategories will be hidden, and hidePacked will hide
 // all packed items.
 func (t *Trip) PropertyMenuItems() []PackMenuItem {

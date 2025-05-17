@@ -38,6 +38,7 @@ func main() {
 	flag.Parse()
 
 	var r packinglib.Registry = packinglib.NewStructRegistry()
+	contexts.PopulateRegistry(r)
 
 	var t *packinglib.Trip
 	if *flagListContexts {
