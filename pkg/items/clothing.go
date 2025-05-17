@@ -13,7 +13,7 @@ var clothing = []*plib.Item{
 	plib.NewItem("crew socks", nil, []string{"Camping"}).Units("pair").TemperatureRange(0, 65).Consumable(1.0).Max(4.0),
 	plib.NewItem("short socks", nil, []string{"Camping"}).Units("pair").TemperatureRange(70, 120).Consumable(1.0).Max(4.0),
 	plib.NewItem("sneakers", nil, []string{"Burn"}),
-	plib.NewItem("smartwool socks", []string{"Camping", "Tiny House", "Skiing", "Hiking"}, nil).Consumable(1.0),
+	plib.NewItem("smartwool socks", []string{"Camping", "Tiny House", "Skiing", "Hiking"}, nil).Units("pair").Consumable(1.0),
 	plib.NewItem("short pj socks", nil, nil).TemperatureRange(60, 120).Units("pair"),
 	plib.NewItem("short pjs", nil, nil).TemperatureRange(70, 120),
 	plib.NewItem("long pjs", nil, nil).TemperatureRange(0, 55),
