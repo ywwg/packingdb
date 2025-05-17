@@ -3,6 +3,7 @@ package packinglib
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"sort"
 )
 
@@ -114,7 +115,10 @@ func (i *Item) Count() float64 {
 // String constructs a pretty string for printing this item
 func (i *Item) String() string {
 	if i.units == "" {
-		if i.count == 1 {
+		// Hack alert -- if we have a Consumable mutator then we do show the count
+		// anyway. Somehow the String func should be handed off to the mutators as
+		// well.
+		if i.count == 1 && !i.hasMutator(&consumableMutator{}) {
 			return i.name
 		}
 		if i.count == float64(int(i.count)) {
@@ -128,6 +132,16 @@ func (i *Item) String() string {
 	}
 	// Currently we always round up so this is not covered.
 	return fmt.Sprintf("%.1f %s of %s", i.count, i.units, i.name)
+}
+
+func (i *Item) hasMutator(wantMut packMutator) bool {
+	wantTyp := reflect.TypeOf(wantMut)
+	for _, m := range i.mutators {
+		if reflect.TypeOf(m) == wantTyp {
+			return true
+		}
+	}
+	return false
 }
 
 // Pack logs the item as packed.
