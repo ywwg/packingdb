@@ -226,7 +226,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 				continue
 			}
 			if i.Count() > 0 {
-				lines = append(lines, fmt.Sprintf("\t(%v) %s", t.itemToCode[i], styleItem(i)))
+				lines = append(lines, fmt.Sprintf("\t%s", styleItem(i)))
 			}
 		}
 	}
