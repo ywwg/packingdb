@@ -27,14 +27,11 @@ var clothing = []*plib.Item{
 	plib.NewItem("long underwear", []string{"Camping", "Tiny House"}, nil).Units("pair").TemperatureRange(0, 45).Consumable(0.25),
 	plib.NewItem("thick slipper socks", nil, nil).TemperatureRange(0, 50).Consumable(0.25),
 	plib.NewItem("tshirts", nil, nil).TemperatureRange(40, 120).Consumable(0.75).Max(4.0),
-	plib.NewItem("longsleeves for under tshirt", nil, nil).TemperatureRange(40, 60),
 	plib.NewItem("non-cotton tops", []string{"Camping", "Hiking"}, nil).TemperatureRange(45, 120).Consumable(0.25),
 	plib.NewItem("underlayer top", []string{"Camping", "Skiing", "Hiking"}, nil).TemperatureRange(0, 50).Consumable(0.5),
 	plib.NewItem("underlayer bottom", []string{"Camping", "Skiing", "Hiking"}, nil).TemperatureRange(0, 50).Consumable(0.5),
 	plib.NewItem("fun outfits", []string{"Partying"}, nil).Consumable(0.75).Max(3.0),
 	plib.NewItem("shirt for flight", []string{"Flight"}, nil),
-	// XXXX here is an example of a "property" that is actually a context.
-	plib.NewItem("kigarumi", []string{"Burn", "fancon"}, nil),
 	plib.NewItem("sweaty shirts", []string{"Dirt", "Handy"}, nil).TemperatureRange(65, 120).Consumable(0.5).Max(3.0),
 	plib.NewItem("light jacket", nil, nil).TemperatureRange(51, 60),
 	plib.NewItem("medium jacket", nil, nil).TemperatureRange(41, 50),
@@ -57,6 +54,10 @@ var clothing = []*plib.Item{
 }
 
 var flightSupplies = []*plib.Item{
-	plib.NewItem("turtl pillow", []string{"Flight", "International"}, nil),
+	plib.NewItem("turtl pillow", []string{"Flight", "International", "PaidTravel"}, nil),
 	plib.NewItem("compression socks in carryon", []string{"Flight", "International"}, nil),
+}
+
+var conSupplies = []*plib.Item{
+	plib.NewItem("fanny pack", []string{"Con", "Partying"}, nil),
 }

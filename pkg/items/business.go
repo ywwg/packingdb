@@ -10,4 +10,6 @@ var business = []*plib.Item{
 		Max(3.0),
 	plib.NewItem("work laptop", []string{"Business"}, nil),
 	plib.NewItem("work laptop power", []string{"Business"}, nil),
+	plib.NewItem("headset earbuds", []string{"Business"}, nil),
+	plib.NewItem("UGREEN power/headset USB-C", []string{"Business"}, nil),
 }

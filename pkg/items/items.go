@@ -15,6 +15,7 @@ func AllItems() []packinglib.ItemList {
 		{Name: "Flight Stuff", Items: flightSupplies},
 		{Name: "Food", Items: food},
 		{Name: "Performing", Items: performing},
+		{Name: "Con Supplies", Items: conSupplies},
 
 		// Sport
 		{Name: "Bicycling", Items: bicycling},

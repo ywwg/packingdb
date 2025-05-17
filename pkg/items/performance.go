@@ -22,7 +22,7 @@ var performing = []*plib.Item{
 	plib.NewItem("needlenose pliers", []string{"MiniMixxx"}, nil),
 	plib.NewItem("mini bt keyboard", []string{"MiniMixxx"}, nil),
 	plib.NewItem("GPD Micro", []string{"MiniMixxx"}, nil),
-	plib.NewItem("Huxley stickers", []string{"fancon"}, nil),
+	plib.NewItem("Mixxx stickers", []string{"DJing"}, nil),
 	plib.NewItem("2x USB-A to square", []string{"MiniMixxx"}, nil),
 	plib.NewItem("Traktor Audio10", []string{"MiniMixxx"}, nil),
 	plib.NewItem("Spare USB-C charger", []string{"MiniMixxx"}, nil),
