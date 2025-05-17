@@ -7,10 +7,10 @@ import (
 var food = []*plib.Item{
 	plib.NewItem("booze", []string{"Burn", "BYOB"}, nil).Consumable(0.25),
 	plib.NewItem("good beer", []string{"Burn", "BYOB"}, nil).Units("sixpacks").Consumable(0.25),
-	plib.NewItem("Drinking water", []string{"Burn"}, nil).Units("gallons").Consumable(0.5),
+	plib.NewItem("Drinking water", []string{"Burn"}, []string{"Firefly"}).Units("gallons").Consumable(0.5),
 	// Burns use a camelbak
 	plib.NewItem("zojirushi bottle", nil, []string{"Burn"}),
-	plib.NewItem("cooking water", []string{"Burn"}, nil).Units("gallons").Consumable(0.25),
+	plib.NewItem("cooking water", []string{"Burn"}, []string{"Firefly"}).Units("gallons").Consumable(0.25),
 	plib.NewItem("cooler", []string{"Camping"}, nil),
 	plib.NewItem("spatula", []string{"Camping"}, nil),
 	plib.NewItem("tongs", []string{"Camping"}, nil),
@@ -20,16 +20,16 @@ var food = []*plib.Item{
 	plib.NewItem("plastic cutlery", []string{"Con"}, nil),
 	plib.NewItem("energy bars", []string{"Camping", "Con", "Cycling", "Hiking"}, nil).Consumable(1.5),
 	plib.NewItem("nuun", []string{"Camping", "Cycling", "Hiking"}, nil).Units("tubes").Consumable(.333),
-	plib.NewItem("eggs", []string{"Burn"}, nil).Custom(func(_ float64, nights int, _ plib.PropertySet) float64 {
+	plib.NewItem("eggs", []string{"Burn"}, []string{"Firefly"}).Custom(func(_ float64, nights int, _ plib.PropertySet) float64 {
 		// 2 Eggs for each morning that I'm there.
 		return float64((nights - 1) * 2)
 	}),
 	plib.NewItem("junk food?", []string{"Camping"}, nil),
 	plib.NewItem("salt and pepper", []string{"Camping"}, nil),
-	plib.NewItem("box soup", []string{"Camping"}, []string{"NoFire"}),
+	plib.NewItem("box soup", []string{"Camping"}, []string{"NoFire", "Firefly"}),
 	plib.NewItem("hot sauce", []string{"Camping"}, nil),
-	plib.NewItem("frozen grillables", []string{"Camping"}, []string{"NoFire"}).Units("servings").Consumable(0.75),
-	plib.NewItem("buns", []string{"Camping"}, []string{"NoFire"}).Units("servings").Consumable(0.75),
+	plib.NewItem("frozen grillables", []string{"Camping"}, []string{"NoFire", "Firefly"}).Units("servings").Consumable(0.75),
+	plib.NewItem("buns", []string{"Camping"}, []string{"NoFire", "Firefly"}).Units("servings").Consumable(0.75),
 
 	// Tiny House food
 	plib.NewItem("breakfasts", []string{"Tiny House"}, nil).Consumable(1.0),
