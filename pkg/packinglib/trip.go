@@ -226,11 +226,7 @@ func (t *Trip) Strings(showCat string, hideUnpacked bool) []string {
 				continue
 			}
 			if i.Count() > 0 {
-				packStr := "o"
-				if i.Packed() {
-					packStr = "*"
-				}
-				lines = append(lines, fmt.Sprintf("\t(%v) %s", packStr, i.String()))
+				lines = append(lines, fmt.Sprintf("\t(%v) %s", t.itemToCode[i], styleItem(i)))
 			}
 		}
 	}
