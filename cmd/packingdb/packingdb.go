@@ -265,16 +265,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		context := &packinglib.Context{
-			Name:       title,
-			Nights:     nights,
-			Properties: make(packinglib.PropertySet),
-		}
-		context.TemperatureMin, err = temperatureEntry("Minimum", -100)
+		tMin, err := temperatureEntry("Minimum", -100)
 		if err != nil {
 			log.Fatal(err)
 		}
-		context.TemperatureMax, err = temperatureEntry("Maximum", -100)
+		tMax, err := temperatureEntry("Maximum", -100)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		context, err := packinglib.NewContext(r, title, nights, tMin, tMax, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
