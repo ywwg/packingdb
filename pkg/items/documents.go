@@ -6,6 +6,7 @@ import (
 
 var documents = []*plib.Item{
 	plib.NewItem("Wallet", nil, nil),
+	plib.NewItem("Keys (incl yubi)", nil, nil),
 	plib.NewItem("Passport", []string{"International"}, nil),
 	plib.NewItem("Event Tickets", []string{"PaidEvent"}, nil),
 	plib.NewItem("Print Reservations", []string{"BigTrip"}, nil),
