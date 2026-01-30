@@ -4,56 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PackingDB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#667eea',
+                            dark: '#764ba2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body>
+<body x-data="packingApp()" x-cloak class="min-h-screen bg-gradient-to-br from-primary-light to-primary-dark">
     <!-- Main Menu Page -->
-    <div id="main-menu" class="page active">
-        <div class="header">
-            <h1>📦 PackingDB</h1>
+    <div x-show="currentPage === 'main-menu'" class="min-h-screen flex flex-col bg-gray-100">
+        <div class="bg-white p-4 shadow-md sticky top-0 z-50">
+            <h1 class="text-2xl font-bold text-primary-light text-center">📦 PackingDB</h1>
         </div>
 
-        <div class="content">
-            <div class="trip-list" id="trip-list">
-                <!-- Trips will be loaded here -->
+        <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <div class="mb-4">
+                <template x-if="trips.length === 0 && !loading">
+                    <div class="text-center py-12 text-gray-600">
+                        <p class="text-lg mb-2">No trips yet</p>
+                        <p class="text-sm opacity-70">Create your first trip to get started!</p>
+                    </div>
+                </template>
+
+                <template x-for="trip in trips" :key="trip">
+                    <div class="bg-white p-5 mb-3 rounded-xl shadow-sm cursor-pointer border-l-4 border-primary-light active:scale-[0.98] transition-transform"
+                         @click="loadTrip(trip)">
+                        <h3 class="text-gray-800 text-lg font-semibold" x-text="trip.replace('.yml', '').replace('.yaml', '').replace('.csv', '')"></h3>
+                    </div>
+                </template>
             </div>
 
-            <button class="btn btn-primary btn-large" id="new-trip-btn">
+            <button class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4"
+                    @click="currentPage = 'new-trip'">
                 ✨ Create New Trip
             </button>
         </div>
     </div>
 
     <!-- New Trip Page -->
-    <div id="new-trip-page" class="page">
-        <div class="header">
-            <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
-            <h1>New Trip</h1>
+    <div x-show="currentPage === 'new-trip'" class="min-h-screen flex flex-col bg-gray-100">
+        <div class="bg-white p-4 shadow-md sticky top-0 z-50">
+            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="currentPage = 'main-menu'">← Back</button>
+            <h1 class="text-2xl font-bold text-primary-light text-center">New Trip</h1>
         </div>
 
-        <div class="content">
-            <form id="new-trip-form">
-                <div class="form-group">
-                    <label for="trip-name">Trip Name</label>
-                    <input type="text" id="trip-name" required placeholder="e.g., Weekend Camping">
+        <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <form @submit.prevent="createTrip">
+                <div class="mb-5">
+                    <label for="trip-name" class="block mb-2 text-gray-800 font-semibold text-sm">Trip Name</label>
+                    <input type="text" id="trip-name" x-model="newTrip.name" required placeholder="e.g., Weekend Camping"
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <div class="form-group">
-                    <label for="trip-nights">Number of Nights</label>
-                    <input type="number" id="trip-nights" min="0" value="2" required>
+                <div class="mb-5">
+                    <label for="trip-nights" class="block mb-2 text-gray-800 font-semibold text-sm">Number of Nights</label>
+                    <input type="number" id="trip-nights" x-model.number="newTrip.nights" min="0" required
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <div class="form-group">
-                    <label for="trip-temp-min">Min Temperature (°F)</label>
-                    <input type="number" id="trip-temp-min" value="60">
+                <div class="mb-5">
+                    <label for="trip-temp-min" class="block mb-2 text-gray-800 font-semibold text-sm">Min Temperature (°F)</label>
+                    <input type="number" id="trip-temp-min" x-model.number="newTrip.temperatureMin"
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <div class="form-group">
-                    <label for="trip-temp-max">Max Temperature (°F)</label>
-                    <input type="number" id="trip-temp-max" value="80">
+                <div class="mb-5">
+                    <label for="trip-temp-max" class="block mb-2 text-gray-800 font-semibold text-sm">Max Temperature (°F)</label>
+                    <input type="number" id="trip-temp-max" x-model.number="newTrip.temperatureMax"
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-large">
+                <button type="submit" class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4">
                     Create Trip →
                 </button>
             </form>
@@ -61,36 +94,39 @@
     </div>
 
     <!-- Trip Details Page -->
-    <div id="trip-details" class="page">
-        <div class="header">
-            <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
-            <h1 id="trip-title">Trip</h1>
+    <div x-show="currentPage === 'trip-details'" class="min-h-screen flex flex-col bg-gray-100">
+        <div class="bg-white p-4 shadow-md sticky top-0 z-50">
+            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="backToMainMenu">← Back</button>
+            <h1 class="text-2xl font-bold text-primary-light text-center" x-text="currentTrip?.name || 'Trip'"></h1>
         </div>
 
-        <div class="content">
-            <div class="trip-info-card">
-                <div class="info-row">
-                    <span class="label">Nights:</span>
-                    <span id="info-nights">-</span>
+        <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <div class="bg-white p-5 rounded-xl mb-6 shadow-sm" x-show="currentTrip">
+                <div class="flex justify-between py-3 border-b border-gray-200">
+                    <span class="font-semibold text-gray-600">Nights:</span>
+                    <span class="text-gray-800" x-text="currentTrip?.nights || '-'"></span>
                 </div>
-                <div class="info-row">
-                    <span class="label">Temperature:</span>
-                    <span id="info-temp">-</span>
+                <div class="flex justify-between py-3 border-b border-gray-200">
+                    <span class="font-semibold text-gray-600">Temperature:</span>
+                    <span class="text-gray-800 text-right flex-1 ml-4" x-text="currentTrip ? `${currentTrip.temperatureMin}°F - ${currentTrip.temperatureMax}°F` : '-'"></span>
                 </div>
-                <div class="info-row">
-                    <span class="label">Properties:</span>
-                    <span id="info-properties">-</span>
+                <div class="flex justify-between py-3">
+                    <span class="font-semibold text-gray-600">Properties:</span>
+                    <span class="text-gray-800 text-right flex-1 ml-4" x-text="currentTrip?.properties?.join(', ') || 'None'"></span>
                 </div>
             </div>
 
-            <div class="menu-buttons">
-                <button class="btn btn-primary" onclick="showPropertiesPage()">
+            <div class="flex flex-col gap-3">
+                <button class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform"
+                        @click="loadProperties">
                     ⚙️ Configure Properties
                 </button>
-                <button class="btn btn-primary" onclick="showPackingPage()">
+                <button class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform"
+                        @click="loadItems">
                     🎒 Pack Items
                 </button>
-                <button class="btn btn-secondary" onclick="showEditTripPage()">
+                <button class="w-full bg-white text-primary-light border-2 border-primary-light font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform"
+                        @click="showEditTrip">
                     ✏️ Edit Trip Settings
                 </button>
             </div>
@@ -98,30 +134,33 @@
     </div>
 
     <!-- Edit Trip Settings Page -->
-    <div id="edit-trip-page" class="page">
-        <div class="header">
-            <button class="back-btn" onclick="showPage('trip-details')">← Back</button>
-            <h1>Edit Trip Settings</h1>
+    <div x-show="currentPage === 'edit-trip'" class="min-h-screen flex flex-col bg-gray-100">
+        <div class="bg-white p-4 shadow-md sticky top-0 z-50">
+            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="currentPage = 'trip-details'">← Back</button>
+            <h1 class="text-2xl font-bold text-primary-light text-center">Edit Trip Settings</h1>
         </div>
 
-        <div class="content">
-            <form id="edit-trip-form">
-                <div class="form-group">
-                    <label for="edit-nights">Number of Nights</label>
-                    <input type="number" id="edit-nights" min="0" required>
+        <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <form @submit.prevent="updateTrip">
+                <div class="mb-5">
+                    <label for="edit-nights" class="block mb-2 text-gray-800 font-semibold text-sm">Number of Nights</label>
+                    <input type="number" id="edit-nights" x-model.number="editForm.nights" min="0" required
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <div class="form-group">
-                    <label for="edit-temp-min">Min Temperature (°F)</label>
-                    <input type="number" id="edit-temp-min">
+                <div class="mb-5">
+                    <label for="edit-temp-min" class="block mb-2 text-gray-800 font-semibold text-sm">Min Temperature (°F)</label>
+                    <input type="number" id="edit-temp-min" x-model.number="editForm.temperatureMin"
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <div class="form-group">
-                    <label for="edit-temp-max">Max Temperature (°F)</label>
-                    <input type="number" id="edit-temp-max">
+                <div class="mb-5">
+                    <label for="edit-temp-max" class="block mb-2 text-gray-800 font-semibold text-sm">Max Temperature (°F)</label>
+                    <input type="number" id="edit-temp-max" x-model.number="editForm.temperatureMax"
+                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-large">
+                <button type="submit" class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4">
                     💾 Save Changes
                 </button>
             </form>
@@ -129,53 +168,105 @@
     </div>
 
     <!-- Properties Page -->
-    <div id="properties-page" class="page">
-        <div class="header">
-            <button class="back-btn" onclick="showPage('trip-details')">← Back</button>
-            <h1>Trip Properties</h1>
+    <div x-show="currentPage === 'properties'" class="min-h-screen flex flex-col bg-gray-100">
+        <div class="bg-white p-4 shadow-md sticky top-0 z-50">
+            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="currentPage = 'trip-details'">← Back</button>
+            <h1 class="text-2xl font-bold text-primary-light text-center">Trip Properties</h1>
         </div>
 
-        <div class="content">
-            <div class="search-box">
-                <input type="text" id="property-search" placeholder="🔍 Search properties...">
+        <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <div class="mb-4">
+                <input type="text" x-model="propertySearch" placeholder="🔍 Search properties..."
+                       class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
             </div>
-            <div id="properties-list" class="properties-list">
-                <!-- Properties will be loaded here -->
+            <div class="flex flex-col gap-2">
+                <template x-for="prop in filteredProperties" :key="prop.name">
+                    <div class="bg-white p-4 rounded-lg flex items-center cursor-pointer shadow-sm active:scale-[0.98] transition-transform"
+                         :class="prop.active ? 'bg-gradient-to-r from-primary-light to-primary-dark text-white' : ''"
+                         @click="toggleProperty(prop.name)">
+                        <div class="w-6 h-6 border-2 rounded-md mr-4 flex items-center justify-center flex-shrink-0"
+                             :class="prop.active ? 'bg-white border-white' : 'border-gray-300'">
+                            <span x-show="prop.active" class="text-primary-light font-bold">✓</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-semibold mb-1" x-text="prop.name"></div>
+                            <div class="text-sm opacity-80" x-text="prop.description"></div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
 
     <!-- Packing Page -->
-    <div id="packing-page" class="page">
-        <div class="header">
-            <button class="back-btn" onclick="showPage('trip-details')">← Back</button>
-            <h1>Pack Items</h1>
-            <div class="header-stats">
-                <span id="pack-stats">0/0 packed</span>
+    <div x-show="currentPage === 'packing'" class="min-h-screen flex flex-col bg-gray-100">
+        <div class="bg-white p-4 shadow-md sticky top-0 z-50">
+            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="currentPage = 'trip-details'">← Back</button>
+            <h1 class="text-2xl font-bold text-primary-light text-center">Pack Items</h1>
+            <div class="text-center mt-2 text-sm text-gray-600 font-medium">
+                <span x-text="`${packedCount}/${totalItems} packed`"></span>
             </div>
         </div>
 
-        <div class="content">
-            <div class="controls">
-                <label class="toggle-control">
-                    <input type="checkbox" id="hide-packed">
+        <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <div class="mb-4">
+                <label class="flex items-center bg-white p-4 rounded-lg cursor-pointer">
+                    <input type="checkbox" x-model="hidePacked" class="mr-3 w-5 h-5 cursor-pointer">
                     <span>Hide packed items</span>
                 </label>
             </div>
 
-            <div id="packing-list" class="packing-list">
-                <!-- Packing items will be loaded here -->
+            <div class="flex flex-col gap-4">
+                <template x-for="category in categories" :key="category.name">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-sm" x-show="visibleItemsInCategory(category) > 0">
+                        <div class="bg-gradient-to-r from-primary-light to-primary-dark text-white p-4 font-bold flex justify-between items-center cursor-pointer select-none"
+                             @click="toggleCategoryCollapse(category.name)">
+                            <span x-text="category.name"></span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm opacity-90" x-text="`${packedInCategory(category)}/${category.items.length}`"></span>
+                                <span class="text-xl transition-transform duration-200"
+                                      :class="{ 'rotate-180': !isCategoryCollapsed(category.name) }">▼</span>
+                            </div>
+                        </div>
+                        <div class="p-2" x-show="!isCategoryCollapsed(category.name)" x-collapse>
+                            <template x-for="item in category.items" :key="item.code">
+                                <div class="p-4 border-b border-gray-200 last:border-0 flex items-center cursor-pointer active:bg-gray-50"
+                                     :class="{ 'opacity-60': item.packed, 'hidden': hidePacked && item.packed }"
+                                     @click="toggleItem(item.code)">
+                                    <div class="w-7 h-7 border-2 rounded-full mr-4 flex items-center justify-center flex-shrink-0"
+                                         :class="item.packed ? 'bg-green-500 border-green-500' : 'border-gray-300'">
+                                        <span x-show="item.packed" class="text-white font-bold text-sm">✓</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-gray-800"
+                                             :class="{ 'line-through': item.packed }"
+                                             x-text="item.name"></div>
+                                        <div class="text-sm text-gray-600 mt-1" x-show="item.count > 1" x-text="`Quantity: ${item.count}`"></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" :class="{ 'hidden': !loading }">
+        <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- Toast Notifications -->
-    <div id="toast" class="toast"></div>
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-4 rounded-lg shadow-lg max-w-[90%] text-center text-white transition-all duration-300 z-50"
+         :class="{
+             'opacity-0 translate-y-24': !toast.show,
+             'opacity-100 translate-y-0': toast.show,
+             'bg-green-500': toast.type === 'success',
+             'bg-red-500': toast.type === 'error',
+             'bg-gray-800': toast.type !== 'success' && toast.type !== 'error'
+         }"
+         x-text="toast.message"></div>
 
     <script src="app.js"></script>
 </body>

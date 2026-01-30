@@ -1,340 +1,249 @@
-// Global state
-let currentTrip = null;
-let allProperties = [];
-let allItems = [];
-
-// API Base URL
-const API_BASE = '/api';
-
-// Utility Functions
-function showLoading() {
-    document.getElementById('loading').classList.add('active');
-}
-
-function hideLoading() {
-    document.getElementById('loading').classList.remove('active');
-}
-
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast ${type} show`;
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
-}
-
-// API Functions
-async function apiCall(endpoint, method = 'GET', body = null) {
-    const options = {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
+// Alpine.js app
+function packingApp() {
+    return {
+        // State
+        currentPage: 'main-menu',
+        loading: false,
+        trips: [],
+        currentTrip: null,
+        currentTripName: null,
+        properties: [],
+        propertySearch: '',
+        categories: [],
+        hidePacked: false,
+        collapsedCategories: new Set(),
+        toast: {
+            show: false,
+            message: '',
+            type: 'success'
         },
-    };
+        newTrip: {
+            name: '',
+            nights: 2,
+            temperatureMin: 60,
+            temperatureMax: 80
+        },
+        editForm: {
+            nights: 0,
+            temperatureMin: 0,
+            temperatureMax: 0
+        },
 
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
+        // Computed properties
+        get filteredProperties() {
+            if (!this.propertySearch) return this.properties;
+            const search = this.propertySearch.toLowerCase();
+            return this.properties.filter(p =>
+                p.name.toLowerCase().includes(search) ||
+                p.description.toLowerCase().includes(search)
+            );
+        },
 
-    const response = await fetch(`${API_BASE}${endpoint}`, options);
-    const data = await response.json();
+        get packedCount() {
+            return this.categories.reduce((total, cat) =>
+                total + cat.items.filter(i => i.packed).length, 0
+            );
+        },
 
-    if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
-    }
+        get totalItems() {
+            return this.categories.reduce((total, cat) =>
+                total + cat.items.length, 0
+            );
+        },
 
-    return data;
-}
+        // Lifecycle
+        init() {
+            this.loadTrips();
+        },
 
-async function loadTrips() {
-    try {
-        showLoading();
-        const data = await apiCall('/trips');
-        renderTripList(data.trips || []);
-    } catch (error) {
-        showToast('Failed to load trips: ' + error.message, 'error');
-    } finally {
-        hideLoading();
-    }
-}
+        // Helper methods
+        visibleItemsInCategory(category) {
+            if (!this.hidePacked) return category.items.length;
+            return category.items.filter(i => !i.packed).length;
+        },
 
-async function createTrip(tripData) {
-    try {
-        showLoading();
-        await apiCall('/trips', 'POST', tripData);
-        showToast('Trip created successfully!');
-        showPage('main-menu');
-        loadTrips();
-    } catch (error) {
-        showToast('Failed to create trip: ' + error.message, 'error');
-    } finally {
-        hideLoading();
-    }
-}
+        packedInCategory(category) {
+            return category.items.filter(i => i.packed).length;
+        },
 
-async function loadTrip(tripName) {
-    try {
-        showLoading();
-        currentTrip = tripName;
-        const data = await apiCall(`/trips/${encodeURIComponent(tripName)}`);
-        renderTripDetails(data);
-        showPage('trip-details');
-    } catch (error) {
-        showToast('Failed to load trip: ' + error.message, 'error');
-    } finally {
-        hideLoading();
-    }
-}
+        toggleCategoryCollapse(categoryName) {
+            if (this.collapsedCategories.has(categoryName)) {
+                this.collapsedCategories.delete(categoryName);
+            } else {
+                this.collapsedCategories.add(categoryName);
+            }
+        },
 
-async function updateTrip(tripName, updates) {
-    try {
-        showLoading();
-        await apiCall(`/trips/${encodeURIComponent(tripName)}/update`, 'PUT', updates);
-        showToast('Trip updated successfully!');
-        loadTrip(tripName);
-    } catch (error) {
-        showToast('Failed to update trip: ' + error.message, 'error');
-    } finally {
-        hideLoading();
-    }
-}
+        isCategoryCollapsed(categoryName) {
+            return this.collapsedCategories.has(categoryName);
+        },
 
-async function loadProperties(tripName) {
-    try {
-        showLoading();
-        const data = await apiCall(`/trips/${encodeURIComponent(tripName)}/properties`);
-        allProperties = data.properties || [];
-        renderProperties(allProperties);
-        showPage('properties-page');
-    } catch (error) {
-        showToast('Failed to load properties: ' + error.message, 'error');
-    } finally {
-        hideLoading();
-    }
-}
+        showToast(message, type = 'success') {
+            this.toast = { show: true, message, type };
+            setTimeout(() => {
+                this.toast.show = false;
+            }, 3000);
+        },
 
-async function toggleProperty(tripName, propertyName) {
-    try {
-        await apiCall(`/trips/${encodeURIComponent(tripName)}/properties/${encodeURIComponent(propertyName)}/toggle`, 'POST');
-        // Update UI optimistically
-        const property = allProperties.find(p => p.name === propertyName);
-        if (property) {
-            property.active = !property.active;
-            renderProperties(allProperties);
-        }
-    } catch (error) {
-        showToast('Failed to toggle property: ' + error.message, 'error');
-        // Reload to ensure consistency
-        loadProperties(tripName);
-    }
-}
+        // API methods
+        async apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
 
-async function loadItems(tripName) {
-    try {
-        showLoading();
-        const data = await apiCall(`/trips/${encodeURIComponent(tripName)}/items`);
-        allItems = data.categories || [];
-        renderPackingList(allItems);
-        showPage('packing-page');
-    } catch (error) {
-        showToast('Failed to load items: ' + error.message, 'error');
-    } finally {
-        hideLoading();
-    }
-}
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
 
-async function toggleItem(tripName, itemCode) {
-    try {
-        await apiCall(`/trips/${encodeURIComponent(tripName)}/items/${encodeURIComponent(itemCode)}/toggle`, 'POST');
-        // Update UI optimistically
-        for (const category of allItems) {
-            const item = category.items.find(i => i.code === itemCode);
-            if (item) {
-                item.packed = !item.packed;
-                break;
+            const response = await fetch(`/api${endpoint}`, options);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Request failed');
+            }
+
+            return data;
+        },
+
+        // Trip operations
+        async loadTrips() {
+            try {
+                this.loading = true;
+                const data = await this.apiCall('/trips');
+                this.trips = data.trips || [];
+            } catch (error) {
+                this.showToast('Failed to load trips: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async createTrip() {
+            try {
+                this.loading = true;
+                await this.apiCall('/trips', 'POST', {
+                    name: this.newTrip.name,
+                    nights: this.newTrip.nights,
+                    temperatureMin: this.newTrip.temperatureMin,
+                    temperatureMax: this.newTrip.temperatureMax,
+                    properties: []
+                });
+                this.showToast('Trip created successfully!');
+                this.newTrip = { name: '', nights: 2, temperatureMin: 60, temperatureMax: 80 };
+                await this.loadTrips();
+                this.currentPage = 'main-menu';
+            } catch (error) {
+                this.showToast('Failed to create trip: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async loadTrip(tripName) {
+            try {
+                this.loading = true;
+                this.currentTripName = tripName.replace(/\.(yml|yaml|csv)$/, '');
+                const data = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}`);
+                this.currentTrip = data;
+                this.currentPage = 'trip-details';
+            } catch (error) {
+                this.showToast('Failed to load trip: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        showEditTrip() {
+            this.editForm = {
+                nights: this.currentTrip.nights,
+                temperatureMin: this.currentTrip.temperatureMin,
+                temperatureMax: this.currentTrip.temperatureMax
+            };
+            this.currentPage = 'edit-trip';
+        },
+
+        async updateTrip() {
+            try {
+                this.loading = true;
+                await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/update`, 'PUT', this.editForm);
+                this.showToast('Trip updated successfully!');
+                await this.loadTrip(this.currentTripName);
+                this.currentPage = 'trip-details';
+            } catch (error) {
+                this.showToast('Failed to update trip: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        backToMainMenu() {
+            this.currentTrip = null;
+            this.currentTripName = null;
+            this.loadTrips();
+            this.currentPage = 'main-menu';
+        },
+
+        // Properties operations
+        async loadProperties() {
+            try {
+                this.loading = true;
+                const data = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/properties`);
+                this.properties = data.properties || [];
+                this.propertySearch = '';
+                this.currentPage = 'properties';
+            } catch (error) {
+                this.showToast('Failed to load properties: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async toggleProperty(propertyName) {
+            try {
+                await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/properties/${encodeURIComponent(propertyName)}/toggle`, 'POST');
+                // Reload all properties to catch any automatic changes
+                const data = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/properties`);
+                this.properties = data.properties || [];
+            } catch (error) {
+                this.showToast('Failed to toggle property: ' + error.message, 'error');
+                this.loadProperties();
+            }
+        },
+
+        // Items operations
+        async loadItems() {
+            try {
+                this.loading = true;
+                const data = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/items`);
+                this.categories = data.categories || [];
+                this.hidePacked = false;
+                this.collapsedCategories.clear();
+                this.currentPage = 'packing';
+            } catch (error) {
+                this.showToast('Failed to load items: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async toggleItem(itemCode) {
+            try {
+                await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/items/${encodeURIComponent(itemCode)}/toggle`, 'POST');
+                // Update local state optimistically
+                for (const category of this.categories) {
+                    const item = category.items.find(i => i.code === itemCode);
+                    if (item) {
+                        item.packed = !item.packed;
+                        break;
+                    }
+                }
+            } catch (error) {
+                this.showToast('Failed to toggle item: ' + error.message, 'error');
+                this.loadItems();
             }
         }
-        renderPackingList(allItems);
-    } catch (error) {
-        showToast('Failed to toggle item: ' + error.message, 'error');
-        // Reload to ensure consistency
-        loadItems(tripName);
-    }
+    };
 }
-
-// Render Functions
-function renderTripList(trips) {
-    const tripList = document.getElementById('trip-list');
-
-    if (trips.length === 0) {
-        tripList.innerHTML = `
-            <div class="empty-state">
-                <p>📭 No trips yet</p>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Create your first packing list!</p>
-            </div>
-        `;
-        return;
-    }
-
-    tripList.innerHTML = trips.map(trip => `
-        <div class="trip-card" onclick="loadTrip('${trip.replace(/\.[^.]+$/, '')}')">
-            <h3>📋 ${trip.replace(/\.[^.]+$/, '')}</h3>
-            <p>Click to view and pack</p>
-        </div>
-    `).join('');
-}
-
-function renderTripDetails(trip) {
-    document.getElementById('trip-title').textContent = trip.name;
-    document.getElementById('info-nights').textContent = trip.nights;
-    document.getElementById('info-temp').textContent = `${trip.temperatureMin}°F - ${trip.temperatureMax}°F`;
-
-    const properties = trip.properties.length > 0
-        ? trip.properties.join(', ')
-        : 'None';
-    document.getElementById('info-properties').textContent = properties;
-}
-
-function renderProperties(properties) {
-    const container = document.getElementById('properties-list');
-
-    container.innerHTML = properties.map(prop => `
-        <div class="property-item ${prop.active ? 'active' : ''}"
-             onclick="toggleProperty('${currentTrip}', '${prop.name}')">
-            <div class="checkbox"></div>
-            <div class="info">
-                <div class="name">${prop.name}</div>
-                ${prop.description ? `<div class="description">${prop.description}</div>` : ''}
-            </div>
-        </div>
-    `).join('');
-}
-
-function renderPackingList(categories) {
-    const container = document.getElementById('packing-list');
-    const hidePacked = document.getElementById('hide-packed').checked;
-
-    let totalItems = 0;
-    let packedItems = 0;
-
-    container.innerHTML = categories.map(category => {
-        const visibleItems = category.items.filter(item => {
-            totalItems++;
-            if (item.packed) packedItems++;
-            return !hidePacked || !item.packed;
-        });
-
-        if (visibleItems.length === 0) return '';
-
-        const categoryPacked = category.items.filter(i => i.packed).length;
-
-        return `
-            <div class="category">
-                <div class="category-header">
-                    <span>${category.name}</span>
-                    <span class="category-count">${categoryPacked}/${category.items.length}</span>
-                </div>
-                <div class="category-items">
-                    ${visibleItems.map(item => `
-                        <div class="item ${item.packed ? 'packed' : ''}"
-                             onclick="toggleItem('${currentTrip}', '${item.code}')">
-                            <div class="checkbox"></div>
-                            <div class="info">
-                                <div class="name">${item.name}</div>
-                                ${item.count > 1 ? `<div class="count">Quantity: ${item.count}</div>` : ''}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    document.getElementById('pack-stats').textContent = `${packedItems}/${totalItems} packed`;
-}
-
-function filterProperties() {
-    const searchTerm = document.getElementById('property-search').value.toLowerCase();
-    const filtered = allProperties.filter(prop =>
-        prop.name.toLowerCase().includes(searchTerm) ||
-        (prop.description && prop.description.toLowerCase().includes(searchTerm))
-    );
-    renderProperties(filtered);
-}
-
-// Page Navigation Functions
-function showPropertiesPage() {
-    loadProperties(currentTrip);
-}
-
-function showPackingPage() {
-    loadItems(currentTrip);
-}
-
-function showEditTripPage() {
-    // Load current values into the edit form
-    apiCall(`/trips/${encodeURIComponent(currentTrip)}`).then(data => {
-        document.getElementById('edit-nights').value = data.nights;
-        document.getElementById('edit-temp-min').value = data.temperatureMin;
-        document.getElementById('edit-temp-max').value = data.temperatureMax;
-        showPage('edit-trip-page');
-    }).catch(error => {
-        showToast('Failed to load trip data: ' + error.message, 'error');
-    });
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Load initial trips
-    loadTrips();
-
-    // New trip button
-    document.getElementById('new-trip-btn').addEventListener('click', () => {
-        showPage('new-trip-page');
-        document.getElementById('new-trip-form').reset();
-    });
-
-    // New trip form submission
-    document.getElementById('new-trip-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const tripData = {
-            name: document.getElementById('trip-name').value,
-            nights: parseInt(document.getElementById('trip-nights').value),
-            temperatureMin: parseInt(document.getElementById('trip-temp-min').value),
-            temperatureMax: parseInt(document.getElementById('trip-temp-max').value),
-            properties: []
-        };
-
-        createTrip(tripData);
-    });
-
-    // Edit trip form submission
-    document.getElementById('edit-trip-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const updates = {
-            nights: parseInt(document.getElementById('edit-nights').value),
-            temperatureMin: parseInt(document.getElementById('edit-temp-min').value),
-            temperatureMax: parseInt(document.getElementById('edit-temp-max').value)
-        };
-
-        updateTrip(currentTrip, updates);
-    });
-
-    // Property search
-    document.getElementById('property-search').addEventListener('input', filterProperties);
-
-    // Hide packed toggle
-    document.getElementById('hide-packed').addEventListener('change', () => {
-        renderPackingList(allItems);
-    });
-});

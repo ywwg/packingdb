@@ -95,13 +95,8 @@ I've created a complete mobile-friendly web frontend for PackingDB with a REST A
 ## How to Run
 
 ```bash
-# Quick start
-./run-web.sh
-
-# Or manually
-cd cmd/packingweb
-go build
-./packingweb
+# From repo root
+go run ./cmd/packingweb
 ```
 
 Then visit `http://localhost:8080` in your browser.

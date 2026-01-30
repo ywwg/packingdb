@@ -47,12 +47,11 @@ func TestE2E(t *testing.T) {
 		t.Fatalf("Static directory not found at %s", staticDir)
 	}
 
-	// Start the server
-	serverCmd := exec.Command(binaryPath)
-	serverCmd.Env = append(os.Environ(),
-		fmt.Sprintf("PORT=%d", port),
-		fmt.Sprintf("TRIPS_DIR=%s", tripsDir),
-		fmt.Sprintf("STATIC_DIR=%s", staticDir),
+	// Start the server with command-line flags
+	serverCmd := exec.Command(binaryPath,
+		"-trips", tripsDir,
+		"-static", staticDir,
+		"-port", fmt.Sprintf("%d", port),
 	)
 
 	// Capture output for debugging
