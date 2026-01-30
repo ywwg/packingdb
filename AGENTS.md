@@ -31,8 +31,8 @@ PackingDB is a trip packing list management system with both a TUI (Terminal UI)
 - Uses chi router for clean route definitions
 
 **Web Frontend (`static/`):**
-- `index.html` - Alpine.js-based single-page application with Tailwind CSS
-- `app.js` - Alpine.js reactive state management (249 lines)
+- `index.html` - Alpine.js-based single-page application with Tailwind CSS (274 lines)
+- `app.js` - Alpine.js reactive state management (250 lines)
 - `styles.css` - Minimal custom CSS (4 lines, only x-cloak directive)
 
 **TUI (`cmd/packingdb/`):**
@@ -208,6 +208,27 @@ isCategoryCollapsed(categoryName) {
 }
 ```
 
+**Auto-refresh for multi-device usage:**
+```javascript
+startAutoRefresh() {
+    this.stopAutoRefresh();
+    // Refresh every 10 seconds
+    this.refreshInterval = setInterval(() => {
+        if (this.currentPage === 'packing') {
+            this.refreshItems();
+        }
+    }, 10000);
+}
+
+stopAutoRefresh() {
+    if (this.refreshInterval) {
+        clearInterval(this.refreshInterval);
+        this.refreshInterval = null;
+    }
+}
+```
+The packing page automatically refreshes every 10 seconds to pick up changes made in other browsers or devices. The refresh is silent (no loading spinner) and preserves UI state like hidePacked and collapsed categories.
+
 ### Styling Guidelines
 
 - Mobile-first approach (design for phones, scale up)
@@ -226,6 +247,11 @@ After API mutations, always refresh state to catch server-side changes:
 - After toggling item: optimistic update is OK (no cascading changes)
 - After updating trip: reload trip details
 - After creating trip: reload trip list
+
+**Multi-device support:**
+- Packing page auto-refreshes every 10 seconds to detect changes from other browsers/devices
+- Refresh is silent (no loading indicator) and preserves UI state (hidePacked, collapsed categories)
+- Auto-refresh stops when navigating away from packing page
 
 ## Common Issues
 

@@ -201,24 +201,24 @@
     <!-- Packing Page -->
     <div x-show="currentPage === 'packing'" class="min-h-screen flex flex-col bg-gray-100">
         <div class="bg-white p-4 shadow-md sticky top-0 z-50">
-            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="currentPage = 'trip-details'">← Back</button>
+            <button class="text-primary-light font-semibold mb-2 active:opacity-60" @click="stopAutoRefresh(); currentPage = 'trip-details'">← Back</button>
             <h1 class="text-2xl font-bold text-primary-light text-center">Pack Items</h1>
             <div class="text-center mt-2 text-sm text-gray-600 font-medium">
                 <span x-text="`${packedCount}/${totalItems} packed`"></span>
             </div>
+            <div class="mt-3">
+                <label class="flex items-center justify-center cursor-pointer">
+                    <input type="checkbox" x-model="hidePacked" class="mr-2 w-5 h-5 cursor-pointer">
+                    <span class="text-sm text-gray-700">Hide packed items</span>
+                </label>
+            </div>
         </div>
 
         <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
-            <div class="mb-4">
-                <label class="flex items-center bg-white p-4 rounded-lg cursor-pointer">
-                    <input type="checkbox" x-model="hidePacked" class="mr-3 w-5 h-5 cursor-pointer">
-                    <span>Hide packed items</span>
-                </label>
-            </div>
 
             <div class="flex flex-col gap-4">
                 <template x-for="category in categories" :key="category.name">
-                    <div class="bg-white rounded-xl overflow-hidden shadow-sm" x-show="visibleItemsInCategory(category) > 0">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-sm">
                         <div class="bg-gradient-to-r from-primary-light to-primary-dark text-white p-4 font-bold flex justify-between items-center cursor-pointer select-none"
                              @click="toggleCategoryCollapse(category.name)">
                             <span x-text="category.name"></span>

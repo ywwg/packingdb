@@ -12,6 +12,7 @@ function packingApp() {
         categories: [],
         hidePacked: false,
         collapsedCategories: new Set(),
+        refreshInterval: null,
         toast: {
             show: false,
             message: '',
@@ -222,10 +223,39 @@ function packingApp() {
                 this.hidePacked = false;
                 this.collapsedCategories.clear();
                 this.currentPage = 'packing';
+                this.startAutoRefresh();
             } catch (error) {
                 this.showToast('Failed to load items: ' + error.message, 'error');
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async refreshItems() {
+            // Silently refresh items without changing UI state
+            try {
+                const data = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/items`);
+                this.categories = data.categories || [];
+            } catch (error) {
+                // Silent failure - don't interrupt user
+                console.error('Auto-refresh failed:', error);
+            }
+        },
+
+        startAutoRefresh() {
+            this.stopAutoRefresh();
+            // Refresh every 10 seconds
+            this.refreshInterval = setInterval(() => {
+                if (this.currentPage === 'packing') {
+                    this.refreshItems();
+                }
+            }, 10000);
+        },
+
+        stopAutoRefresh() {
+            if (this.refreshInterval) {
+                clearInterval(this.refreshInterval);
+                this.refreshInterval = null;
             }
         },
 
