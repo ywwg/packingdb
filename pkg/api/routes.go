@@ -189,9 +189,10 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req struct {
-		Nights         *int `json:"nights"`
-		TemperatureMin *int `json:"temperatureMin"`
-		TemperatureMax *int `json:"temperatureMax"`
+		Name           *string `json:"name"`
+		Nights         *int    `json:"nights"`
+		TemperatureMin *int    `json:"temperatureMin"`
+		TemperatureMax *int    `json:"temperatureMax"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -199,6 +200,9 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Name != nil && *req.Name != "" {
+		trip.C.Name = *req.Name
+	}
 	if req.Nights != nil {
 		trip.C.Nights = *req.Nights
 	}
@@ -219,6 +223,9 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 		s.respondError(w, fmt.Sprintf("Failed to save trip: %v", err), http.StatusInternalServerError)
 		return
 	}
+
+	// Invalidate cache for this trip
+	delete(s.trips, name)
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,

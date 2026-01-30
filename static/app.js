@@ -25,6 +25,7 @@ function packingApp() {
             temperatureMax: 80
         },
         editForm: {
+            name: '',
             nights: 0,
             temperatureMin: 0,
             temperatureMax: 0
@@ -159,6 +160,7 @@ function packingApp() {
 
         showEditTrip() {
             this.editForm = {
+                name: this.currentTrip.name,
                 nights: this.currentTrip.nights,
                 temperatureMin: this.currentTrip.temperatureMin,
                 temperatureMax: this.currentTrip.temperatureMax

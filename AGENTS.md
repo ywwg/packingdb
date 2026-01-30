@@ -139,7 +139,7 @@ See [WEB_IMPLEMENTATION.md](WEB_IMPLEMENTATION.md#rest-api-endpoints) for comple
 - `GET /api/trips` - List all trips
 - `POST /api/trips` - Create new trip
 - `GET /api/trips/{name}` - Get trip details
-- `PUT /api/trips/{name}/update` - Update trip settings
+- `PUT /api/trips/{name}/update` - Update trip settings (name is stored in file, filename stays the same)
 - `GET /api/properties` - List all available properties
 - `GET /api/trips/{name}/properties` - Get trip properties
 - `POST /api/trips/{name}/properties/{property}/toggle` - Toggle property
@@ -151,6 +151,7 @@ See [WEB_IMPLEMENTATION.md](WEB_IMPLEMENTATION.md#rest-api-endpoints) for comple
 - After toggling properties, always fetch the full property list to see cascading changes
 - Items are organized by category in the response
 - Packed status is persisted to the trip file immediately
+- Trip name can be changed independently of the filename (stored inside the file)
 
 ## Frontend Development
 
