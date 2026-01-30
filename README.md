@@ -4,6 +4,34 @@ The #1 Enterprise solution for making sure you remember all your shit.
 
 packingdb is web scale.
 
+## Quick Start
+
+### Web Interface (Recommended for Mobile) 📱
+
+The easiest way to use packingdb is through the mobile-friendly web interface:
+
+```bash
+./run-web.sh
+```
+
+Then open `http://localhost:8080` in your browser or phone. The web interface provides:
+- Mobile-optimized responsive design
+- Easy trip creation and management
+- Simple property configuration
+- Touch-friendly packing checkboxes
+
+See [static/README.md](static/README.md) for more details about the web interface.
+
+### Command Line Interface
+
+For the traditional terminal-based interface:
+
+```bash
+cd cmd/packingdb
+go build
+./packingdb <trip-file.yml>
+```
+
 ## Go env setup
 
 Setting up Go is a little more complex than it needs to be.  First, set the GOPATH environment

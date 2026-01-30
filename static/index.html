@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PackingDB</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Menu Page -->
+    <div id="main-menu" class="page active">
+        <div class="header">
+            <h1>📦 PackingDB</h1>
+        </div>
+
+        <div class="content">
+            <div class="trip-list" id="trip-list">
+                <!-- Trips will be loaded here -->
+            </div>
+
+            <button class="btn btn-primary btn-large" id="new-trip-btn">
+                ✨ Create New Trip
+            </button>
+        </div>
+    </div>
+
+    <!-- New Trip Page -->
+    <div id="new-trip-page" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+            <h1>New Trip</h1>
+        </div>
+
+        <div class="content">
+            <form id="new-trip-form">
+                <div class="form-group">
+                    <label for="trip-name">Trip Name</label>
+                    <input type="text" id="trip-name" required placeholder="e.g., Weekend Camping">
+                </div>
+
+                <div class="form-group">
+                    <label for="trip-nights">Number of Nights</label>
+                    <input type="number" id="trip-nights" min="0" value="2" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="trip-temp-min">Min Temperature (°F)</label>
+                    <input type="number" id="trip-temp-min" value="60">
+                </div>
+
+                <div class="form-group">
+                    <label for="trip-temp-max">Max Temperature (°F)</label>
+                    <input type="number" id="trip-temp-max" value="80">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">
+                    Create Trip →
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trip Details Page -->
+    <div id="trip-details" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+            <h1 id="trip-title">Trip</h1>
+        </div>
+
+        <div class="content">
+            <div class="trip-info-card">
+                <div class="info-row">
+                    <span class="label">Nights:</span>
+                    <span id="info-nights">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Temperature:</span>
+                    <span id="info-temp">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Properties:</span>
+                    <span id="info-properties">-</span>
+                </div>
+            </div>
+
+            <div class="menu-buttons">
+                <button class="btn btn-primary" onclick="showPropertiesPage()">
+                    ⚙️ Configure Properties
+                </button>
+                <button class="btn btn-primary" onclick="showPackingPage()">
+                    🎒 Pack Items
+                </button>
+                <button class="btn btn-secondary" onclick="showEditTripPage()">
+                    ✏️ Edit Trip Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Trip Settings Page -->
+    <div id="edit-trip-page" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('trip-details')">← Back</button>
+            <h1>Edit Trip Settings</h1>
+        </div>
+
+        <div class="content">
+            <form id="edit-trip-form">
+                <div class="form-group">
+                    <label for="edit-nights">Number of Nights</label>
+                    <input type="number" id="edit-nights" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-temp-min">Min Temperature (°F)</label>
+                    <input type="number" id="edit-temp-min">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-temp-max">Max Temperature (°F)</label>
+                    <input type="number" id="edit-temp-max">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">
+                    💾 Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Properties Page -->
+    <div id="properties-page" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('trip-details')">← Back</button>
+            <h1>Trip Properties</h1>
+        </div>
+
+        <div class="content">
+            <div class="search-box">
+                <input type="text" id="property-search" placeholder="🔍 Search properties...">
+            </div>
+            <div id="properties-list" class="properties-list">
+                <!-- Properties will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Packing Page -->
+    <div id="packing-page" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('trip-details')">← Back</button>
+            <h1>Pack Items</h1>
+            <div class="header-stats">
+                <span id="pack-stats">0/0 packed</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="controls">
+                <label class="toggle-control">
+                    <input type="checkbox" id="hide-packed">
+                    <span>Hide packed items</span>
+                </label>
+            </div>
+
+            <div id="packing-list" class="packing-list">
+                <!-- Packing items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PackingDB API Examples</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        h1 { color: #569cd6; }
+        h2 { color: #4ec9b0; margin-top: 30px; }
+        pre {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 3px solid #569cd6;
+        }
+        code { color: #ce9178; }
+        .method {
+            color: #dcdcaa;
+            font-weight: bold;
+        }
+        .endpoint { color: #4ec9b0; }
+    </style>
+</head>
+<body>
+    <h1>PackingDB REST API Examples</h1>
+    <p>Use these API endpoints to integrate with PackingDB programmatically.</p>
+
+    <h2>List All Trips</h2>
+    <pre><code><span class="method">GET</span> <span class="endpoint">/api/trips</span>
+
+Response:
+{
+  "trips": ["weekend-camping.yml", "business-trip.yml"]
+}</code></pre>
+
+    <h2>Create a New Trip</h2>
+    <pre><code><span class="method">POST</span> <span class="endpoint">/api/trips</span>
+Content-Type: application/json
+
+{
+  "name": "Weekend Camping",
+  "nights": 2,
+  "temperatureMin": 45,
+  "temperatureMax": 75,
+  "properties": ["Camping", "Hiking", "Swimming"]
+}
+
+Response:
+{
+  "success": true,
+  "filename": "trips/Weekend Camping.yml"
+}</code></pre>
+
+    <h2>Get Trip Details</h2>
+    <pre><code><span class="method">GET</span> <span class="endpoint">/api/trips/Weekend%20Camping</span>
+
+Response:
+{
+  "name": "Weekend Camping",
+  "nights": 2,
+  "temperatureMin": 45,
+  "temperatureMax": 75,
+  "properties": ["Camping", "Hiking", "Swimming"]
+}</code></pre>
+
+    <h2>Update Trip Settings</h2>
+    <pre><code><span class="method">PUT</span> <span class="endpoint">/api/trips/Weekend%20Camping/update</span>
+Content-Type: application/json
+
+{
+  "nights": 3,
+  "temperatureMin": 50,
+  "temperatureMax": 80
+}
+
+Response:
+{
+  "success": true
+}</code></pre>
+
+    <h2>List All Available Properties</h2>
+    <pre><code><span class="method">GET</span> <span class="endpoint">/api/properties</span>
+
+Response:
+{
+  "properties": [
+    {
+      "name": "Camping",
+      "description": "",
+      "active": false
+    },
+    {
+      "name": "Swimming",
+      "description": "",
+      "active": false
+    }
+  ]
+}</code></pre>
+
+    <h2>Get Trip Properties</h2>
+    <pre><code><span class="method">GET</span> <span class="endpoint">/api/trips/Weekend%20Camping/properties</span>
+
+Response:
+{
+  "properties": [
+    {
+      "name": "Camping",
+      "description": "",
+      "active": true
+    },
+    {
+      "name": "Swimming",
+      "description": "",
+      "active": true
+    }
+  ]
+}</code></pre>
+
+    <h2>Toggle a Property</h2>
+    <pre><code><span class="method">POST</span> <span class="endpoint">/api/trips/Weekend%20Camping/properties/Camping/toggle</span>
+
+Response:
+{
+  "success": true
+}</code></pre>
+
+    <h2>Get Packing Items</h2>
+    <pre><code><span class="method">GET</span> <span class="endpoint">/api/trips/Weekend%20Camping/items</span>
+
+Response:
+{
+  "categories": [
+    {
+      "name": "Clothing",
+      "items": [
+        {
+          "code": "a",
+          "name": "Socks",
+          "category": "Clothing",
+          "packed": false,
+          "count": 3
+        },
+        {
+          "code": "b",
+          "name": "Underwear",
+          "category": "Clothing",
+          "packed": true,
+          "count": 3
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+    <h2>Toggle Item Packed Status</h2>
+    <pre><code><span class="method">POST</span> <span class="endpoint">/api/trips/Weekend%20Camping/items/a/toggle</span>
+
+Response:
+{
+  "success": true
+}</code></pre>
+
+    <h2>cURL Examples</h2>
+    <pre><code># Create a trip
+curl -X POST http://localhost:8080/api/trips \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Business Trip NYC",
+    "nights": 3,
+    "temperatureMin": 60,
+    "temperatureMax": 80,
+    "properties": ["Business", "Flight", "NYC"]
+  }'
+
+# Get trip items
+curl http://localhost:8080/api/trips/Business%20Trip%20NYC/items
+
+# Toggle an item
+curl -X POST http://localhost:8080/api/trips/Business%20Trip%20NYC/items/a/toggle
+
+# Toggle a property
+curl -X POST http://localhost:8080/api/trips/Business%20Trip%20NYC/properties/International/toggle</code></pre>
+
+    <h2>JavaScript Fetch Examples</h2>
+    <pre><code>// Create a trip
+fetch('/api/trips', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name: 'Beach Weekend',
+    nights: 2,
+    temperatureMin: 70,
+    temperatureMax: 85,
+    properties: ['Swimming', 'Bright']
+  })
+})
+.then(res => res.json())
+.then(data => console.log(data));
+
+// Get packing items
+fetch('/api/trips/Beach%20Weekend/items')
+  .then(res => res.json())
+  .then(data => console.log(data.categories));
+
+// Toggle an item
+fetch('/api/trips/Beach%20Weekend/items/a/toggle', {
+  method: 'POST'
+})
+.then(res => res.json())
+.then(data => console.log(data));</code></pre>
+
+    <h2>Error Responses</h2>
+    <pre><code>// When an error occurs:
+{
+  "error": "Trip not found: NonExistent Trip"
+}
+
+// HTTP Status Codes:
+// 200 - Success
+// 400 - Bad Request (invalid input)
+// 404 - Not Found (trip doesn't exist)
+// 409 - Conflict (trip already exists)
+// 500 - Internal Server Error</code></pre>
+</body>
+</html>
