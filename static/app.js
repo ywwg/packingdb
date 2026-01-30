@@ -269,6 +269,10 @@ function packingApp() {
                     const item = category.items.find(i => i.code === itemCode);
                     if (item) {
                         item.packed = !item.packed;
+                        // Check if all items are now packed
+                        if (this.packedCount === this.totalItems && this.totalItems > 0) {
+                            this.triggerFireworks();
+                        }
                         break;
                     }
                 }
@@ -276,6 +280,33 @@ function packingApp() {
                 this.showToast('Failed to toggle item: ' + error.message, 'error');
                 this.loadItems();
             }
+        },
+
+        triggerFireworks() {
+            var duration = 10 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+              // launch a few confetti from the left edge
+              confetti({
+                particleCount: 7,
+                angle: 60,
+                spread: 180,
+                origin: { x: 0 }
+              });
+              // and launch a few from the right edge
+              confetti({
+                particleCount: 7,
+                angle: 120,
+                spread: 180,
+                origin: { x: 1 }
+              });
+
+              // keep going until we are out of time
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
         }
     };
 }

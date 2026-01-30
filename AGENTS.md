@@ -31,9 +31,9 @@ PackingDB is a trip packing list management system with both a TUI (Terminal UI)
 - Uses chi router for clean route definitions
 
 **Web Frontend (`static/`):**
-- `index.html` - Alpine.js-based single-page application with Tailwind CSS (274 lines)
-- `app.js` - Alpine.js reactive state management (250 lines)
-- `styles.css` - Minimal custom CSS (4 lines, only x-cloak directive)
+- `index.html` - Alpine.js-based single-page application with Tailwind CSS (285 lines)
+- `app.js` - Alpine.js reactive state management (307 lines)
+- `styles.css` - Minimal custom CSS (3 lines, only x-cloak directive)
 
 **TUI (`cmd/packingdb/`):**
 - Terminal-based interactive interface using promptui
@@ -316,6 +316,7 @@ packingdb/
 ### Frontend
 - Alpine.js 3.x (CDN) - Reactive framework
 - Tailwind CSS 3.x (CDN) - Utility-first CSS framework
+- canvas-confetti 1.9.2 (CDN) - Celebration animations
 - No build tools required
 - No npm/node dependencies
 
