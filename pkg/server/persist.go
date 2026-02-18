@@ -1,8 +1,9 @@
 package server
 
 import (
-	"log"
 	"time"
+
+	"github.com/ywwg/packingdb/pkg/logger"
 )
 
 // StartBackgroundPersist starts the background goroutine that periodically saves dirty trips
@@ -41,6 +42,10 @@ func (s *Server) persistDirtyTrips() {
 	}
 	s.mu.Unlock()
 
+	if len(dirtyNames) > 0 {
+		logger.Debug("Persisting dirty trips", "count", len(dirtyNames))
+	}
+
 	for _, name := range dirtyNames {
 		s.mu.RLock()
 		trip, ok := s.trips[name]
@@ -52,13 +57,16 @@ func (s *Server) persistDirtyTrips() {
 
 		filename := s.findTripFile(name)
 		if filename == "" {
+			logger.Warn("Trip file not found for persist", "trip", name)
 			continue
 		}
 
 		if err := trip.SaveToFile(filename); err != nil {
-			log.Printf("Error saving trip %s: %v", name, err)
+			logger.Error("Failed to save trip", "trip", name, "file", filename, "error", err)
 			continue
 		}
+
+		logger.Info("Persisted trip to disk", "trip", name, "file", filename)
 
 		s.mu.Lock()
 		delete(s.dirtyTrips, name)

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/ywwg/packingdb/pkg/logger"
 	"github.com/ywwg/packingdb/pkg/packinglib"
 )
 
@@ -424,6 +425,26 @@ func (s *Server) findTripFile(name string) string {
 func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
 
+	// Request logging middleware
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+
+			// Wrap response writer to capture status code
+			wrapped := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+
+			next.ServeHTTP(wrapped, r)
+
+			duration := time.Since(start)
+			logger.Info("HTTP request",
+				"method", r.Method,
+				"path", r.URL.Path,
+				"status", wrapped.statusCode,
+				"duration", duration,
+			)
+		})
+	})
+
 	// CORS middleware
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -452,4 +473,15 @@ func (s *Server) Handler() http.Handler {
 	r.Post("/api/trips/{name}/properties/{property}/toggle", s.togglePropertyHandler)
 
 	return r
+}
+
+// responseWriter wraps http.ResponseWriter to capture status code
+type responseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (rw *responseWriter) WriteHeader(code int) {
+	rw.statusCode = code
+	rw.ResponseWriter.WriteHeader(code)
 }

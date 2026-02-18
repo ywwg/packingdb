@@ -3,13 +3,13 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/ywwg/packingdb/pkg/contexts"
+	"github.com/ywwg/packingdb/pkg/logger"
 	"github.com/ywwg/packingdb/pkg/packinglib"
 	"github.com/ywwg/packingdb/pkg/server"
 )
@@ -19,14 +19,18 @@ func main() {
 	tripsDir := flag.String("trips", "./public/trips", "Directory for trip files")
 	staticDir := flag.String("static", "./static", "Directory for static files")
 	port := flag.String("port", "8080", "Port to listen on")
+	logLevel := flag.String("log-level", "info", "Log level (debug, info, warn, error)")
 	flag.Parse()
+
+	// Initialize logger
+	logger.Init(*logLevel)
 
 	registry := packinglib.NewStructRegistry()
 	contexts.PopulateRegistry(registry)
 
 	// Create trips directory if it doesn't exist
 	if err := os.MkdirAll(*tripsDir, 0755); err != nil {
-		log.Fatal(err)
+		logger.Fatal("Failed to create trips directory", "error", err)
 	}
 
 	// Create API server
@@ -38,7 +42,7 @@ func main() {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		log.Println("Shutting down, saving changes...")
+		logger.Info("Shutting down, saving changes...")
 		apiServer.Shutdown()
 		os.Exit(0)
 	}()
@@ -50,7 +54,9 @@ func main() {
 	// API routes
 	http.Handle("/api/", apiServer.Handler())
 
-	log.Printf("Starting packingweb server on port %s", *port)
-	log.Printf("Visit http://localhost:%s to use the app", *port)
-	log.Fatal(http.ListenAndServe(":"+*port, nil))
+	logger.Info("Starting packingweb server", "port", *port)
+	logger.Info("Visit the app", "url", "http://localhost:"+*port)
+	if err := http.ListenAndServe(":"+*port, nil); err != nil {
+		logger.Fatal("Server failed", "error", err)
+	}
 }
