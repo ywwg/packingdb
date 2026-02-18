@@ -1,11 +1,14 @@
 package server
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -132,11 +135,10 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filename := filepath.Join(s.TripsDir, req.Name+".yml")
-
-	// Check if trip already exists
-	if _, err := os.Stat(filename); !os.IsNotExist(err) {
-		s.respondError(w, "Trip already exists", http.StatusConflict)
+	safeBase := sanitizeFilename(req.Name)
+	filename, err := s.uniqueTripFilename(safeBase)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Failed to generate filename: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -158,11 +160,14 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.trips[req.Name] = trip
+	// Cache under the filename base (without extension) so loadTrip can find it
+	filenameBase := strings.TrimSuffix(filepath.Base(filename), ".yml")
+	s.trips[filenameBase] = trip
+	logger.Info("Created new trip", "name", req.Name, "file", filename)
 
 	s.respondJSON(w, map[string]interface{}{
 		"success":  true,
-		"filename": filename,
+		"filename": filepath.Base(filename),
 	})
 }
 
@@ -386,6 +391,47 @@ func (s *Server) togglePropertyHandler(w http.ResponseWriter, r *http.Request) {
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,
 	})
+}
+
+// sanitizeFilename removes all characters that are not alphanumeric, hyphens, or
+// underscores, collapses runs of separators, and trims leading/trailing
+// separators. It also strips any path components to prevent traversal attacks.
+var reUnsafe = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
+
+func sanitizeFilename(name string) string {
+	// Strip any path components — prevents directory traversal
+	name = filepath.Base(name)
+	// Replace all unsafe characters with hyphens
+	name = reUnsafe.ReplaceAllString(name, "-")
+	// Trim leading/trailing hyphens
+	name = strings.Trim(name, "-")
+	// Truncate to a reasonable length so the final filename stays manageable
+	if len(name) > 64 {
+		name = name[:64]
+	}
+	if name == "" {
+		name = "trip"
+	}
+	return name
+}
+
+// uniqueTripFilename returns a filename (without directory) that doesn't
+// already exist on disk. It appends a random 6-byte (12-hex-char) suffix to
+// ensure uniqueness.
+func (s *Server) uniqueTripFilename(base string) (string, error) {
+	const maxAttempts = 10
+	for i := 0; i < maxAttempts; i++ {
+		var buf [6]byte
+		if _, err := rand.Read(buf[:]); err != nil {
+			return "", fmt.Errorf("failed to generate random suffix: %w", err)
+		}
+		suffix := hex.EncodeToString(buf[:])
+		filename := filepath.Join(s.TripsDir, base+"-"+suffix+".yml")
+		if _, err := os.Stat(filename); os.IsNotExist(err) {
+			return filename, nil
+		}
+	}
+	return "", fmt.Errorf("could not find a unique filename after %d attempts", maxAttempts)
 }
 
 // Helper functions

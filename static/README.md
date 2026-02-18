@@ -21,7 +21,7 @@ go build
 
 2. Open your browser to `http://localhost:8080`
 
-The server will create a `trips/` directory to store your packing lists.
+The server will create a `public/trips/` directory to store your packing lists.
 
 ## API Endpoints
 
