@@ -75,7 +75,7 @@ go run ./cmd/packingweb
 
 With custom flags:
 ```bash
-go run ./cmd/packingweb -port 9000 -trips ./custom/trips -static ./custom/static
+go run ./cmd/packingweb -port 9000 -trips ./custom/public/trips -static ./custom/static
 ```
 
 ### Verifying Server is Running
