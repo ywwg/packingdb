@@ -76,12 +76,13 @@ func TestE2E(t *testing.T) {
 		testListTripsEmpty(t, baseURL)
 	})
 
+	var tripKey string
 	t.Run("CreateTrip", func(t *testing.T) {
-		testCreateTrip(t, baseURL, tripsDir)
+		tripKey = testCreateTrip(t, baseURL, tripsDir)
 	})
 
 	t.Run("GetTrip", func(t *testing.T) {
-		testGetTrip(t, baseURL)
+		testGetTrip(t, baseURL, tripKey)
 	})
 
 	t.Run("GetProperties", func(t *testing.T) {
@@ -89,15 +90,15 @@ func TestE2E(t *testing.T) {
 	})
 
 	t.Run("GetTripItems", func(t *testing.T) {
-		testGetTripItems(t, baseURL)
+		testGetTripItems(t, baseURL, tripKey)
 	})
 
 	t.Run("ToggleItem", func(t *testing.T) {
-		testToggleItem(t, baseURL)
+		testToggleItem(t, baseURL, tripKey)
 	})
 
 	t.Run("UpdateTrip", func(t *testing.T) {
-		testUpdateTrip(t, baseURL)
+		testUpdateTrip(t, baseURL, tripKey)
 	})
 }
 
@@ -157,8 +158,8 @@ func testListTripsEmpty(t *testing.T, baseURL string) {
 	}
 }
 
-// testCreateTrip creates a new trip
-func testCreateTrip(t *testing.T, baseURL string, tripsDir string) {
+// testCreateTrip creates a new trip and returns the trip key (filename without extension)
+func testCreateTrip(t *testing.T, baseURL string, tripsDir string) string {
 	payload := strings.NewReader(`{
 		"name": "test-trip",
 		"nights": 3,
@@ -187,16 +188,25 @@ func testCreateTrip(t *testing.T, baseURL string, tripsDir string) {
 		t.Error("Expected success: true")
 	}
 
-	// Verify file was created
-	tripFile := filepath.Join(tripsDir, "test-trip.yml")
+	// The API returns the base filename (e.g. "test-trip-abc123.yml")
+	filename, _ := result["filename"].(string)
+	if filename == "" {
+		t.Fatal("Expected filename in response")
+	}
+
+	// Verify file was created on disk
+	tripFile := filepath.Join(tripsDir, filename)
 	if _, err := os.Stat(tripFile); os.IsNotExist(err) {
 		t.Errorf("Trip file was not created at %s", tripFile)
 	}
+
+	// Return the key used in API URLs: filename without extension
+	return strings.TrimSuffix(filename, ".yml")
 }
 
 // testGetTrip retrieves a trip
-func testGetTrip(t *testing.T, baseURL string) {
-	resp, err := http.Get(baseURL + "/api/trips/test-trip")
+func testGetTrip(t *testing.T, baseURL string, tripKey string) {
+	resp, err := http.Get(baseURL + "/api/trips/" + tripKey)
 	if err != nil {
 		t.Fatalf("Failed to get trip: %v", err)
 	}
@@ -253,8 +263,8 @@ func testGetProperties(t *testing.T, baseURL string) {
 }
 
 // testGetTripItems retrieves trip items
-func testGetTripItems(t *testing.T, baseURL string) {
-	resp, err := http.Get(baseURL + "/api/trips/test-trip/items")
+func testGetTripItems(t *testing.T, baseURL string, tripKey string) {
+	resp, err := http.Get(baseURL + "/api/trips/" + tripKey + "/items")
 	if err != nil {
 		t.Fatalf("Failed to get items: %v", err)
 	}
@@ -281,9 +291,9 @@ func testGetTripItems(t *testing.T, baseURL string) {
 }
 
 // testToggleItem toggles an item's packed status
-func testToggleItem(t *testing.T, baseURL string) {
+func testToggleItem(t *testing.T, baseURL string, tripKey string) {
 	// First, get an item code
-	resp, err := http.Get(baseURL + "/api/trips/test-trip/items")
+	resp, err := http.Get(baseURL + "/api/trips/" + tripKey + "/items")
 	if err != nil {
 		t.Fatalf("Failed to get items: %v", err)
 	}
@@ -310,7 +320,7 @@ func testToggleItem(t *testing.T, baseURL string) {
 	initialPacked := item["packed"].(bool)
 
 	// Toggle the item
-	toggleURL := fmt.Sprintf("%s/api/trips/test-trip/items/%s/toggle", baseURL, code)
+	toggleURL := fmt.Sprintf("%s/api/trips/%s/items/%s/toggle", baseURL, tripKey, code)
 	toggleResp, err := http.Post(toggleURL, "application/json", nil)
 	if err != nil {
 		t.Fatalf("Failed to toggle item: %v", err)
@@ -323,7 +333,7 @@ func testToggleItem(t *testing.T, baseURL string) {
 	}
 
 	// Verify the toggle worked
-	resp2, err := http.Get(baseURL + "/api/trips/test-trip/items")
+	resp2, err := http.Get(baseURL + "/api/trips/" + tripKey + "/items")
 	if err != nil {
 		t.Fatalf("Failed to get items after toggle: %v", err)
 	}
@@ -346,14 +356,14 @@ func testToggleItem(t *testing.T, baseURL string) {
 }
 
 // testUpdateTrip updates trip settings
-func testUpdateTrip(t *testing.T, baseURL string) {
+func testUpdateTrip(t *testing.T, baseURL string, tripKey string) {
 	payload := strings.NewReader(`{
 		"nights": 5,
 		"temperatureMin": 50,
 		"temperatureMax": 90
 	}`)
 
-	req, err := http.NewRequest("PUT", baseURL+"/api/trips/test-trip/update", payload)
+	req, err := http.NewRequest("PUT", baseURL+"/api/trips/"+tripKey+"/update", payload)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -371,7 +381,7 @@ func testUpdateTrip(t *testing.T, baseURL string) {
 	}
 
 	// Verify the update
-	getResp, err := http.Get(baseURL + "/api/trips/test-trip")
+	getResp, err := http.Get(baseURL + "/api/trips/" + tripKey)
 	if err != nil {
 		t.Fatalf("Failed to get trip after update: %v", err)
 	}

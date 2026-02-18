@@ -162,7 +162,9 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Cache under the filename base (without extension) so loadTrip can find it
 	filenameBase := strings.TrimSuffix(filepath.Base(filename), ".yml")
+	s.mu.Lock()
 	s.trips[filenameBase] = trip
+	s.mu.Unlock()
 	logger.Info("Created new trip", "name", req.Name, "file", filename)
 
 	s.respondJSON(w, map[string]interface{}{
@@ -436,12 +438,14 @@ func (s *Server) uniqueTripFilename(base string) (string, error) {
 
 // Helper functions
 func (s *Server) loadTrip(name string) (*packinglib.Trip, error) {
-	// Check cache first
+	// Could be faster to do a read-only check first, but we're not at that stage
+	// of growth.
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if trip, ok := s.trips[name]; ok {
 		return trip, nil
 	}
 
-	// Find the trip file
 	filename := s.findTripFile(name)
 	if filename == "" {
 		return nil, fmt.Errorf("trip not found: %s", name)

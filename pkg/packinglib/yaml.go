@@ -1,6 +1,10 @@
 package packinglib
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
 
 const (
 	yaml_version = 1
@@ -28,6 +32,9 @@ func FromTrip(t *Trip) *YamlTrip {
 	for p := range t.C.Properties {
 		yt.Properties = append(yt.Properties, string(p))
 	}
+	sort.Slice(yt.Properties, func(i, j int) bool {
+		return strings.ToLower(yt.Properties[i]) < strings.ToLower(yt.Properties[j])
+	})
 
 	for _, il := range t.packList {
 		for _, i := range il {
