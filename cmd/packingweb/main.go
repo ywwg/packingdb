@@ -6,10 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/ywwg/packingdb/pkg/api"
 	"github.com/ywwg/packingdb/pkg/contexts"
 	"github.com/ywwg/packingdb/pkg/packinglib"
+	"github.com/ywwg/packingdb/pkg/server"
 )
 
 func main() {
@@ -28,7 +30,18 @@ func main() {
 	}
 
 	// Create API server
-	apiServer := api.NewServer(registry, *tripsDir)
+	apiServer := server.NewServer(registry, *tripsDir)
+	apiServer.StartBackgroundPersist()
+
+	// Handle graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		log.Println("Shutting down, saving changes...")
+		apiServer.Shutdown()
+		os.Exit(0)
+	}()
 
 	// Serve static files
 	fs := http.FileServer(http.Dir(*staticDir))

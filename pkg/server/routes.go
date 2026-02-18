@@ -1,4 +1,4 @@
-package api
+package server
 
 import (
 	"encoding/json"
@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ywwg/packingdb/pkg/packinglib"
@@ -17,15 +19,27 @@ import (
 type Server struct {
 	Registry packinglib.Registry
 	TripsDir string
-	trips    map[string]*packinglib.Trip
+
+	mu         sync.RWMutex
+	trips      map[string]*packinglib.Trip
+	dirtyTrips map[string]bool // tracks which trips have unsaved changes
+
+	// For background persistence
+	persistInterval time.Duration
+	stopPersist     chan struct{}
+	persistDone     chan struct{}
 }
 
 // NewServer creates a new API server instance
 func NewServer(registry packinglib.Registry, tripsDir string) *Server {
 	return &Server{
-		Registry: registry,
-		TripsDir: tripsDir,
-		trips:    make(map[string]*packinglib.Trip),
+		Registry:        registry,
+		TripsDir:        tripsDir,
+		trips:           make(map[string]*packinglib.Trip),
+		dirtyTrips:      make(map[string]bool),
+		persistInterval: 30 * time.Second,
+		stopPersist:     make(chan struct{}),
+		persistDone:     make(chan struct{}),
 	}
 }
 
@@ -213,19 +227,8 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 		trip.C.TemperatureMax = *req.TemperatureMax
 	}
 
-	filename := s.findTripFile(name)
-	if filename == "" {
-		s.respondError(w, "Trip file not found", http.StatusNotFound)
-		return
-	}
-
-	if err := trip.SaveToFile(filename); err != nil {
-		s.respondError(w, fmt.Sprintf("Failed to save trip: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// Invalidate cache for this trip
-	delete(s.trips, name)
+	// Mark as dirty instead of saving immediately
+	s.markDirty(name)
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,
@@ -262,16 +265,9 @@ func (s *Server) getItemsHandler(w http.ResponseWriter, r *http.Request) {
 		} else if menuItem.Type == packinglib.MenuPackable {
 			// Get the item from the trip's internal structures
 			if item, ok := trip.GetItemByCode(menuItem.Code); ok {
-				// Clean up the name (remove checkbox symbols and leading spaces)
-				cleanName := menuItem.Name
-				cleanName = strings.TrimSpace(cleanName)
-				cleanName = strings.TrimPrefix(cleanName, "●") // filled circle
-				cleanName = strings.TrimPrefix(cleanName, "○") // empty circle
-				cleanName = strings.TrimSpace(cleanName)
-
 				categoryItems = append(categoryItems, ItemResponse{
 					Code:     menuItem.Code,
-					Name:     cleanName,
+					Name:     item.String(),
 					Category: currentCategory,
 					Packed:   item.Packed(),
 					Count:    item.Count(),
@@ -308,16 +304,8 @@ func (s *Server) toggleItemHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filename := s.findTripFile(name)
-	if filename == "" {
-		s.respondError(w, "Trip file not found", http.StatusNotFound)
-		return
-	}
-
-	if err := trip.SaveToFile(filename); err != nil {
-		s.respondError(w, fmt.Sprintf("Failed to save trip: %v", err), http.StatusInternalServerError)
-		return
-	}
+	// Mark as dirty instead of saving immediately
+	s.markDirty(name)
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,
@@ -391,16 +379,8 @@ func (s *Server) togglePropertyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	filename := s.findTripFile(name)
-	if filename == "" {
-		s.respondError(w, "Trip file not found", http.StatusNotFound)
-		return
-	}
-
-	if err := trip.SaveToFile(filename); err != nil {
-		s.respondError(w, fmt.Sprintf("Failed to save trip: %v", err), http.StatusInternalServerError)
-		return
-	}
+	// Mark as dirty instead of saving immediately
+	s.markDirty(name)
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,

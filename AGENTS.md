@@ -27,7 +27,7 @@ PackingDB is a trip packing list management system with both a TUI (Terminal UI)
 
 **Web Backend (`cmd/packingweb/`):**
 - `main.go` - HTTP server entry point with command-line flags
-- Uses `pkg/api/routes.go` for REST API handlers
+- Uses `pkg/server/` for REST API handlers and background persistence
 - Uses chi router for clean route definitions
 
 **Web Frontend (`static/`):**
@@ -289,8 +289,9 @@ packingdb/
 │       ├── main.go         # Entry point, CLI flags
 │       └── e2e_test.go     # End-to-end tests
 ├── pkg/
-│   ├── api/
-│   │   └── routes.go       # REST API handlers, chi router
+│   ├── server/
+│   │   ├── routes.go       # REST API handlers, chi router
+│   │   └── persist.go      # Background persistence
 │   ├── contexts/
 │   │   └── registry.go     # Property definitions
 │   └── packinglib/
@@ -345,8 +346,10 @@ Legacy CSV format also supported for backwards compatibility.
 ## Performance Considerations
 
 - Trips are cached in memory after first load
-- Trip cache invalidated on any modification
-- No database - all file I/O is synchronous
+- **Background persistence**: Changes are saved to disk every 30 seconds instead of on every API call
+- Dirty tracking: Only modified trips are persisted
+- Graceful shutdown ensures all pending changes are saved before exit
+- No database - file I/O is batched and asynchronous
 - Suitable for single-user, low-volume usage
 - For high-volume, consider adding proper caching layer
 
