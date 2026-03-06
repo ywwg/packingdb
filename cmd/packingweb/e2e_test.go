@@ -158,7 +158,7 @@ func testListTripsEmpty(t *testing.T, baseURL string) {
 	}
 }
 
-// testCreateTrip creates a new trip and returns the trip key (filename without extension)
+// testCreateTrip creates a new trip and returns the trip name
 func testCreateTrip(t *testing.T, baseURL string, tripsDir string) string {
 	payload := strings.NewReader(`{
 		"name": "test-trip",
@@ -200,8 +200,8 @@ func testCreateTrip(t *testing.T, baseURL string, tripsDir string) string {
 		t.Errorf("Trip file was not created at %s", tripFile)
 	}
 
-	// Return the key used in API URLs: filename without extension
-	return strings.TrimSuffix(filename, ".yml")
+	// Return the trip name (used in API URLs, not the filename)
+	return "test-trip"
 }
 
 // testGetTrip retrieves a trip

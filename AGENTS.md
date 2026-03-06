@@ -48,6 +48,7 @@ PackingDB is a trip packing list management system with both a TUI (Terminal UI)
 6. **Stateless server** - Each API request is independent, trips cached in memory
 7. **Chi router** - Clean, standard Go routing library
 8. **CDN-based frontend** - No build tools, npm, or node dependencies required
+9. **Name-based trip lookup** - Trip names (stored inside files) are the API identifiers, not filenames. A name→filename mapping is built on startup by scanning all trip files.
 
 ## Server Management
 
@@ -152,6 +153,9 @@ See [WEB_IMPLEMENTATION.md](WEB_IMPLEMENTATION.md#rest-api-endpoints) for comple
 - Items are organized by category in the response
 - Packed status is persisted to the trip file immediately
 - Trip name can be changed independently of the filename (stored inside the file)
+- The `{name}` URL parameter is the **trip name** (from inside the file), not the filename
+- On startup, the server scans all trip files to build a name→filename mapping (`ScanTrips()`)
+- Creating a new trip adds to the mapping; renaming a trip re-keys the mapping
 
 ## Frontend Development
 

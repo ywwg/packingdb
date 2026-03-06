@@ -49,15 +49,11 @@ func (s *Server) persistDirtyTrips() {
 	for _, name := range dirtyNames {
 		s.mu.RLock()
 		trip, ok := s.trips[name]
+		filename := s.nameToFile[name]
 		s.mu.RUnlock()
 
-		if !ok {
-			continue
-		}
-
-		filename := s.findTripFile(name)
-		if filename == "" {
-			logger.Warn("Trip file not found for persist", "trip", name)
+		if !ok || filename == "" {
+			logger.Warn("Trip not found for persist", "trip", name)
 			continue
 		}
 

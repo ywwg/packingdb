@@ -1,17 +1,11 @@
 package server
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -19,96 +13,18 @@ import (
 	"github.com/ywwg/packingdb/pkg/packinglib"
 )
 
-// Server holds the state for the API server
-type Server struct {
-	Registry packinglib.Registry
-	TripsDir string
-
-	mu         sync.RWMutex
-	trips      map[string]*packinglib.Trip
-	dirtyTrips map[string]bool // tracks which trips have unsaved changes
-
-	// For background persistence
-	persistInterval time.Duration
-	stopPersist     chan struct{}
-	persistDone     chan struct{}
-}
-
-// NewServer creates a new API server instance
-func NewServer(registry packinglib.Registry, tripsDir string) *Server {
-	return &Server{
-		Registry:        registry,
-		TripsDir:        tripsDir,
-		trips:           make(map[string]*packinglib.Trip),
-		dirtyTrips:      make(map[string]bool),
-		persistInterval: 30 * time.Second,
-		stopPersist:     make(chan struct{}),
-		persistDone:     make(chan struct{}),
-	}
-}
-
-// Response types
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type TripInfo struct {
-	Name           string   `json:"name"`
-	Nights         int      `json:"nights"`
-	TemperatureMin int      `json:"temperatureMin"`
-	TemperatureMax int      `json:"temperatureMax"`
-	Properties     []string `json:"properties"`
-}
-
-type ItemResponse struct {
-	Code     string  `json:"code"`
-	Name     string  `json:"name"`
-	Category string  `json:"category"`
-	Packed   bool    `json:"packed"`
-	Count    float64 `json:"count"`
-}
-
-type CategoryResponse struct {
-	Name  string         `json:"name"`
-	Items []ItemResponse `json:"items"`
-}
-
-type PropertyResponse struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Active      bool   `json:"active"`
-}
-
-// Helper functions
-func (s *Server) respondError(w http.ResponseWriter, message string, status int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(ErrorResponse{Error: message})
-}
-
-func (s *Server) respondJSON(w http.ResponseWriter, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-}
-
 // Handlers
 
 // GET /api/trips - List all trips
 func (s *Server) listTripsHandler(w http.ResponseWriter, r *http.Request) {
-	files, err := os.ReadDir(s.TripsDir)
-	if err != nil {
-		s.respondError(w, "Failed to read trips directory", http.StatusInternalServerError)
-		return
+	s.mu.RLock()
+	tripNames := make([]string, 0, len(s.nameToFile))
+	for name := range s.nameToFile {
+		tripNames = append(tripNames, name)
 	}
+	s.mu.RUnlock()
 
-	tripNames := []string{}
-	for _, file := range files {
-		if !file.IsDir() && (strings.HasSuffix(file.Name(), ".csv") ||
-			strings.HasSuffix(file.Name(), ".yml") ||
-			strings.HasSuffix(file.Name(), ".yaml")) {
-			tripNames = append(tripNames, file.Name())
-		}
-	}
+	sort.Strings(tripNames)
 
 	s.respondJSON(w, map[string]interface{}{
 		"trips": tripNames,
@@ -132,6 +48,15 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 
 	if req.Name == "" {
 		s.respondError(w, "Trip name is required", http.StatusBadRequest)
+		return
+	}
+
+	// Check for duplicate trip name
+	s.mu.RLock()
+	_, exists := s.nameToFile[req.Name]
+	s.mu.RUnlock()
+	if exists {
+		s.respondError(w, fmt.Sprintf("A trip named %q already exists", req.Name), http.StatusConflict)
 		return
 	}
 
@@ -160,10 +85,10 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Cache under the filename base (without extension) so loadTrip can find it
-	filenameBase := strings.TrimSuffix(filepath.Base(filename), ".yml")
+	// Cache under the trip name and update the name-to-file mapping
 	s.mu.Lock()
-	s.trips[filenameBase] = trip
+	s.trips[req.Name] = trip
+	s.nameToFile[req.Name] = filename
 	s.mu.Unlock()
 	logger.Info("Created new trip", "name", req.Name, "file", filename)
 
@@ -222,9 +147,38 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Name != nil && *req.Name != "" {
+	dirtyKey := name
+
+	s.mu.Lock()
+	if req.Name != nil && *req.Name != "" && *req.Name != trip.C.Name {
+		// Check for name collision with an existing trip
+		if _, exists := s.nameToFile[*req.Name]; exists {
+			s.mu.Unlock()
+			s.respondError(w, fmt.Sprintf("A trip named %q already exists", *req.Name), http.StatusConflict)
+			return
+		}
+
+		oldName := trip.C.Name
 		trip.C.Name = *req.Name
+
+		// Update nameToFile mapping
+		if filePath, ok := s.nameToFile[oldName]; ok {
+			delete(s.nameToFile, oldName)
+			s.nameToFile[*req.Name] = filePath
+		}
+
+		// Re-key trip cache
+		delete(s.trips, oldName)
+		s.trips[*req.Name] = trip
+
+		// Re-key dirty trips
+		if s.dirtyTrips[oldName] {
+			delete(s.dirtyTrips, oldName)
+		}
+
+		dirtyKey = *req.Name
 	}
+
 	if req.Nights != nil {
 		trip.C.Nights = *req.Nights
 	}
@@ -235,11 +189,12 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 		trip.C.TemperatureMax = *req.TemperatureMax
 	}
 
-	// Mark as dirty instead of saving immediately
-	s.markDirty(name)
+	s.dirtyTrips[dirtyKey] = true
+	s.mu.Unlock()
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,
+		"name":    dirtyKey,
 	})
 }
 
@@ -395,82 +350,6 @@ func (s *Server) togglePropertyHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// sanitizeFilename removes all characters that are not alphanumeric, hyphens, or
-// underscores, collapses runs of separators, and trims leading/trailing
-// separators. It also strips any path components to prevent traversal attacks.
-var reUnsafe = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
-
-func sanitizeFilename(name string) string {
-	// Strip any path components — prevents directory traversal
-	name = filepath.Base(name)
-	// Replace all unsafe characters with hyphens
-	name = reUnsafe.ReplaceAllString(name, "-")
-	// Trim leading/trailing hyphens
-	name = strings.Trim(name, "-")
-	// Truncate to a reasonable length so the final filename stays manageable
-	if len(name) > 64 {
-		name = name[:64]
-	}
-	if name == "" {
-		name = "trip"
-	}
-	return name
-}
-
-// uniqueTripFilename returns a filename (without directory) that doesn't
-// already exist on disk. It appends a random 6-byte (12-hex-char) suffix to
-// ensure uniqueness.
-func (s *Server) uniqueTripFilename(base string) (string, error) {
-	const maxAttempts = 10
-	for i := 0; i < maxAttempts; i++ {
-		var buf [6]byte
-		if _, err := rand.Read(buf[:]); err != nil {
-			return "", fmt.Errorf("failed to generate random suffix: %w", err)
-		}
-		suffix := hex.EncodeToString(buf[:])
-		filename := filepath.Join(s.TripsDir, base+"-"+suffix+".yml")
-		if _, err := os.Stat(filename); os.IsNotExist(err) {
-			return filename, nil
-		}
-	}
-	return "", fmt.Errorf("could not find a unique filename after %d attempts", maxAttempts)
-}
-
-// Helper functions
-func (s *Server) loadTrip(name string) (*packinglib.Trip, error) {
-	// Could be faster to do a read-only check first, but we're not at that stage
-	// of growth.
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if trip, ok := s.trips[name]; ok {
-		return trip, nil
-	}
-
-	filename := s.findTripFile(name)
-	if filename == "" {
-		return nil, fmt.Errorf("trip not found: %s", name)
-	}
-
-	trip, err := packinglib.LoadFromFile(s.Registry, 0, filename)
-	if err != nil {
-		return nil, err
-	}
-
-	s.trips[name] = trip
-	return trip, nil
-}
-
-func (s *Server) findTripFile(name string) string {
-	// Try different extensions
-	for _, ext := range []string{".yml", ".yaml", ".csv"} {
-		filename := filepath.Join(s.TripsDir, name+ext)
-		if _, err := os.Stat(filename); !os.IsNotExist(err) {
-			return filename
-		}
-	}
-	return ""
-}
-
 // Handler returns the HTTP handler for API routes
 func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
@@ -523,15 +402,4 @@ func (s *Server) Handler() http.Handler {
 	r.Post("/api/trips/{name}/properties/{property}/toggle", s.togglePropertyHandler)
 
 	return r
-}
-
-// responseWriter wraps http.ResponseWriter to capture status code
-type responseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func (rw *responseWriter) WriteHeader(code int) {
-	rw.statusCode = code
-	rw.ResponseWriter.WriteHeader(code)
 }

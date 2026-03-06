@@ -33,8 +33,12 @@ func main() {
 		logger.Fatal("Failed to create trips directory", "error", err)
 	}
 
-	// Create API server
-	apiServer := server.NewServer(registry, *tripsDir)
+	// Create API server (scans trip files to build name→filename mapping)
+	apiServer, err := server.NewServer(registry, *tripsDir)
+	if err != nil {
+		logger.Fatal("Failed to create server", "error", err)
+	}
+
 	apiServer.StartBackgroundPersist()
 
 	// Handle graceful shutdown

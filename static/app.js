@@ -147,7 +147,7 @@ function packingApp() {
         async loadTrip(tripName) {
             try {
                 this.loading = true;
-                this.currentTripName = tripName.replace(/\.(yml|yaml|csv)$/, '');
+                this.currentTripName = tripName;
                 const data = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}`);
                 this.currentTrip = data;
                 this.currentPage = 'trip-details';
@@ -171,7 +171,11 @@ function packingApp() {
         async updateTrip() {
             try {
                 this.loading = true;
-                await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/update`, 'PUT', this.editForm);
+                const result = await this.apiCall(`/trips/${encodeURIComponent(this.currentTripName)}/update`, 'PUT', this.editForm);
+                // If the name changed, the backend returns the new name
+                if (result.name) {
+                    this.currentTripName = result.name;
+                }
                 this.showToast('Trip updated successfully!');
                 await this.loadTrip(this.currentTripName);
                 this.currentPage = 'trip-details';
