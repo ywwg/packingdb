@@ -56,27 +56,21 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Atomically check for duplicate trip name and reserve it so that two
-	// concurrent requests cannot both pass the existence check and create trips
-	// with the same name. The placeholder (empty filename) is visible to any
-	// concurrent duplicate check; persistDirtyTrips skips entries with an empty
-	// filename, so the placeholder is harmless until the final update below.
+	// Hold the lock for the remainder of the handler so that the duplicate
+	// check, reservation, I/O, and final mapping update are all atomic with
+	// respect to other concurrent requests and the background persistence
+	// goroutine.
 	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if _, exists := s.nameToFile[req.Name]; exists {
-		s.mu.Unlock()
 		s.respondError(w, fmt.Sprintf("A trip named %q already exists", req.Name), http.StatusConflict)
 		return
 	}
-	// Reserve the name with an empty placeholder so subsequent requests see it.
-	s.nameToFile[req.Name] = ""
-	s.mu.Unlock()
 
 	safeBase := sanitizeFilename(req.Name)
 	filename, err := s.uniqueTripFilename(safeBase)
 	if err != nil {
-		s.mu.Lock()
-		delete(s.nameToFile, req.Name)
-		s.mu.Unlock()
 		s.respondError(w, fmt.Sprintf("Failed to generate filename: %v", err), http.StatusInternalServerError)
 		return
 	}
@@ -84,35 +78,23 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 	// Create context with properties
 	context, err := packinglib.NewContext(s.Registry, req.Name, req.Nights, req.TemperatureMin, req.TemperatureMax, req.Properties)
 	if err != nil {
-		s.mu.Lock()
-		delete(s.nameToFile, req.Name)
-		s.mu.Unlock()
 		s.respondError(w, fmt.Sprintf("Failed to create context: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	trip, err := packinglib.NewTripFromCustomContext(s.Registry, context)
 	if err != nil {
-		s.mu.Lock()
-		delete(s.nameToFile, req.Name)
-		s.mu.Unlock()
 		s.respondError(w, fmt.Sprintf("Failed to create trip: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	if err := trip.SaveToFile(filename); err != nil {
-		s.mu.Lock()
-		delete(s.nameToFile, req.Name)
-		s.mu.Unlock()
 		s.respondError(w, fmt.Sprintf("Failed to save trip: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	// Cache under the trip name and update the name-to-file mapping
-	s.mu.Lock()
 	s.trips[req.Name] = trip
 	s.nameToFile[req.Name] = filename
-	s.mu.Unlock()
 	logger.Info("Created new trip", "name", req.Name, "file", filename)
 
 	s.respondJSON(w, map[string]interface{}{

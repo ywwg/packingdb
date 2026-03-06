@@ -35,41 +35,26 @@ func (s *Server) Shutdown() {
 // persistDirtyTrips saves all trips that have been modified
 func (s *Server) persistDirtyTrips() {
 	s.mu.Lock()
-	// Copy dirty trip names so we can release lock while saving
-	dirtyNames := make([]string, 0, len(s.dirtyTrips))
+	defer s.mu.Unlock()
+
+	if len(s.dirtyTrips) > 0 {
+		logger.Debug("Persisting dirty trips", "count", len(s.dirtyTrips))
+	}
+
 	for name := range s.dirtyTrips {
-		dirtyNames = append(dirtyNames, name)
-	}
-	s.mu.Unlock()
-
-	if len(dirtyNames) > 0 {
-		logger.Debug("Persisting dirty trips", "count", len(dirtyNames))
-	}
-
-	for _, name := range dirtyNames {
-		// Hold the lock during the save so that concurrent trip mutations
-		// (which also hold s.mu) cannot corrupt the trip data while it is
-		// being serialized to disk, and so that clearing the dirty flag is
-		// atomic with the save (preventing a dirty signal set after the save
-		// started from being silently dropped).
-		s.mu.Lock()
 		trip, ok := s.trips[name]
 		filename := s.nameToFile[name]
 		if !ok || filename == "" {
-			s.mu.Unlock()
 			logger.Warn("Trip not found for persist", "trip", name)
 			continue
 		}
 
 		if err := trip.SaveToFile(filename); err != nil {
-			s.mu.Unlock()
 			logger.Error("Failed to save trip", "trip", name, "file", filename, "error", err)
 			continue
 		}
 
 		delete(s.dirtyTrips, name)
-		s.mu.Unlock()
-
 		logger.Info("Persisted trip to disk", "trip", name, "file", filename)
 	}
 }
