@@ -25,6 +25,16 @@ PackingDB is a trip packing list management system with both a TUI (Terminal UI)
 - `context.go` - Trip context (nights, temp, properties)
 - `item.go` - Item definitions and packing state
 
+**Weather (`pkg/weather/`):**
+- `weather.go` - Location geocoding and temperature lookup using the free Open-Meteo API
+  - Geocodes location names to coordinates
+  - Rejects past dates (start date must be today or in the future)
+  - Uses forecast API for dates within 16 days (inclusive)
+  - Uses previous year's data for dates too far in the future ("typical" temperatures)
+  - Returns min low and max high across the date range in Fahrenheit
+  - Server and weather package compare dates using the server's local calendar day, avoiding UTC rollover issues for local "today"
+- `weather_test.go` - Unit tests with mock httptest server covering Lookup (forecast, typical, past-date rejection, geocode failure, min-nights clamp, API errors), GeocodeSuggestions (basic, comma filter, US/Canadian abbreviations, empty query, max results, no admin1, server error), and matchesAdmin1Filter (prefix match, abbreviation expansion)
+
 **Web Backend (`cmd/packingweb/`):**
 - `main.go` - HTTP server entry point with command-line flags
 - Uses `pkg/server/` for REST API handlers and background persistence
@@ -50,6 +60,14 @@ PackingDB is a trip packing list management system with both a TUI (Terminal UI)
 8. **CDN-based frontend** - No build tools, npm, or node dependencies required
 9. **Name-based trip lookup** - Trip names (stored inside files) are the API identifiers, not filenames. A name→filename mapping is built on startup by scanning all trip files.
 
+### Trip Creation Flow
+
+The "New Trip" form asks for a **location** and **date range** (start/end dates). The frontend calls `GET /api/weather` with these values to geocode the location and fetch temperature data from Open-Meteo. Past dates are rejected (start date must be today or later). The weather source varies:
+- **Forecast**: dates within 16 days from now (inclusive)
+- **Typical**: dates further in the future (uses same dates from previous year)
+
+Nights are calculated automatically from the date range. The user can adjust the temperatures and nights before creating the trip.
+
 ## Server Management
 
 ### After Manual Testing
@@ -59,11 +77,6 @@ Always kill the test server after completing manual testing to avoid:
 - Confusion about which server is running
 
 **Command:**
-```bash
-pkill -f "go run ./cmd/packingweb"
-```
-
-Or if the binary was built:
 ```bash
 pkill packingweb
 ```
@@ -106,7 +119,7 @@ go test -v -run TestE2E
 ### Manual Testing
 - Start server with `go run ./cmd/packingweb`
 - Test functionality in browser or with curl
-- **ALWAYS** kill the server when done with `pkill -f "go run ./cmd/packingweb"`
+- **ALWAYS** kill the server when done with `pkill packingweb`
 
 ### API Testing with curl
 ```bash
@@ -128,7 +141,7 @@ curl -s -X POST http://localhost:8080/api/trips/test-trip/items/z/toggle
 1. Make changes to code
 2. Start server for testing: `go run ./cmd/packingweb`
 3. Test changes (browser or curl)
-4. **Kill server:** `pkill -f "go run ./cmd/packingweb"`
+4. **Kill server:** `pkill packingweb`
 5. Run automated tests if needed: `go test ./...`
 6. Commit changes
 
@@ -137,6 +150,7 @@ curl -s -X POST http://localhost:8080/api/trips/test-trip/items/z/toggle
 See [WEB_IMPLEMENTATION.md](WEB_IMPLEMENTATION.md#rest-api-endpoints) for complete API documentation.
 
 **Key endpoints:**
+- `GET /api/weather?location=X&startDate=Y&endDate=Z` - Look up weather for location/dates
 - `GET /api/trips` - List all trips
 - `POST /api/trips` - Create new trip
 - `GET /api/trips/{name}` - Get trip details
@@ -296,6 +310,8 @@ packingdb/
 │   ├── server/
 │   │   ├── routes.go       # REST API handlers, chi router
 │   │   └── persist.go      # Background persistence
+│   ├── weather/
+│   │   └── weather.go      # Open-Meteo geocoding + weather lookup
 │   ├── contexts/
 │   │   └── registry.go     # Property definitions
 │   └── packinglib/

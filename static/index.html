@@ -36,6 +36,11 @@
         </div>
 
         <div class="flex-1 p-4 overflow-y-auto max-w-2xl mx-auto w-full">
+            <button class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4 mb-6"
+                    @click="currentPage = 'new-trip'">
+                ✨ Create New Trip
+            </button>
+
             <div class="mb-4">
                 <template x-if="trips.length === 0 && !loading">
                     <div class="text-center py-12 text-gray-600">
@@ -51,11 +56,6 @@
                     </div>
                 </template>
             </div>
-
-            <button class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4"
-                    @click="currentPage = 'new-trip'">
-                ✨ Create New Trip
-            </button>
         </div>
     </div>
 
@@ -74,25 +74,118 @@
                            class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
                 </div>
 
+                <!-- Mode Toggle -->
                 <div class="mb-5">
-                    <label for="trip-nights" class="block mb-2 text-gray-800 font-semibold text-sm">Number of Nights</label>
-                    <input type="number" id="trip-nights" x-model.number="newTrip.nights" min="1" required
-                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" x-model="newTrip.manualEntry" class="mr-2 w-5 h-5 cursor-pointer">
+                        <span class="text-sm text-gray-700 font-semibold">Enter details manually (skip weather lookup)</span>
+                    </label>
                 </div>
 
-                <div class="mb-5">
-                    <label for="trip-temp-min" class="block mb-2 text-gray-800 font-semibold text-sm">Min Temperature (°F)</label>
-                    <input type="number" id="trip-temp-min" x-model.number="newTrip.temperatureMin"
-                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                <!-- Weather Lookup Mode -->
+                <div x-show="!newTrip.manualEntry">
+                    <div class="mb-5 relative">
+                        <label for="trip-location" class="block mb-2 text-gray-800 font-semibold text-sm">Location</label>
+                        <input type="text" id="trip-location" x-model="newTrip.location" :required="!newTrip.manualEntry" placeholder="e.g., Denver, CO"
+                               autocomplete="off"
+                               @input="onLocationInput()"
+                               @focus="if (newTrip.locationSuggestions.length) newTrip.showSuggestions = true"
+                               @blur="hideLocationSuggestions()"
+                               class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                        <!-- Autocomplete Dropdown -->
+                        <div x-show="newTrip.showSuggestions && newTrip.locationSuggestions.length > 0"
+                             class="absolute z-50 w-full bg-white border-2 border-gray-300 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                            <template x-for="(suggestion, idx) in newTrip.locationSuggestions" :key="idx">
+                                <div class="px-4 py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-200 border-b border-gray-100 last:border-0"
+                                     @mousedown.prevent="selectLocationSuggestion(suggestion)">
+                                    <span class="text-gray-800 font-medium" x-text="suggestion.display"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="trip-start" class="block mb-2 text-gray-800 font-semibold text-sm">Start Date</label>
+                        <input type="date" id="trip-start" x-model="newTrip.startDate" :required="!newTrip.manualEntry"
+                               :min="todayStr"
+                               @change="clearWeatherState()"
+                               class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="trip-end" class="block mb-2 text-gray-800 font-semibold text-sm">End Date</label>
+                        <input type="date" id="trip-end" x-model="newTrip.endDate" :required="!newTrip.manualEntry"
+                               :min="newTrip.startDate || todayStr"
+                               @change="clearWeatherState()"
+                               class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                    </div>
+
+                    <button type="button"
+                            class="w-full bg-white text-primary-light border-2 border-primary-light font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mb-4"
+                            :class="{ 'opacity-50': newTrip.weatherLoading }"
+                            :disabled="newTrip.weatherLoading"
+                            @click="lookupWeather">
+                        <span x-show="!newTrip.weatherLoading">🌤️ Look Up Weather</span>
+                        <span x-show="newTrip.weatherLoading">⏳ Looking up weather...</span>
+                    </button>
+
+                    <!-- Weather Results -->
+                    <div x-show="newTrip.weatherLookedUp" class="bg-white p-5 rounded-xl mb-5 shadow-sm border-l-4 border-green-500">
+                        <h3 class="font-bold text-gray-800 mb-3">📍 Weather Data</h3>
+                        <div class="text-sm text-gray-600 mb-2" x-show="newTrip.weatherLocation">
+                            Location: <span class="font-semibold text-gray-800" x-text="newTrip.weatherLocation"></span>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2">
+                            Source: <span class="font-semibold text-gray-800" x-text="newTrip.weatherSource === 'typical' ? 'Typical (historical avg)' : newTrip.weatherSource === 'forecast' ? 'Forecast' : 'Historical'"></span>
+                        </div>
+                        <div class="flex justify-between py-2 border-t border-gray-200">
+                            <span class="font-semibold text-gray-600">Nights:</span>
+                            <input type="number" x-model.number="newTrip.nights" min="1"
+                                   class="w-20 px-2 py-1 border-2 border-gray-300 rounded-lg text-right focus:outline-none focus:border-primary-light bg-white">
+                        </div>
+                        <div class="flex justify-between py-2 border-t border-gray-200">
+                            <span class="font-semibold text-gray-600">Min Temp (°F):</span>
+                            <input type="number" x-model.number="newTrip.temperatureMin"
+                                   class="w-20 px-2 py-1 border-2 border-gray-300 rounded-lg text-right focus:outline-none focus:border-primary-light bg-white">
+                        </div>
+                        <div class="flex justify-between py-2 border-t border-gray-200">
+                            <span class="font-semibold text-gray-600">Max Temp (°F):</span>
+                            <input type="number" x-model.number="newTrip.temperatureMax"
+                                   class="w-20 px-2 py-1 border-2 border-gray-300 rounded-lg text-right focus:outline-none focus:border-primary-light bg-white">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">You can adjust these values if needed.</p>
+                    </div>
+
+                    <!-- Weather Error -->
+                    <div x-show="newTrip.weatherError" class="bg-red-50 p-4 rounded-xl mb-5 border-l-4 border-red-500">
+                        <p class="text-red-700 text-sm" x-text="newTrip.weatherError"></p>
+                    </div>
                 </div>
 
-                <div class="mb-5">
-                    <label for="trip-temp-max" class="block mb-2 text-gray-800 font-semibold text-sm">Max Temperature (°F)</label>
-                    <input type="number" id="trip-temp-max" x-model.number="newTrip.temperatureMax"
-                           class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                <!-- Manual Entry Mode -->
+                <div x-show="newTrip.manualEntry">
+                    <div class="mb-5">
+                        <label for="manual-nights" class="block mb-2 text-gray-800 font-semibold text-sm">Number of Nights</label>
+                        <input type="number" id="manual-nights" x-model.number="newTrip.nights" min="1" :required="newTrip.manualEntry"
+                               class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="manual-temp-min" class="block mb-2 text-gray-800 font-semibold text-sm">Min Temperature (°F)</label>
+                        <input type="number" id="manual-temp-min" x-model.number="newTrip.temperatureMin" :required="newTrip.manualEntry"
+                               class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="manual-temp-max" class="block mb-2 text-gray-800 font-semibold text-sm">Max Temperature (°F)</label>
+                        <input type="number" id="manual-temp-max" x-model.number="newTrip.temperatureMax" :required="newTrip.manualEntry"
+                               class="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-light bg-white">
+                    </div>
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4">
+                <button type="submit" class="w-full bg-gradient-to-r from-primary-light to-primary-dark text-white font-semibold py-4 px-6 rounded-xl shadow-md active:scale-[0.98] transition-transform mt-4"
+                        :class="{ 'opacity-50': !newTrip.manualEntry && !newTrip.weatherLookedUp }"
+                        :disabled="!newTrip.manualEntry && !newTrip.weatherLookedUp">
                     Create Trip →
                 </button>
             </form>
