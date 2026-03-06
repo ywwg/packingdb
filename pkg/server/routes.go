@@ -51,6 +51,11 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Nights <= 0 {
+		s.respondError(w, "Nights must be a positive number", http.StatusBadRequest)
+		return
+	}
+
 	// Check for duplicate trip name
 	s.mu.RLock()
 	_, exists := s.nameToFile[req.Name]
@@ -180,6 +185,11 @@ func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Nights != nil {
+		if *req.Nights <= 0 {
+			s.mu.Unlock()
+			s.respondError(w, "Nights must be a positive number", http.StatusBadRequest)
+			return
+		}
 		trip.C.Nights = *req.Nights
 	}
 	if req.TemperatureMin != nil {

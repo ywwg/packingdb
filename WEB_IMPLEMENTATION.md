@@ -153,7 +153,7 @@ The web server was successfully built and tested:
 
 ## Compatibility
 
-- **Go Version**: Works with Go 1.16+
+- **Go Version**: Requires Go 1.22+ (toolchain go1.22.2)
 - **Browsers**: Modern browsers (Chrome, Firefox, Safari, Edge)
 - **Mobile**: iOS Safari, Chrome Android
 - **Desktop**: All major browsers at any screen size
