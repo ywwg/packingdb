@@ -119,7 +119,7 @@ Then visit `http://localhost:8080` in your browser.
 
 ## Storage
 
-Trips are stored in the `trips/` directory in YAML format (with CSV backup). The web interface uses the same file format as the CLI tool, so trips created in either interface can be used in both.
+Trips are stored in the `public/trips/` directory in YAML format (with CSV backup). The web interface uses the same file format as the CLI tool, so trips created in either interface can be used in both.
 
 ## Design Decisions
 
