@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -411,10 +412,34 @@ func (s *Server) weatherHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := weather.Lookup(location, startDate, endDate)
-	if err != nil {
-		s.respondError(w, fmt.Sprintf("Weather lookup failed: %v", err), http.StatusInternalServerError)
-		return
+	// If lat/lon are provided (from autocomplete selection), skip geocoding.
+	latStr := r.URL.Query().Get("lat")
+	lonStr := r.URL.Query().Get("lon")
+
+	var result *weather.Result
+	if latStr != "" && lonStr != "" {
+		lat, err := strconv.ParseFloat(latStr, 64)
+		if err != nil || lat < -90 || lat > 90 {
+			s.respondError(w, "Invalid lat parameter (must be between -90 and 90)", http.StatusBadRequest)
+			return
+		}
+		lon, err := strconv.ParseFloat(lonStr, 64)
+		if err != nil || lon < -180 || lon > 180 {
+			s.respondError(w, "Invalid lon parameter (must be between -180 and 180)", http.StatusBadRequest)
+			return
+		}
+		result, err = weather.LookupByCoords(lat, lon, location, startDate, endDate)
+		if err != nil {
+			s.respondError(w, fmt.Sprintf("Weather lookup failed: %v", err), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		var err error
+		result, err = weather.Lookup(location, startDate, endDate)
+		if err != nil {
+			s.respondError(w, fmt.Sprintf("Weather lookup failed: %v", err), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	s.respondJSON(w, result)

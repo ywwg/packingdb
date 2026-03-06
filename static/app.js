@@ -35,7 +35,9 @@ function packingApp() {
             manualEntry: false,
             locationSuggestions: [],
             showSuggestions: false,
-            locationDebounceTimer: null
+            locationDebounceTimer: null,
+            selectedLat: null,
+            selectedLon: null
         },
         editForm: {
             name: '',
@@ -149,6 +151,8 @@ function packingApp() {
             this.newTrip.weatherSource = null;
             this.newTrip.weatherLocation = null;
             this.newTrip.weatherError = null;
+            this.newTrip.selectedLat = null;
+            this.newTrip.selectedLon = null;
         },
 
         onLocationInput() {
@@ -177,6 +181,8 @@ function packingApp() {
 
         selectLocationSuggestion(suggestion) {
             this.newTrip.location = suggestion.display;
+            this.newTrip.selectedLat = suggestion.latitude;
+            this.newTrip.selectedLon = suggestion.longitude;
             this.newTrip.showSuggestions = false;
             this.newTrip.locationSuggestions = [];
         },
@@ -209,6 +215,10 @@ function packingApp() {
                     startDate: this.newTrip.startDate,
                     endDate: this.newTrip.endDate
                 });
+                if (this.newTrip.selectedLat !== null && this.newTrip.selectedLon !== null) {
+                    params.set('lat', this.newTrip.selectedLat);
+                    params.set('lon', this.newTrip.selectedLon);
+                }
                 const data = await this.apiCall(`/weather?${params}`);
                 this.newTrip.nights = data.nights;
                 this.newTrip.temperatureMin = data.temperatureMin;
@@ -245,7 +255,8 @@ function packingApp() {
                     weatherSource: null, weatherLocation: null,
                     weatherLookedUp: false, weatherLoading: false, weatherError: null,
                     manualEntry: false,
-                    locationSuggestions: [], showSuggestions: false, locationDebounceTimer: null
+                    locationSuggestions: [], showSuggestions: false, locationDebounceTimer: null,
+                    selectedLat: null, selectedLon: null
                 };
                 await this.loadTrips();
                 this.currentPage = 'main-menu';

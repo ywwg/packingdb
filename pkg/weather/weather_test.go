@@ -159,6 +159,46 @@ func TestLookup_Typical(t *testing.T) {
 	}
 }
 
+func TestLookupByCoords_Forecast(t *testing.T) {
+	// LookupByCoords doesn't need geocoding results — it skips geocoding.
+	server := setupMockServer(t, nil, []float64{30.0, 28.5, 32.0}, []float64{55.0, 60.0, 58.0})
+	defer server.Close()
+	defer restoreBaseURLs()
+
+	start := localDate(time.Now()).AddDate(0, 0, 1)
+	end := start.AddDate(0, 0, 3)
+
+	result, err := LookupByCoords(42.36, -73.59, "Chatham, New York, United States", start, end)
+	if err != nil {
+		t.Fatalf("LookupByCoords returned error: %v", err)
+	}
+	if result.Source != "forecast" {
+		t.Errorf("expected source 'forecast', got %q", result.Source)
+	}
+	if result.Location != "Chatham, New York, United States" {
+		t.Errorf("unexpected location: %q", result.Location)
+	}
+	if result.Nights != 3 {
+		t.Errorf("expected 3 nights, got %d", result.Nights)
+	}
+	if result.TemperatureMin != 29 {
+		t.Errorf("expected min temp 29, got %d", result.TemperatureMin)
+	}
+	if result.TemperatureMax != 60 {
+		t.Errorf("expected max temp 60, got %d", result.TemperatureMax)
+	}
+}
+
+func TestLookupByCoords_RejectsPastDates(t *testing.T) {
+	start := time.Date(2024, 7, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2024, 7, 5, 0, 0, 0, 0, time.UTC)
+
+	_, err := LookupByCoords(42.36, -73.59, "Chatham, New York, United States", start, end)
+	if err == nil {
+		t.Fatal("expected error for past dates, got nil")
+	}
+}
+
 func TestLookup_GeocodeFail(t *testing.T) {
 	// Empty geocoding results → error.
 	server := setupMockServer(t, nil, nil, nil)

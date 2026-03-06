@@ -119,7 +119,54 @@ func Lookup(location string, startDate, endDate time.Time) (*Result, error) {
 	}, nil
 }
 
-// admin1Abbreviations maps common two-letter abbreviations to full admin1
+// LookupByCoords fetches weather data for known coordinates, skipping
+// geocoding entirely. Used when the frontend already resolved the location
+// via autocomplete.
+func LookupByCoords(lat, lon float64, displayName string, startDate, endDate time.Time) (*Result, error) {
+	startDate = localDate(startDate)
+	endDate = localDate(endDate)
+
+	today := localDate(time.Now())
+	if startDate.Before(today) {
+		return nil, fmt.Errorf("start date must be today or in the future")
+	}
+
+	nights := int(endDate.Sub(startDate).Hours()/24 + 0.5)
+	if nights < 1 {
+		nights = 1
+	}
+
+	forecastLimit := today.AddDate(0, 0, 16)
+
+	var tempMin, tempMax float64
+	var source string
+	var err error
+
+	if !startDate.After(forecastLimit) && !endDate.After(forecastLimit) {
+		tempMin, tempMax, err = fetchForecast(lat, lon, startDate, endDate)
+		source = "forecast"
+	} else {
+		typicalStart := startDate.AddDate(-1, 0, 0)
+		typicalEnd := endDate.AddDate(-1, 0, 0)
+		tempMin, tempMax, err = fetchHistorical(lat, lon, typicalStart, typicalEnd)
+		source = "typical"
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("weather fetch failed: %w", err)
+	}
+
+	return &Result{
+		Location:       displayName,
+		Latitude:       lat,
+		Longitude:      lon,
+		Nights:         nights,
+		TemperatureMin: int(math.Round(tempMin)),
+		TemperatureMax: int(math.Round(tempMax)),
+		Source:         source,
+	}, nil
+}
+
 // (state/province) names for the US and Canada.
 var admin1Abbreviations = map[string]string{
 	// US States
@@ -252,10 +299,28 @@ func GeocodeSuggestions(query string) ([]GeocodeSuggestion, error) {
 }
 
 // geocode uses the Open-Meteo Geocoding API to resolve a location name to
-// coordinates.
+// coordinates. If location contains commas (e.g. "Chatham, New York, United
+// States"), only the part before the first comma is sent as the search name
+// and the rest is used to pick the best match.
 func geocode(location string) (lat, lon float64, name string, err error) {
-	u := fmt.Sprintf("%s/v1/search?name=%s&count=1&language=en&format=json",
-		geocodingBaseURL, url.QueryEscape(location))
+	searchName := location
+	var filterParts []string
+	if idx := strings.Index(location, ","); idx >= 0 {
+		searchName = strings.TrimSpace(location[:idx])
+		for _, part := range strings.Split(location[idx+1:], ",") {
+			if p := strings.TrimSpace(part); p != "" {
+				filterParts = append(filterParts, strings.ToLower(p))
+			}
+		}
+	}
+
+	count := 1
+	if len(filterParts) > 0 {
+		count = 20
+	}
+
+	u := fmt.Sprintf("%s/v1/search?name=%s&count=%d&language=en&format=json",
+		geocodingBaseURL, url.QueryEscape(searchName), count)
 
 	resp, err := httpClient.Get(u)
 	if err != nil {
@@ -276,7 +341,32 @@ func geocode(location string) (lat, lon float64, name string, err error) {
 		return 0, 0, "", fmt.Errorf("location %q not found", location)
 	}
 
+	// If the caller passed extra qualifiers (state, country), find the
+	// first result that matches all of them.
 	r := geo.Results[0]
+	if len(filterParts) > 0 {
+		found := false
+		for _, candidate := range geo.Results {
+			fields := strings.ToLower(candidate.Admin1 + " " + candidate.Country)
+			allMatch := true
+			for _, fp := range filterParts {
+				if !matchesAdmin1Filter(candidate.Admin1, candidate.Country, fp) &&
+					!strings.Contains(fields, fp) {
+					allMatch = false
+					break
+				}
+			}
+			if allMatch {
+				r = candidate
+				found = true
+				break
+			}
+		}
+		if !found {
+			return 0, 0, "", fmt.Errorf("location %q not found", location)
+		}
+	}
+
 	resolvedName := r.Name
 	if r.Admin1 != "" {
 		resolvedName += ", " + r.Admin1
