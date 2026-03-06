@@ -111,6 +111,12 @@ func (t *Trip) HasProperty(p Property) bool {
 	return t.C.hasProperty(p)
 }
 
+// GetItemByCode returns the item with the given code, or false if not found.
+func (t *Trip) GetItemByCode(code string) (*Item, bool) {
+	item, ok := t.codeToItem[code]
+	return item, ok
+}
+
 // makeList returns a map of category to slice of PackedItems for the given trip
 func (t *Trip) makeList() PackList {
 	packlist := make(PackList)

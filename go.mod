@@ -1,8 +1,9 @@
 module github.com/ywwg/packingdb
 
-go 1.21
+go 1.25.7
 
 require (
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/manifoldco/promptui v0.9.0
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.22.0
