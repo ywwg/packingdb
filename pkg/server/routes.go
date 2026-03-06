@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/ywwg/packingdb/pkg/logger"
 	"github.com/ywwg/packingdb/pkg/packinglib"
+	"github.com/ywwg/packingdb/pkg/weather"
 )
 
 // Handlers
@@ -371,6 +372,71 @@ func (s *Server) togglePropertyHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GET /api/weather?location=X&startDate=Y&endDate=Z - Look up weather for a location and date range
+func (s *Server) weatherHandler(w http.ResponseWriter, r *http.Request) {
+	location := r.URL.Query().Get("location")
+	startStr := r.URL.Query().Get("startDate")
+	endStr := r.URL.Query().Get("endDate")
+
+	if location == "" {
+		s.respondError(w, "location is required", http.StatusBadRequest)
+		return
+	}
+	if startStr == "" || endStr == "" {
+		s.respondError(w, "startDate and endDate are required (YYYY-MM-DD)", http.StatusBadRequest)
+		return
+	}
+
+	startDate, err := time.ParseInLocation("2006-01-02", startStr, time.Local)
+	if err != nil {
+		s.respondError(w, "Invalid startDate format, use YYYY-MM-DD", http.StatusBadRequest)
+		return
+	}
+	endDate, err := time.ParseInLocation("2006-01-02", endStr, time.Local)
+	if err != nil {
+		s.respondError(w, "Invalid endDate format, use YYYY-MM-DD", http.StatusBadRequest)
+		return
+	}
+
+	if endDate.Before(startDate) {
+		s.respondError(w, "endDate must be after startDate", http.StatusBadRequest)
+		return
+	}
+
+	today := time.Now()
+	y, m, d := today.In(time.Local).Date()
+	localToday := time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+	if startDate.Before(localToday) {
+		s.respondError(w, "startDate must be today or in the future", http.StatusBadRequest)
+		return
+	}
+
+	result, err := weather.Lookup(location, startDate, endDate)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Weather lookup failed: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	s.respondJSON(w, result)
+}
+
+// GET /api/geocode?q=X - Autocomplete location suggestions
+func (s *Server) geocodeHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		s.respondError(w, "q parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	suggestions, err := weather.GeocodeSuggestions(query)
+	if err != nil {
+		s.respondError(w, fmt.Sprintf("Geocoding failed: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	s.respondJSON(w, suggestions)
+}
+
 // Handler returns the HTTP handler for API routes
 func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
@@ -414,6 +480,8 @@ func (s *Server) Handler() http.Handler {
 	// Register routes
 	r.Get("/api/trips", s.listTripsHandler)
 	r.Post("/api/trips", s.createTripHandler)
+	r.Get("/api/weather", s.weatherHandler)
+	r.Get("/api/geocode", s.geocodeHandler)
 	r.Get("/api/properties", s.getPropertiesHandler)
 	r.Get("/api/trips/{name}", s.getTripHandler)
 	r.Put("/api/trips/{name}/update", s.updateTripHandler)
