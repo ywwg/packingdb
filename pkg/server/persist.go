@@ -35,23 +35,15 @@ func (s *Server) Shutdown() {
 // persistDirtyTrips saves all trips that have been modified
 func (s *Server) persistDirtyTrips() {
 	s.mu.Lock()
-	// Copy dirty trip names so we can release lock while saving
-	dirtyNames := make([]string, 0, len(s.dirtyTrips))
+	defer s.mu.Unlock()
+
+	if len(s.dirtyTrips) > 0 {
+		logger.Debug("Persisting dirty trips", "count", len(s.dirtyTrips))
+	}
+
 	for name := range s.dirtyTrips {
-		dirtyNames = append(dirtyNames, name)
-	}
-	s.mu.Unlock()
-
-	if len(dirtyNames) > 0 {
-		logger.Debug("Persisting dirty trips", "count", len(dirtyNames))
-	}
-
-	for _, name := range dirtyNames {
-		s.mu.RLock()
 		trip, ok := s.trips[name]
 		filename := s.nameToFile[name]
-		s.mu.RUnlock()
-
 		if !ok || filename == "" {
 			logger.Warn("Trip not found for persist", "trip", name)
 			continue
@@ -62,17 +54,8 @@ func (s *Server) persistDirtyTrips() {
 			continue
 		}
 
-		logger.Info("Persisted trip to disk", "trip", name, "file", filename)
-
-		s.mu.Lock()
 		delete(s.dirtyTrips, name)
-		s.mu.Unlock()
+		logger.Info("Persisted trip to disk", "trip", name, "file", filename)
 	}
 }
 
-// markDirty marks a trip as having unsaved changes
-func (s *Server) markDirty(name string) {
-	s.mu.Lock()
-	s.dirtyTrips[name] = true
-	s.mu.Unlock()
-}

@@ -97,6 +97,18 @@ func TestE2E(t *testing.T) {
 		testToggleItem(t, baseURL, tripKey)
 	})
 
+	t.Run("GetTripProperties", func(t *testing.T) {
+		testGetTripProperties(t, baseURL, tripKey)
+	})
+
+	t.Run("ToggleTripProperty", func(t *testing.T) {
+		testToggleTripProperty(t, baseURL, tripKey)
+	})
+
+	t.Run("RenameTrip", func(t *testing.T) {
+		tripKey = testRenameTrip(t, baseURL, tripKey)
+	})
+
 	t.Run("UpdateTrip", func(t *testing.T) {
 		testUpdateTrip(t, baseURL, tripKey)
 	})
@@ -403,4 +415,179 @@ func testUpdateTrip(t *testing.T, baseURL string, tripKey string) {
 	if tempMax := trip["temperatureMax"]; tempMax != float64(90) {
 		t.Errorf("Expected temperatureMax 90 after update, got %v", tempMax)
 	}
+}
+
+// testGetTripProperties retrieves properties for a specific trip
+func testGetTripProperties(t *testing.T, baseURL string, tripKey string) {
+	url := fmt.Sprintf("%s/api/trips/%s/properties", baseURL, tripKey)
+	resp, err := http.Get(url)
+	if err != nil {
+		t.Fatalf("Failed to GET trip properties: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("GET %s returned status %d, want %d. Body: %s", url, resp.StatusCode, http.StatusOK, body)
+	}
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		t.Fatalf("Failed to decode trip properties response: %v", err)
+	}
+
+	properties, ok := result["properties"].([]interface{})
+	if !ok {
+		t.Fatal("Expected properties array in response")
+	}
+	if len(properties) == 0 {
+		t.Error("Expected at least one property in trip properties list")
+	}
+
+	// Verify properties have expected fields and that at least one is active
+	// (trip was created with Hiking and Camping)
+	var activeCount int
+	for _, p := range properties {
+		prop, ok := p.(map[string]interface{})
+		if !ok {
+			t.Error("Expected property to be an object")
+			continue
+		}
+		if _, ok := prop["name"]; !ok {
+			t.Error("Expected property to have a name field")
+		}
+		if _, ok := prop["active"]; !ok {
+			t.Error("Expected property to have an active field")
+		}
+		if active, _ := prop["active"].(bool); active {
+			activeCount++
+		}
+	}
+	if activeCount == 0 {
+		t.Error("Expected at least one active property (trip was created with Hiking and Camping)")
+	}
+}
+
+// testToggleTripProperty toggles a property on the trip and verifies it changed
+func testToggleTripProperty(t *testing.T, baseURL string, tripKey string) {
+	// Get current properties to find an active one to toggle off
+	url := fmt.Sprintf("%s/api/trips/%s/properties", baseURL, tripKey)
+	resp, err := http.Get(url)
+	if err != nil {
+		t.Fatalf("Failed to GET trip properties: %v", err)
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		t.Fatalf("Failed to decode trip properties response: %v", err)
+	}
+
+	properties := result["properties"].([]interface{})
+
+	// Find an active property to toggle off
+	var targetProp string
+	for _, p := range properties {
+		prop := p.(map[string]interface{})
+		if active, _ := prop["active"].(bool); active {
+			targetProp = prop["name"].(string)
+			break
+		}
+	}
+	if targetProp == "" {
+		t.Skip("No active properties available to toggle")
+	}
+
+	// Toggle it off
+	toggleURL := fmt.Sprintf("%s/api/trips/%s/properties/%s/toggle", baseURL, tripKey, targetProp)
+	toggleResp, err := http.Post(toggleURL, "application/json", nil)
+	if err != nil {
+		t.Fatalf("Failed to toggle property: %v", err)
+	}
+	defer toggleResp.Body.Close()
+
+	if toggleResp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(toggleResp.Body)
+		t.Fatalf("Toggle property returned status %d, want %d. Body: %s", toggleResp.StatusCode, http.StatusOK, body)
+	}
+
+	// Verify it is now inactive
+	resp2, err := http.Get(url)
+	if err != nil {
+		t.Fatalf("Failed to GET trip properties after toggle: %v", err)
+	}
+	defer resp2.Body.Close()
+
+	var result2 map[string]interface{}
+	if err := json.NewDecoder(resp2.Body).Decode(&result2); err != nil {
+		t.Fatalf("Failed to decode trip properties response after toggle: %v", err)
+	}
+
+	properties2 := result2["properties"].([]interface{})
+	for _, p := range properties2 {
+		prop := p.(map[string]interface{})
+		if prop["name"].(string) == targetProp {
+			if active, _ := prop["active"].(bool); active {
+				t.Errorf("Property %q should be inactive after toggle, but is still active", targetProp)
+			}
+			return
+		}
+	}
+	t.Errorf("Property %q not found in properties list after toggle", targetProp)
+}
+
+// testRenameTrip renames a trip and returns the new trip key
+func testRenameTrip(t *testing.T, baseURL string, tripKey string) string {
+	newName := "renamed-trip"
+	payload := strings.NewReader(fmt.Sprintf(`{"name": %q}`, newName))
+
+	req, err := http.NewRequest("PUT", baseURL+"/api/trips/"+tripKey+"/update", payload)
+	if err != nil {
+		t.Fatalf("Failed to create rename request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Failed to rename trip: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Rename trip returned status %d, want %d. Body: %s", resp.StatusCode, http.StatusOK, body)
+	}
+
+	// Old name should no longer be accessible
+	oldResp, err := http.Get(baseURL + "/api/trips/" + tripKey)
+	if err != nil {
+		t.Fatalf("Failed to GET old trip name: %v", err)
+	}
+	defer oldResp.Body.Close()
+	if oldResp.StatusCode != http.StatusNotFound {
+		t.Errorf("Old trip name %q should return 404 after rename, got %d", tripKey, oldResp.StatusCode)
+	}
+
+	// New name should be accessible
+	newResp, err := http.Get(baseURL + "/api/trips/" + newName)
+	if err != nil {
+		t.Fatalf("Failed to GET renamed trip: %v", err)
+	}
+	defer newResp.Body.Close()
+
+	if newResp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(newResp.Body)
+		t.Fatalf("GET renamed trip returned status %d, want %d. Body: %s", newResp.StatusCode, http.StatusOK, body)
+	}
+
+	var trip map[string]interface{}
+	if err := json.NewDecoder(newResp.Body).Decode(&trip); err != nil {
+		t.Fatalf("Failed to decode renamed trip response: %v", err)
+	}
+
+	if name := trip["name"]; name != newName {
+		t.Errorf("Expected trip name %q after rename, got %v", newName, name)
+	}
+
+	return newName
 }

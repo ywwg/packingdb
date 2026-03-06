@@ -104,16 +104,17 @@ Then visit `http://localhost:8080` in your browser.
 ## Architecture
 
 ### Backend
-- Standard Go HTTP server with no external dependencies
+- Standard Go HTTP server using `github.com/go-chi/chi/v5` for routing
 - In-memory trip cache for performance
 - File-based persistence (YAML/CSV)
-- CORS enabled for development
+- CORS configured to allow all origins (`*`) — suitable for single-user local use only; restrict origins before exposing to a network
 - JSON request/response format
 
 ### Frontend
-- Vanilla JavaScript (no frameworks)
+- Alpine.js 3.x (via CDN) — lightweight reactive framework, no build step required
+- Tailwind CSS 3.x (via CDN) — utility-first CSS
 - Single-page application
-- Mobile-first CSS with flexbox
+- Mobile-first responsive design
 - Progressive enhancement approach
 - Works offline once loaded
 

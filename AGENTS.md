@@ -151,7 +151,7 @@ See [WEB_IMPLEMENTATION.md](WEB_IMPLEMENTATION.md#rest-api-endpoints) for comple
 - Toggling a property may automatically enable other properties (e.g., enabling "Camping" might auto-enable "Outdoors")
 - After toggling properties, always fetch the full property list to see cascading changes
 - Items are organized by category in the response
-- Packed status is persisted to the trip file immediately
+- Toggling an item's packed status marks the trip as dirty; dirty trips are persisted to their trip files asynchronously by a background task that runs every `persistInterval` (default 30 seconds) and on graceful shutdown
 - Trip name can be changed independently of the filename (stored inside the file)
 - The `{name}` URL parameter is the **trip name** (from inside the file), not the filename
 - On startup, the server scans all trip files to build a name→filename mapping (`ScanTrips()`)

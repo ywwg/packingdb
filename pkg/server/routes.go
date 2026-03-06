@@ -56,11 +56,14 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check for duplicate trip name
-	s.mu.RLock()
-	_, exists := s.nameToFile[req.Name]
-	s.mu.RUnlock()
-	if exists {
+	// Hold the lock for the remainder of the handler so that the duplicate
+	// check, reservation, I/O, and final mapping update are all atomic with
+	// respect to other concurrent requests and the background persistence
+	// goroutine.
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, exists := s.nameToFile[req.Name]; exists {
 		s.respondError(w, fmt.Sprintf("A trip named %q already exists", req.Name), http.StatusConflict)
 		return
 	}
@@ -90,11 +93,8 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Cache under the trip name and update the name-to-file mapping
-	s.mu.Lock()
 	s.trips[req.Name] = trip
 	s.nameToFile[req.Name] = filename
-	s.mu.Unlock()
 	logger.Info("Created new trip", "name", req.Name, "file", filename)
 
 	s.respondJSON(w, map[string]interface{}{
@@ -272,13 +272,20 @@ func (s *Server) toggleItemHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := trip.ToggleItemPacked(code); err != nil {
-		s.respondError(w, fmt.Sprintf("Failed to toggle item: %v", err), http.StatusBadRequest)
+	// Hold the lock while mutating the trip so that the background persistence
+	// goroutine (which also holds s.mu during SaveToFile) cannot race on the
+	// trip's internal data structures.
+	s.mu.Lock()
+	toggleErr := trip.ToggleItemPacked(code)
+	if toggleErr == nil {
+		s.dirtyTrips[name] = true
+	}
+	s.mu.Unlock()
+
+	if toggleErr != nil {
+		s.respondError(w, fmt.Sprintf("Failed to toggle item: %v", toggleErr), http.StatusBadRequest)
 		return
 	}
-
-	// Mark as dirty instead of saving immediately
-	s.markDirty(name)
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,
@@ -340,20 +347,24 @@ func (s *Server) togglePropertyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Hold the lock while mutating the trip to prevent races with the background
+	// persistence goroutine (which holds s.mu during SaveToFile).
+	s.mu.Lock()
+	var mutateErr error
 	if trip.HasProperty(packinglib.Property(property)) {
-		if err := trip.RemoveProperty(property); err != nil {
-			s.respondError(w, fmt.Sprintf("Failed to remove property: %v", err), http.StatusBadRequest)
-			return
-		}
+		mutateErr = trip.RemoveProperty(property)
 	} else {
-		if err := trip.AddProperty(property); err != nil {
-			s.respondError(w, fmt.Sprintf("Failed to add property: %v", err), http.StatusBadRequest)
-			return
-		}
+		mutateErr = trip.AddProperty(property)
 	}
+	if mutateErr == nil {
+		s.dirtyTrips[name] = true
+	}
+	s.mu.Unlock()
 
-	// Mark as dirty instead of saving immediately
-	s.markDirty(name)
+	if mutateErr != nil {
+		s.respondError(w, fmt.Sprintf("Failed to toggle property: %v", mutateErr), http.StatusBadRequest)
+		return
+	}
 
 	s.respondJSON(w, map[string]interface{}{
 		"success": true,
