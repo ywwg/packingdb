@@ -11,7 +11,7 @@ packingdb is web scale.
 The easiest way to use packingdb is through the mobile-friendly web interface:
 
 ```bash
-./run-web.sh
+go run ./cmd/packingweb
 ```
 
 Then open `http://localhost:8080` in your browser or phone. The web interface provides:

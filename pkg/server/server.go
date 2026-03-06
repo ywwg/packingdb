@@ -218,15 +218,19 @@ func (s *Server) respondJSON(w http.ResponseWriter, data interface{}) {
 }
 
 // sanitizeFilename removes all characters that are not alphanumeric, hyphens, or
-// underscores, collapses runs of separators, and trims leading/trailing
-// separators. It also strips any path components to prevent traversal attacks.
+// underscores, collapses runs of unsafe characters and repeated hyphens into a
+// single hyphen, and trims leading/trailing separators. It also strips any path
+// components to prevent traversal attacks.
 var reUnsafe = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
+var reRepeatDash = regexp.MustCompile(`-{2,}`)
 
 func sanitizeFilename(name string) string {
 	// Strip any path components — prevents directory traversal
 	name = filepath.Base(name)
 	// Replace all unsafe characters with hyphens
 	name = reUnsafe.ReplaceAllString(name, "-")
+	// Collapse repeated hyphens into a single hyphen
+	name = reRepeatDash.ReplaceAllString(name, "-")
 	// Trim leading/trailing hyphens
 	name = strings.Trim(name, "-")
 	// Truncate to a reasonable length so the final filename stays manageable
@@ -239,7 +243,7 @@ func sanitizeFilename(name string) string {
 	return name
 }
 
-// uniqueTripFilename returns a filename (without directory) that doesn't
+// uniqueTripFilename returns a full file path under s.TripsDir that doesn't
 // already exist on disk. It appends a random 6-byte (12-hex-char) suffix to
 // ensure uniqueness.
 func (s *Server) uniqueTripFilename(base string) (string, error) {
