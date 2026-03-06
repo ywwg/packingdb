@@ -37,7 +37,7 @@ function packingApp() {
             const search = this.propertySearch.toLowerCase();
             return this.properties.filter(p =>
                 p.name.toLowerCase().includes(search) ||
-                p.description.toLowerCase().includes(search)
+                (p.description ?? '').toLowerCase().includes(search)
             );
         },
 

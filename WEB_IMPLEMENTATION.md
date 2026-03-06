@@ -38,7 +38,7 @@ I've created a complete mobile-friendly web frontend for PackingDB with a REST A
 
 ### Documentation & Scripts
 - **static/README.md** - Web interface documentation
-- **run-web.sh** - Quick start script
+
 - **README.md** - Updated with web interface section
 
 ### Library Enhancement
@@ -154,7 +154,7 @@ The web server was successfully built and tested:
 
 ## Compatibility
 
-- **Go Version**: Requires Go 1.22+ (toolchain go1.22.2)
+- **Go Version**: Requires Go 1.25.7+
 - **Browsers**: Modern browsers (Chrome, Firefox, Safari, Edge)
 - **Mobile**: iOS Safari, Chrome Android
 - **Desktop**: All major browsers at any screen size
