@@ -130,7 +130,7 @@ func (s *Server) getTripHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// PUT /api/trips/{name} - Update trip properties
+// PUT /api/trips/{name}/update - Update trip settings (name, nights, temperatures)
 func (s *Server) updateTripHandler(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 

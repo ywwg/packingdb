@@ -61,8 +61,28 @@ func TestE2E(t *testing.T) {
 	if err := serverCmd.Start(); err != nil {
 		t.Fatalf("Failed to start server: %v", err)
 	}
-	defer serverCmd.Process.Kill()
+	defer func() {
+		if serverCmd.Process == nil {
+			return
+		}
+		// Try to shut down the server gracefully to allow cleanup of background goroutines.
+		_ = serverCmd.Process.Signal(os.Interrupt)
 
+		done := make(chan struct{})
+		go func() {
+			// Wait for the process to exit; ignore the error here since we're in cleanup.
+			_ = serverCmd.Wait()
+			close(done)
+		}()
+
+		select {
+		case <-done:
+			// Graceful shutdown completed.
+		case <-time.After(5 * time.Second):
+			// Fallback to forceful kill if the process does not exit in time.
+			_ = serverCmd.Process.Kill()
+		}
+	}()
 	// Wait for server to be ready
 	baseURL := fmt.Sprintf("http://localhost:%d", port)
 	if !waitForServer(baseURL, 5*time.Second) {
@@ -101,19 +121,130 @@ func TestE2E(t *testing.T) {
 		testGetTripProperties(t, baseURL, tripKey)
 	})
 
-	t.Run("ToggleTripProperty", func(t *testing.T) {
-		testToggleTripProperty(t, baseURL, tripKey)
+	t.Run("GetAllProperties", func(t *testing.T) {
+		testGetAllProperties(t, baseURL)
 	})
 
-	t.Run("RenameTrip", func(t *testing.T) {
-		tripKey = testRenameTrip(t, baseURL, tripKey)
+	t.Run("GetTripItems", func(t *testing.T) {
+		testGetTripItems(t, baseURL, tripKey)
+	})
+
+	t.Run("GetTripProperties", func(t *testing.T) {
+		testGetTripProperties(t, baseURL, tripKey)
+	})
+
+	t.Run("ToggleItem", func(t *testing.T) {
+		testToggleItem(t, baseURL, tripKey)
+	})
+
+	t.Run("ToggleTripProperty", func(t *testing.T) {
+		testToggleTripProperty(t, baseURL, tripKey)
 	})
 
 	t.Run("UpdateTrip", func(t *testing.T) {
 		testUpdateTrip(t, baseURL, tripKey)
 	})
+
+	t.Run("RenameTrip", func(t *testing.T) {
+		testRenameTrip(t, baseURL, tripKey)
+	})
 }
 
+func testGetAllProperties(t *testing.T, baseURL string) {
+	resp, err := http.Get(baseURL + "/api/properties")
+	if err != nil {
+		t.Fatalf("failed to GET all properties: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("GET /api/properties returned status %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	var body interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil && err != io.EOF {
+		t.Fatalf("failed to decode /api/properties response: %v", err)
+	}
+}
+
+func testGetTripProperties(t *testing.T, baseURL, tripKey string) {
+	url := fmt.Sprintf("%s/api/trips/%s/properties", baseURL, tripKey)
+	resp, err := http.Get(url)
+	if err != nil {
+		t.Fatalf("failed to GET trip properties: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("GET %%s returned status %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	var body interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil && err != io.EOF {
+		t.Fatalf("failed to decode trip properties response: %v", err)
+	}
+}
+
+func testToggleTripProperty(t *testing.T, baseURL, tripKey string) {
+	url := fmt.Sprintf("%s/api/trips/%s/properties/toggle", baseURL, tripKey)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	if err != nil {
+		t.Fatalf("failed to create toggle trip property request: %v", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to POST trip property toggle: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+		t.Fatalf("POST %%s returned status %d, want %d or %d", resp.StatusCode, http.StatusOK, http.StatusNoContent)
+	}
+}
+
+func testRenameTrip(t *testing.T, baseURL, tripKey string) {
+	newName := "renamed-trip"
+	url := fmt.Sprintf("%s/api/trips/%s/update", baseURL, tripKey)
+	body := fmt.Sprintf(`{"name":%q}`, newName)
+
+	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(body))
+	if err != nil {
+		t.Fatalf("failed to create rename trip request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to PUT trip rename: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		t.Fatalf("PUT %%s returned status %d, want 2xx", resp.StatusCode)
+	}
+
+	// Verify that the trip's name was updated by fetching it again.
+	getURL := fmt.Sprintf("%s/api/trips/%s", baseURL, tripKey)
+	getResp, err := http.Get(getURL)
+	if err != nil {
+		t.Fatalf("failed to GET trip after rename: %v", err)
+	}
+	defer getResp.Body.Close()
+
+	if getResp.StatusCode != http.StatusOK {
+		t.Fatalf("GET %%s after rename returned status %d, want %d", getResp.StatusCode, http.StatusOK)
+	}
+
+	var trip map[string]interface{}
+	if err := json.NewDecoder(getResp.Body).Decode(&trip); err != nil {
+		t.Fatalf("failed to decode trip after rename: %v", err)
+	}
+
+	if name, ok := trip["name"].(string); !ok || name != newName {
+		t.Fatalf("trip name after rename = %v, want %q", trip["name"], newName)
+	}
+}
 // getFreePort finds an available port on the system
 func getFreePort() (int, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
