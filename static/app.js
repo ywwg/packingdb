@@ -20,9 +20,24 @@ function packingApp() {
         },
         newTrip: {
             name: '',
+            location: '',
+            startDate: '',
+            endDate: '',
+            // Populated by weather lookup or manual entry
             nights: 2,
             temperatureMin: 60,
-            temperatureMax: 80
+            temperatureMax: 80,
+            weatherSource: null,
+            weatherLocation: null,
+            weatherLookedUp: false,
+            weatherLoading: false,
+            weatherError: null,
+            manualEntry: false,
+            locationSuggestions: [],
+            showSuggestions: false,
+            locationDebounceTimer: null,
+            selectedLat: null,
+            selectedLon: null
         },
         editForm: {
             name: '',
@@ -51,6 +66,14 @@ function packingApp() {
             return this.categories.reduce((total, cat) =>
                 total + cat.items.length, 0
             );
+        },
+
+        get todayStr() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
         },
 
         // Lifecycle
@@ -123,7 +146,99 @@ function packingApp() {
             }
         },
 
+        clearWeatherState() {
+            this.newTrip.weatherLookedUp = false;
+            this.newTrip.weatherSource = null;
+            this.newTrip.weatherLocation = null;
+            this.newTrip.weatherError = null;
+            this.newTrip.selectedLat = null;
+            this.newTrip.selectedLon = null;
+        },
+
+        onLocationInput() {
+            this.clearWeatherState();
+            const query = this.newTrip.location.trim();
+            if (this.newTrip.locationDebounceTimer) {
+                clearTimeout(this.newTrip.locationDebounceTimer);
+            }
+            if (query.length < 2) {
+                this.newTrip.locationSuggestions = [];
+                this.newTrip.showSuggestions = false;
+                return;
+            }
+            this.newTrip.locationDebounceTimer = setTimeout(async () => {
+                try {
+                    const resp = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
+                    if (resp.ok) {
+                        this.newTrip.locationSuggestions = await resp.json();
+                        this.newTrip.showSuggestions = this.newTrip.locationSuggestions.length > 0;
+                    }
+                } catch (e) {
+                    // Silently ignore autocomplete errors
+                }
+            }, 300);
+        },
+
+        selectLocationSuggestion(suggestion) {
+            this.newTrip.location = suggestion.display;
+            this.newTrip.selectedLat = suggestion.latitude;
+            this.newTrip.selectedLon = suggestion.longitude;
+            this.newTrip.showSuggestions = false;
+            this.newTrip.locationSuggestions = [];
+        },
+
+        hideLocationSuggestions() {
+            // Small delay so click on suggestion registers before hiding
+            setTimeout(() => {
+                this.newTrip.showSuggestions = false;
+            }, 200);
+        },
+
+        async lookupWeather() {
+            if (!this.newTrip.location || !this.newTrip.startDate || !this.newTrip.endDate) {
+                this.showToast('Please enter location and dates first', 'error');
+                return;
+            }
+            if (this.newTrip.startDate < this.todayStr) {
+                this.showToast('Start date must be today or later', 'error');
+                return;
+            }
+            if (this.newTrip.endDate < this.todayStr) {
+                this.showToast('End date must be today or later', 'error');
+                return;
+            }
+            try {
+                this.newTrip.weatherLoading = true;
+                this.newTrip.weatherError = null;
+                const params = new URLSearchParams({
+                    location: this.newTrip.location,
+                    startDate: this.newTrip.startDate,
+                    endDate: this.newTrip.endDate
+                });
+                if (this.newTrip.selectedLat !== null && this.newTrip.selectedLon !== null) {
+                    params.set('lat', this.newTrip.selectedLat);
+                    params.set('lon', this.newTrip.selectedLon);
+                }
+                const data = await this.apiCall(`/weather?${params}`);
+                this.newTrip.nights = data.nights;
+                this.newTrip.temperatureMin = data.temperatureMin;
+                this.newTrip.temperatureMax = data.temperatureMax;
+                this.newTrip.weatherSource = data.source;
+                this.newTrip.weatherLocation = data.location;
+                this.newTrip.weatherLookedUp = true;
+            } catch (error) {
+                this.newTrip.weatherError = error.message;
+                this.showToast('Weather lookup failed: ' + error.message, 'error');
+            } finally {
+                this.newTrip.weatherLoading = false;
+            }
+        },
+
         async createTrip() {
+            if (!this.newTrip.manualEntry && !this.newTrip.weatherLookedUp) {
+                this.showToast('Please look up weather or switch to manual entry', 'error');
+                return;
+            }
             try {
                 this.loading = true;
                 await this.apiCall('/trips', 'POST', {
@@ -134,7 +249,15 @@ function packingApp() {
                     properties: []
                 });
                 this.showToast('Trip created successfully!');
-                this.newTrip = { name: '', nights: 2, temperatureMin: 60, temperatureMax: 80 };
+                this.newTrip = {
+                    name: '', location: '', startDate: '', endDate: '',
+                    nights: 2, temperatureMin: 60, temperatureMax: 80,
+                    weatherSource: null, weatherLocation: null,
+                    weatherLookedUp: false, weatherLoading: false, weatherError: null,
+                    manualEntry: false,
+                    locationSuggestions: [], showSuggestions: false, locationDebounceTimer: null,
+                    selectedLat: null, selectedLon: null
+                };
                 await this.loadTrips();
                 this.currentPage = 'main-menu';
             } catch (error) {
