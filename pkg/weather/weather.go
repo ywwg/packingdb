@@ -72,6 +72,9 @@ func Lookup(location string, startDate, endDate time.Time) (*Result, error) {
 	if startDate.Before(today) {
 		return nil, fmt.Errorf("start date must be today or in the future")
 	}
+	if endDate.Before(startDate) {
+		return nil, fmt.Errorf("end date cannot be before start date")
+	}
 
 	// Step 1: Geocode the location
 	lat, lon, resolvedName, err := geocode(location)
@@ -129,6 +132,9 @@ func LookupByCoords(lat, lon float64, displayName string, startDate, endDate tim
 	today := localDate(time.Now())
 	if startDate.Before(today) {
 		return nil, fmt.Errorf("start date must be today or in the future")
+	}
+	if endDate.Before(startDate) {
+		return nil, fmt.Errorf("end date cannot be before start date")
 	}
 
 	nights := int(endDate.Sub(startDate).Hours()/24 + 0.5)

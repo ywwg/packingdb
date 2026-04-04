@@ -27,8 +27,9 @@ type mockDailyWeather struct {
 }
 
 // setupMockServer creates an httptest.Server that handles geocoding, forecast,
-// and archive endpoints. It returns the server and a cleanup function that
-// restores the original base URLs.
+// and archive endpoints. It returns the server and overrides the package-level
+// base URLs to point to it. Callers are responsible for restoring the original
+// base URLs after the test completes.
 func setupMockServer(t *testing.T, geocodeResults []mockGeocodingResult, dailyMin, dailyMax []float64) *httptest.Server {
 	t.Helper()
 

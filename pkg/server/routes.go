@@ -400,7 +400,7 @@ func (s *Server) weatherHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if endDate.Before(startDate) {
-		s.respondError(w, "endDate must be after startDate", http.StatusBadRequest)
+		s.respondError(w, "endDate must be on or after startDate", http.StatusBadRequest)
 		return
 	}
 
