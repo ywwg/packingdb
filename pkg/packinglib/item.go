@@ -158,6 +158,29 @@ func (i *Item) Prerequisites() PropertySet {
 	return i.prerequisites
 }
 
+// Clone returns a deep copy of the item. The prerequisites map and mutators
+// slice are allocated fresh so the clone can be mutated without affecting
+// the original. Mutator values are shared (they are immutable after
+// construction) but the backing array is new. Count and packed are copied
+// as-is; callers needing a pristine state should construct a new trip.
+func (i *Item) Clone() *Item {
+	clone := *i // value-typed fields: name, units, count, packed
+
+	if i.prerequisites != nil {
+		clone.prerequisites = make(PropertySet, len(i.prerequisites))
+		for k, v := range i.prerequisites {
+			clone.prerequisites[k] = v
+		}
+	}
+
+	if i.mutators != nil {
+		clone.mutators = make([]packMutator, len(i.mutators))
+		copy(clone.mutators, i.mutators)
+	}
+
+	return &clone
+}
+
 type packMutator interface {
 	// Name returns the human-readable name of this mutator.
 	Name() string

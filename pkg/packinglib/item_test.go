@@ -336,3 +336,71 @@ func TestItemMutatorsPreSorted(t *testing.T) {
 		require.Equal(t, []int{2, 1, 0}, priorities, "item %s mutators must be priority-descending", it.Name())
 	}
 }
+
+func TestItemClone(t *testing.T) {
+	src := &Item{
+		name:          "compass",
+		units:         "",
+		count:         3,
+		packed:        false,
+		prerequisites: PropertySet{"outdoors": true, "indoor": false},
+		mutators: []packMutator{
+			&temperatureMutator{TemperatureMin: 30, TemperatureMax: 80},
+			&consumableMutator{DailyRate: 1.5},
+		},
+	}
+	clone := src.Clone()
+
+	require.NotSame(t, src, clone)
+	require.Equal(t, src.Name(), clone.Name())
+	require.Equal(t, src.Count(), clone.Count())
+	require.Equal(t, src.Packed(), clone.Packed())
+	require.Equal(t, src.prerequisites, clone.prerequisites)
+	require.Equal(t, len(src.mutators), len(clone.mutators))
+}
+
+func TestItemCloneIndependentPrerequisites(t *testing.T) {
+	src := &Item{
+		name:          "compass",
+		prerequisites: PropertySet{"outdoors": true},
+	}
+	clone := src.Clone()
+
+	clone.prerequisites["new-key"] = true
+	_, exists := src.prerequisites["new-key"]
+	require.False(t, exists, "mutation on clone must not affect source prerequisites")
+}
+
+func TestItemCloneMutatorsSlice(t *testing.T) {
+	src := &Item{
+		name: "soap",
+		mutators: []packMutator{
+			&consumableMutator{DailyRate: 1.0},
+		},
+	}
+	clone := src.Clone()
+
+	// Distinct backing arrays: appending to the clone must not extend the source.
+	clone.mutators = append(clone.mutators, &maxCountMutator{Max: 5})
+	require.Equal(t, 1, len(src.mutators), "append on clone must not extend source mutators")
+	require.Equal(t, 2, len(clone.mutators))
+}
+
+func TestItemClonePreservesPackedAndCount(t *testing.T) {
+	src := &Item{
+		name:   "notebook",
+		count:  4,
+		packed: true,
+	}
+	clone := src.Clone()
+	require.True(t, clone.Packed())
+	require.Equal(t, float64(4), clone.Count())
+}
+
+func TestItemCloneNilFields(t *testing.T) {
+	src := &Item{name: "minimal"}
+	require.NotPanics(t, func() {
+		clone := src.Clone()
+		require.Equal(t, "minimal", clone.Name())
+	})
+}
