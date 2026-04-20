@@ -81,7 +81,7 @@ func (r *StructRegistry) GetDescription(p Property) string {
 // Also registers a property with the context name.
 func (r *StructRegistry) RegisterContext(c Context) {
 	if _, ok := r.contexts[c.Name]; ok {
-		return // already registered, no-op per D-01
+		return
 	}
 	r.contexts[c.Name] = c
 	r.RegisterProperty(Property(c.Name), "")
