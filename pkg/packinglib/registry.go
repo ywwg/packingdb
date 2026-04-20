@@ -147,6 +147,12 @@ func (r *StructRegistry) RegisterItems(category Category, items []*Item) {
 				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
 			}
 		}
+		// Pre-sort mutators by Priority() descending, once at registration time.
+		// After this point mutator order is invariant. AdjustCount relies on this
+		// and must not re-sort (see ISOL-07 / D-05).
+		sort.Slice(i.mutators, func(x, y int) bool {
+			return i.mutators[y].Priority() < i.mutators[x].Priority()
+		})
 	}
 	r.allItems[category] = items
 }
