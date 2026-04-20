@@ -43,11 +43,40 @@ func TestTwoRegistriesCoexist(t *testing.T) {
 	require.NotNil(t, r1)
 	require.NotNil(t, r2)
 
-	// Both registries have the same item categories, independently registered
-	require.Equal(t, len(r1.AllItems()), len(r2.AllItems()))
+	// Both registries have the same set of categories
+	cats1 := make([]Category, 0, len(r1.AllItems()))
+	for c := range r1.AllItems() {
+		cats1 = append(cats1, c)
+	}
+	cats2 := make([]Category, 0, len(r2.AllItems()))
+	for c := range r2.AllItems() {
+		cats2 = append(cats2, c)
+	}
+	require.ElementsMatch(t, cats1, cats2)
 
-	// Both registries have the same properties
-	require.Equal(t, len(r1.AllProperties()), len(r2.AllProperties()))
+	// Both registries have the same set of items (by name) in each category
+	for _, cat := range cats1 {
+		names1 := make([]string, 0, len(r1.AllItems()[cat]))
+		for _, i := range r1.AllItems()[cat] {
+			names1 = append(names1, i.Name())
+		}
+		names2 := make([]string, 0, len(r2.AllItems()[cat]))
+		for _, i := range r2.AllItems()[cat] {
+			names2 = append(names2, i.Name())
+		}
+		require.ElementsMatch(t, names1, names2, "items in category %s", cat)
+	}
+
+	// Both registries have the same set of properties (by key)
+	props1 := make([]Property, 0, len(r1.AllProperties()))
+	for p := range r1.AllProperties() {
+		props1 = append(props1, p)
+	}
+	props2 := make([]Property, 0, len(r2.AllProperties()))
+	for p := range r2.AllProperties() {
+		props2 = append(props2, p)
+	}
+	require.ElementsMatch(t, props1, props2)
 
 	// Verify each registry has the expected context
 	c1, err := r1.GetContext("beach-trip")
@@ -101,5 +130,17 @@ func TestRegistryCountTwo(t *testing.T) {
 		NewItem("sim-socks", []string{"Flight"}, []string{"camping"}),
 	})
 
-	require.Equal(t, len(r1.AllItems()), len(r2.AllItems()))
+	names1 := make([]string, 0)
+	for _, items := range r1.AllItems() {
+		for _, i := range items {
+			names1 = append(names1, i.Name())
+		}
+	}
+	names2 := make([]string, 0)
+	for _, items := range r2.AllItems() {
+		for _, i := range items {
+			names2 = append(names2, i.Name())
+		}
+	}
+	require.ElementsMatch(t, names1, names2)
 }
