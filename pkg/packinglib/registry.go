@@ -28,6 +28,12 @@ type Registry interface {
 	GetContext(name string) (*Context, error)
 	GetConcreteContext(name string, nights, tmin, tmax int) (*Context, error)
 	HasProperty(p Property) bool
+
+	// Clone returns a deep copy of the registry. Items are cloned via
+	// Item.Clone so each registry owns independent item state. Trip
+	// construction uses this so each trip's packing state is isolated
+	// from other trips and from the master registry.
+	Clone() Registry
 }
 
 // StructRegistry is a simple in-memory impl of a ContextRegistry
@@ -173,4 +179,36 @@ func (r *StructRegistry) ListProperties() []Property {
 func (r *StructRegistry) HasProperty(p Property) bool {
 	_, ok := r.allProperties[p]
 	return ok
+}
+
+// Clone returns a deep copy of the registry. Map contents are copied element
+// by element; item slices are rebuilt with each *Item deep-copied via
+// Item.Clone(). Value-typed Context entries in contexts are copied by map
+// range; callers that need the Context's registry field rebound should do so
+// after retrieving the cloned Context (Context.clone handles this for trip
+// construction).
+func (r *StructRegistry) Clone() Registry {
+	c := &StructRegistry{
+		contexts:      make(map[string]Context, len(r.contexts)),
+		allProperties: make(map[Property]string, len(r.allProperties)),
+		allItems:      make(PackList, len(r.allItems)),
+		dupeChecker:   make(map[string]bool, len(r.dupeChecker)),
+	}
+	for k, v := range r.contexts {
+		c.contexts[k] = v
+	}
+	for k, v := range r.allProperties {
+		c.allProperties[k] = v
+	}
+	for k, v := range r.dupeChecker {
+		c.dupeChecker[k] = v
+	}
+	for category, items := range r.allItems {
+		cloned := make([]*Item, len(items))
+		for i, item := range items {
+			cloned[i] = item.Clone()
+		}
+		c.allItems[category] = cloned
+	}
+	return c
 }
