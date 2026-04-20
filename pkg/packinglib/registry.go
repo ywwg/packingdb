@@ -29,6 +29,7 @@ type StructRegistry struct {
 	contexts      map[string]Context
 	allProperties map[Property]string
 	allItems      PackList
+	dupeChecker   map[string]bool
 }
 
 func NewStructRegistry() Registry {
@@ -36,6 +37,7 @@ func NewStructRegistry() Registry {
 		contexts:      make(map[string]Context),
 		allProperties: make(map[Property]string),
 		allItems:      make(PackList),
+		dupeChecker:   make(map[string]bool),
 	}
 	return r
 }
@@ -79,7 +81,7 @@ func (r *StructRegistry) GetDescription(p Property) string {
 // Also registers a property with the context name.
 func (r *StructRegistry) RegisterContext(c Context) {
 	if _, ok := r.contexts[c.Name]; ok {
-		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
+		return // already registered, no-op per D-01
 	}
 	r.contexts[c.Name] = c
 	r.RegisterProperty(Property(c.Name), "")
@@ -89,6 +91,12 @@ func (r *StructRegistry) RegisterContext(c Context) {
 // desc should be a user-visible description of the property.
 // Does not verify that all of the properties are in the allProperties map.
 func (r *StructRegistry) RegisterProperty(prop Property, desc string) {
+	if _, ok := r.allProperties[prop]; ok {
+		if desc != "" {
+			r.allProperties[prop] = desc
+		}
+		return
+	}
 	r.allProperties[prop] = desc
 }
 
@@ -122,10 +130,10 @@ func (r *StructRegistry) GetConcreteContext(name string, nights, tmin, tmax int)
 // cause a panic.
 func (r *StructRegistry) RegisterItems(category Category, items []*Item) {
 	for _, i := range items {
-		if _, ok := dupeChecker[strings.ToLower(i.Name())]; ok {
+		if _, ok := r.dupeChecker[strings.ToLower(i.Name())]; ok {
 			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
 		}
-		dupeChecker[i.Name()] = true
+		r.dupeChecker[i.Name()] = true
 		for p := range i.Prerequisites() {
 			if _, ok := r.allProperties[p]; !ok {
 				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
@@ -152,7 +160,3 @@ func (r *StructRegistry) HasProperty(p Property) bool {
 	_, ok := r.allProperties[p]
 	return ok
 }
-
-// dupeChecker is a map to track all of the item names and make sure we don't
-// have any duplicates.
-var dupeChecker = make(map[string]bool)
