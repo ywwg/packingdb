@@ -125,3 +125,4 @@ src/golang.org/*
 .cproject
 .project
 packingdb.code-workspace
+.planning/
