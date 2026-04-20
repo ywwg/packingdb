@@ -98,3 +98,26 @@ func (c *Context) removeProperty(prop string) error {
 func (c *Context) hasProperty(prop Property) bool {
 	return c.Properties[prop]
 }
+
+// clone returns a deep copy of the context. The Properties map is copied
+// into fresh backing storage so mutations on the clone do not affect the
+// source. The registry reference is rebound to newRegistry so that Trip
+// and Context share the same cloned registry instance (see D-03 / ISOL-04).
+// Unexported: only NewTripFromCustomContext calls this. External callers
+// should go through trip construction, which clones both registry and
+// context consistently.
+func (c *Context) clone(newRegistry Registry) *Context {
+	cloned := *c // scalar fields: Name, Nights, TemperatureMin, TemperatureMax
+	cloned.registry = newRegistry
+
+	if c.Properties != nil {
+		cloned.Properties = make(PropertySet, len(c.Properties))
+		for k, v := range c.Properties {
+			cloned.Properties[k] = v
+		}
+	} else {
+		cloned.Properties = make(PropertySet)
+	}
+
+	return &cloned
+}

@@ -93,3 +93,64 @@ func TestStructRegistryCloneDupeChecker(t *testing.T) {
 		src.RegisterItems("extra", []*Item{NewItem("isolate-probe", []string{"isolate"}, nil)})
 	})
 }
+
+func TestContextCloneDeepCopiesProperties(t *testing.T) {
+	r := NewTestRegistry()
+	src := &Context{
+		Name:       "beach-trip",
+		Nights:     3,
+		Properties: PropertySet{"hot-weather": true, "outdoors": false},
+		registry:   r,
+	}
+
+	clone := src.clone(r)
+	clone.Properties["new-prop"] = true
+
+	_, srcHas := src.Properties["new-prop"]
+	require.False(t, srcHas, "mutation on clone must not leak into source properties")
+}
+
+func TestContextCloneRebindsRegistry(t *testing.T) {
+	r1 := NewTestRegistry()
+	r2 := NewTestRegistry()
+	src := &Context{
+		Name:       "beach-trip",
+		Properties: PropertySet{},
+		registry:   r1,
+	}
+
+	clone := src.clone(r2)
+
+	require.NotSame(t, r1, clone.registry, "clone registry must not still point at r1")
+	require.Same(t, r2, clone.registry, "clone registry must be the passed-in r2")
+}
+
+func TestContextCloneNilProperties(t *testing.T) {
+	r := NewTestRegistry()
+	src := &Context{Name: "bare", registry: r}
+
+	clone := src.clone(r)
+	require.NotNil(t, clone.Properties, "clone Properties must be writable, not nil")
+
+	require.NotPanics(t, func() {
+		clone.Properties[Property("hot-weather")] = true
+	})
+}
+
+func TestContextClonePreservesScalars(t *testing.T) {
+	r := NewTestRegistry()
+	src := &Context{
+		Name:           "x",
+		Nights:         7,
+		TemperatureMin: 40,
+		TemperatureMax: 85,
+		Properties:     PropertySet{},
+		registry:       r,
+	}
+
+	clone := src.clone(r)
+	require.Equal(t, "x", clone.Name)
+	require.Equal(t, 7, clone.Nights)
+	require.Equal(t, 40, clone.TemperatureMin)
+	require.Equal(t, 85, clone.TemperatureMax)
+}
