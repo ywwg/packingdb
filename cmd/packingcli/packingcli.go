@@ -38,7 +38,9 @@ func main() {
 	flag.Parse()
 
 	var r packinglib.Registry = packinglib.NewStructRegistry()
-	contexts.PopulateRegistry(r)
+	if err := contexts.PopulateRegistry(r); err != nil {
+		panic(err.Error())
+	}
 
 	var t *packinglib.Trip
 	if *flagListContexts {
@@ -66,7 +68,9 @@ func main() {
 		if err != nil {
 			panic(err.Error())
 		}
-		contexts.PopulateRegistry(r)
+		if err := contexts.PopulateRegistry(r); err != nil {
+			panic(err.Error())
+		}
 		for _, l := range t.Strings(*flagCategory, *flagHidePacked) {
 			fmt.Println(l)
 		}

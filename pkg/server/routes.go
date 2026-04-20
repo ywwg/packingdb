@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -80,7 +81,11 @@ func (s *Server) createTripHandler(w http.ResponseWriter, r *http.Request) {
 	// Create context with properties
 	context, err := packinglib.NewContext(s.Registry, req.Name, req.Nights, req.TemperatureMin, req.TemperatureMax, req.Properties)
 	if err != nil {
-		s.respondError(w, fmt.Sprintf("Failed to create context: %v", err), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if errors.Is(err, packinglib.ErrContextExists) {
+			status = http.StatusConflict
+		}
+		s.respondError(w, fmt.Sprintf("Failed to create context: %v", err), status)
 		return
 	}
 

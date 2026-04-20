@@ -246,7 +246,9 @@ func main() {
 	filename := args[0]
 
 	var r packinglib.Registry = packinglib.NewStructRegistry()
-	contexts.PopulateRegistry(r)
+	if err := contexts.PopulateRegistry(r); err != nil {
+		log.Fatal(err)
+	}
 	var t *packinglib.Trip
 	// File mode: load if the file already exists or create new if not
 	if _, err := os.Stat(filename); !os.IsNotExist(err) {

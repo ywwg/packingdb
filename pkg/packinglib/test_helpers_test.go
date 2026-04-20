@@ -1,6 +1,7 @@
 package packinglib
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -25,13 +26,15 @@ func NewTestRegistry() Registry {
 		NewItem("notebook", nil, nil),
 	})
 
-	r.RegisterContext(Context{
+	if err := r.RegisterContext(Context{
 		Name:           "beach-trip",
 		Nights:         3,
 		TemperatureMin: 70,
 		TemperatureMax: 90,
 		Properties:     PropertySet{"hot-weather": true, "outdoors": true, "beach-trip": true},
-	})
+	}); err != nil {
+		panic(err)
+	}
 
 	return r
 }
@@ -88,7 +91,7 @@ func TestTwoRegistriesCoexist(t *testing.T) {
 	require.Equal(t, 3, c2.Nights)
 }
 
-func TestNewContextIdempotent(t *testing.T) {
+func TestNewContextDuplicateReturnsError(t *testing.T) {
 	r := NewTestRegistry()
 
 	// Create a new context -- calls RegisterProperty and RegisterContext internally
@@ -96,15 +99,32 @@ func TestNewContextIdempotent(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, c1)
 
-	// Create the same context again -- must NOT panic
+	// Duplicate registration returns ErrContextExists instead of silently succeeding
 	c2, err := NewContext(r, "test-ctx", 5, 40, 70, []string{"outdoors"})
-	require.NoError(t, err)
-	require.NotNil(t, c2)
+	require.ErrorIs(t, err, ErrContextExists)
+	require.Nil(t, c2)
 
-	// First registration wins in the registry
+	// Original registration is preserved in the registry
 	stored, err := r.GetContext("test-ctx")
 	require.NoError(t, err)
 	require.Equal(t, 3, stored.Nights, "first registration should be preserved")
+}
+
+func TestRegisterContextDuplicateReturnsError(t *testing.T) {
+	r := NewStructRegistry()
+	c := Context{
+		Name:           "beach",
+		Nights:         3,
+		TemperatureMin: 70,
+		TemperatureMax: 90,
+		Properties:     PropertySet{},
+	}
+
+	require.NoError(t, r.RegisterContext(c))
+
+	err := r.RegisterContext(c)
+	require.Error(t, err)
+	require.True(t, errors.Is(err, ErrContextExists))
 }
 
 func TestRegistryCountTwo(t *testing.T) {

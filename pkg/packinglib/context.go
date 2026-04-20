@@ -46,7 +46,9 @@ func NewContext(r Registry, name string, nights, tmin, tmax int, properties []st
 		}
 	}
 
-	r.RegisterContext(*c)
+	if err := r.RegisterContext(*c); err != nil {
+		return nil, err
+	}
 	return c, nil
 }
 

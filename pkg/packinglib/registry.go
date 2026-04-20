@@ -1,10 +1,16 @@
 package packinglib
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 )
+
+// ErrContextExists is returned by RegisterContext when a context with the
+// given name is already registered. Callers that expect to re-register (e.g.,
+// reload paths) should use GetContext or GetConcreteContext instead.
+var ErrContextExists = errors.New("context already registered")
 
 // ContextRegistry is a generic interface for uhhh doing things with contexts.
 type Registry interface {
@@ -15,7 +21,7 @@ type Registry interface {
 	Context(name string) (*Context, error)
 
 	// Not clear how registration should work... probably just "add"
-	RegisterContext(c Context)
+	RegisterContext(c Context) error
 	RegisterProperty(prop Property, desc string)
 	RegisterItems(category Category, items []*Item)
 	ListProperties() []Property
@@ -79,12 +85,14 @@ func (r *StructRegistry) GetDescription(p Property) string {
 
 // RegisterContext registers the given context with the system.
 // Also registers a property with the context name.
-func (r *StructRegistry) RegisterContext(c Context) {
+// Returns ErrContextExists wrapped with the name if the context is already registered.
+func (r *StructRegistry) RegisterContext(c Context) error {
 	if _, ok := r.contexts[c.Name]; ok {
-		return
+		return fmt.Errorf("%w: %s", ErrContextExists, c.Name)
 	}
 	r.contexts[c.Name] = c
 	r.RegisterProperty(Property(c.Name), "")
+	return nil
 }
 
 // RegisterProperty adds a new Property to the database so it can be used.

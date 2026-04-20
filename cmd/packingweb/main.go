@@ -26,7 +26,9 @@ func main() {
 	logger.Init(*logLevel)
 
 	registry := packinglib.NewStructRegistry()
-	contexts.PopulateRegistry(registry)
+	if err := contexts.PopulateRegistry(registry); err != nil {
+		logger.Fatal("Failed to populate registry", "error", err)
+	}
 
 	// Create trips directory if it doesn't exist
 	if err := os.MkdirAll(*tripsDir, 0755); err != nil {

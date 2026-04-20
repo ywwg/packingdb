@@ -46,9 +46,26 @@ func FromTrip(t *Trip) *YamlTrip {
 }
 
 func (yt *YamlTrip) AsTrip(r Registry) (*Trip, error) {
-	c, err := NewContext(r, yt.Name, yt.Nights, yt.TempMin, yt.TempMax, yt.Properties)
+	// Try to reuse a previously registered context with the YAML's overrides.
+	// Fall back to creating a fresh one (and registering it) if unknown.
+	c, err := r.GetConcreteContext(yt.Name, yt.Nights, yt.TempMin, yt.TempMax)
 	if err != nil {
-		return nil, err
+		c, err = NewContext(r, yt.Name, yt.Nights, yt.TempMin, yt.TempMax, yt.Properties)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// GetConcreteContext returns a copy without the registry reference; wire
+		// it up and attach any YAML-declared properties.
+		c.registry = r
+		if c.Properties == nil {
+			c.Properties = make(PropertySet)
+		}
+		for _, p := range yt.Properties {
+			if err := c.addProperty(p); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	t, err := NewTripFromCustomContext(r, c)

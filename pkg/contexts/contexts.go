@@ -1,6 +1,8 @@
 package contexts
 
 import (
+	"fmt"
+
 	"github.com/ywwg/packingdb/pkg/items"
 	plib "github.com/ywwg/packingdb/pkg/packinglib"
 )
@@ -223,14 +225,17 @@ func AllContexts() []plib.Context {
 	}
 }
 
-func PopulateRegistry(r plib.Registry) {
+func PopulateRegistry(r plib.Registry) error {
 	for name, desc := range plib.AllProperties() {
 		r.RegisterProperty(name, desc)
 	}
 	for _, c := range AllContexts() {
-		r.RegisterContext(c)
+		if err := r.RegisterContext(c); err != nil {
+			return fmt.Errorf("registering context %q: %w", c.Name, err)
+		}
 	}
 	for _, i := range items.AllItems() {
 		r.RegisterItems(plib.Category(i.Name), i.Items)
 	}
+	return nil
 }
