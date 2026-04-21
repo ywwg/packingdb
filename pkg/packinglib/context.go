@@ -81,8 +81,11 @@ func (c *Context) addProperty(prop string) error {
 	return nil
 }
 
-// removeProperty removes the property with the given name to the context, or
-// returns error if it's not found. Empty strings are ignored.
+// removeProperty removes the property with the given name from the context,
+// or returns error if it's not registered. Empty strings are ignored. Uses
+// delete() rather than setting the value to false so the Properties map
+// accurately reflects membership and serialization is lossless across
+// add/remove sequences (HARD-03; Pitfall 9).
 func (c *Context) removeProperty(prop string) error {
 	if prop == "" {
 		return nil
@@ -90,7 +93,7 @@ func (c *Context) removeProperty(prop string) error {
 	if !c.registry.HasProperty(Property(prop)) {
 		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
-	c.Properties[Property(prop)] = false
+	delete(c.Properties, Property(prop))
 	return nil
 }
 

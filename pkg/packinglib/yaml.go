@@ -29,7 +29,10 @@ func FromTrip(t *Trip) *YamlTrip {
 		TempMax: t.C.TemperatureMax,
 	}
 
-	for p := range t.C.Properties {
+	for p, val := range t.C.Properties {
+		if !val {
+			continue
+		}
 		yt.Properties = append(yt.Properties, string(p))
 	}
 	sort.Slice(yt.Properties, func(i, j int) bool {
