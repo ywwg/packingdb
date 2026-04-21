@@ -120,6 +120,12 @@ func (s *Server) getTripHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Hold the read lock while inspecting trip state so concurrent writers
+	// (toggle handlers, persistDirtyTrips) cannot race on the Properties map
+	// or the Context fields (HARD-02).
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	properties := []string{}
 	for p, val := range trip.C.Properties {
 		if val {
@@ -225,6 +231,12 @@ func (s *Server) getItemsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Hold the read lock across the full item snapshot so concurrent writers
+	// (toggle handlers, persistDirtyTrips) cannot race on the trip's packList
+	// or per-item packed/count fields (HARD-02).
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	categories := []CategoryResponse{}
 	currentCategory := ""
 	var categoryItems []ItemResponse
@@ -326,6 +338,11 @@ func (s *Server) getTripPropertiesHandler(w http.ResponseWriter, r *http.Request
 		s.respondError(w, fmt.Sprintf("Failed to load trip: %v", err), http.StatusNotFound)
 		return
 	}
+
+	// Hold the read lock while reading trip membership so concurrent property
+	// toggles cannot race on the context's Properties map (HARD-02).
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	properties := s.Registry.ListProperties()
 	propList := []PropertyResponse{}
