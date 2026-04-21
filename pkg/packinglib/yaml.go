@@ -143,10 +143,13 @@ type YamlItem struct {
 }
 
 // PackItem returns an extremely minimal version of YamlItem that only
-// records the name, and whether the item is packed.
+// records the name, and whether the item is packed. The packed bool is
+// copied into a local before taking its address so the returned snapshot
+// is independent of any subsequent mutation on the source Item (HARD-01).
 func PackItem(i *Item) *YamlItem {
+	packed := i.packed
 	return &YamlItem{
 		Name:   i.name,
-		Packed: &i.packed,
+		Packed: &packed,
 	}
 }

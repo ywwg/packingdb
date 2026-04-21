@@ -166,3 +166,22 @@ func populateRegistry(r Registry) {
 }
 
 func Int(v int) *int { return &v }
+
+// TestPackItemSnapshot verifies HARD-01: PackItem must return a snapshot of
+// the packed bool, not an alias to the source Item's packed field. Mutating
+// the source Item after PackItem returns must not change the serialized
+// value. See Pitfall 3 in .planning/research/PITFALLS.md.
+func TestPackItemSnapshot(t *testing.T) {
+	i := NewItem("compass", nil, nil)
+	i.Pack(true)
+
+	yi := PackItem(i)
+	require.NotNil(t, yi.Packed, "YamlItem.Packed must be non-nil after PackItem")
+	require.True(t, *yi.Packed, "snapshot must capture packed=true at call time")
+
+	i.Pack(false)
+	require.True(t, *yi.Packed, "snapshot must remain true after source mutated to false")
+
+	*yi.Packed = false
+	require.False(t, i.Packed(), "source packed was false after i.Pack(false) and must not be driven by snapshot flip")
+}
