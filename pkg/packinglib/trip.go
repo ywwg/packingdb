@@ -56,13 +56,24 @@ func getCode(idx int) string {
 	return code
 }
 
-// NewTripFromCustomContext returns a constructed trip for the given
-// constructed context and number of nights.
+// NewTripFromCustomContext returns a constructed trip whose registry and
+// context are deep-copied from the caller's arguments. The trip owns its
+// own registry clone; packing, counting, and property changes on this trip
+// do not affect the caller's registry or any other trip. The cloned context
+// is rebound to the cloned registry so Trip.registry and Trip.C.registry
+// point to the same instance (see ISOL-03, ISOL-04 / D-02, D-03).
 func NewTripFromCustomContext(registry Registry, context *Context) (*Trip, error) {
+	// Clone the master registry ONCE. Both the trip and its context use this
+	// same cloned instance. Do not call Clone() anywhere else in this path;
+	// that would produce two separate registry instances and silently
+	// desynchronize addProperty/removeProperty from makeList.
+	clonedRegistry := registry.Clone()
+	clonedContext := context.clone(clonedRegistry)
+
 	t := &Trip{
-		C:           context,
-		contextName: context.Name,
-		registry:    registry,
+		C:           clonedContext,
+		contextName: clonedContext.Name,
+		registry:    clonedRegistry,
 	}
 	t.packList = t.makeList()
 	t.codeToItem = make(map[string]*Item)

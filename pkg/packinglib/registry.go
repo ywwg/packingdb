@@ -1,10 +1,16 @@
 package packinglib
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 )
+
+// ErrContextExists is returned by RegisterContext when a context with the
+// given name is already registered. Callers that expect to re-register (e.g.,
+// reload paths) should use GetContext or GetConcreteContext instead.
+var ErrContextExists = errors.New("context already registered")
 
 // ContextRegistry is a generic interface for uhhh doing things with contexts.
 type Registry interface {
@@ -15,13 +21,19 @@ type Registry interface {
 	Context(name string) (*Context, error)
 
 	// Not clear how registration should work... probably just "add"
-	RegisterContext(c Context)
+	RegisterContext(c Context) error
 	RegisterProperty(prop Property, desc string)
 	RegisterItems(category Category, items []*Item)
 	ListProperties() []Property
 	GetContext(name string) (*Context, error)
 	GetConcreteContext(name string, nights, tmin, tmax int) (*Context, error)
 	HasProperty(p Property) bool
+
+	// Clone returns a deep copy of the registry. Items are cloned via
+	// Item.Clone so each registry owns independent item state. Trip
+	// construction uses this so each trip's packing state is isolated
+	// from other trips and from the master registry.
+	Clone() Registry
 }
 
 // StructRegistry is a simple in-memory impl of a ContextRegistry
@@ -29,6 +41,7 @@ type StructRegistry struct {
 	contexts      map[string]Context
 	allProperties map[Property]string
 	allItems      PackList
+	dupeChecker   map[string]bool
 }
 
 func NewStructRegistry() Registry {
@@ -36,6 +49,7 @@ func NewStructRegistry() Registry {
 		contexts:      make(map[string]Context),
 		allProperties: make(map[Property]string),
 		allItems:      make(PackList),
+		dupeChecker:   make(map[string]bool),
 	}
 	return r
 }
@@ -77,18 +91,26 @@ func (r *StructRegistry) GetDescription(p Property) string {
 
 // RegisterContext registers the given context with the system.
 // Also registers a property with the context name.
-func (r *StructRegistry) RegisterContext(c Context) {
+// Returns ErrContextExists wrapped with the name if the context is already registered.
+func (r *StructRegistry) RegisterContext(c Context) error {
 	if _, ok := r.contexts[c.Name]; ok {
-		panic(fmt.Sprintf("Duplicate context: %s", c.Name))
+		return fmt.Errorf("%w: %s", ErrContextExists, c.Name)
 	}
 	r.contexts[c.Name] = c
 	r.RegisterProperty(Property(c.Name), "")
+	return nil
 }
 
 // RegisterProperty adds a new Property to the database so it can be used.
 // desc should be a user-visible description of the property.
 // Does not verify that all of the properties are in the allProperties map.
 func (r *StructRegistry) RegisterProperty(prop Property, desc string) {
+	if _, ok := r.allProperties[prop]; ok {
+		if desc != "" {
+			r.allProperties[prop] = desc
+		}
+		return
+	}
 	r.allProperties[prop] = desc
 }
 
@@ -122,15 +144,21 @@ func (r *StructRegistry) GetConcreteContext(name string, nights, tmin, tmax int)
 // cause a panic.
 func (r *StructRegistry) RegisterItems(category Category, items []*Item) {
 	for _, i := range items {
-		if _, ok := dupeChecker[strings.ToLower(i.Name())]; ok {
+		if _, ok := r.dupeChecker[strings.ToLower(i.Name())]; ok {
 			panic(fmt.Sprintf("Duplicate item name: %s: %s", category, i.Name()))
 		}
-		dupeChecker[i.Name()] = true
+		r.dupeChecker[i.Name()] = true
 		for p := range i.Prerequisites() {
 			if _, ok := r.allProperties[p]; !ok {
 				panic(fmt.Sprintf("Prerequisite property not found in allProperties, is it registered?: %s", p))
 			}
 		}
+		// Pre-sort mutators by Priority() descending, once at registration time.
+		// After this point mutator order is invariant. AdjustCount relies on this
+		// and must not re-sort (see ISOL-07 / D-05).
+		sort.Slice(i.mutators, func(x, y int) bool {
+			return i.mutators[y].Priority() < i.mutators[x].Priority()
+		})
 	}
 	r.allItems[category] = items
 }
@@ -153,6 +181,34 @@ func (r *StructRegistry) HasProperty(p Property) bool {
 	return ok
 }
 
-// dupeChecker is a map to track all of the item names and make sure we don't
-// have any duplicates.
-var dupeChecker = make(map[string]bool)
+// Clone returns a deep copy of the registry. Map contents are copied element
+// by element; item slices are rebuilt with each *Item deep-copied via
+// Item.Clone(). Value-typed Context entries in contexts are copied by map
+// range; callers that need the Context's registry field rebound should do so
+// after retrieving the cloned Context (Context.clone handles this for trip
+// construction).
+func (r *StructRegistry) Clone() Registry {
+	c := &StructRegistry{
+		contexts:      make(map[string]Context, len(r.contexts)),
+		allProperties: make(map[Property]string, len(r.allProperties)),
+		allItems:      make(PackList, len(r.allItems)),
+		dupeChecker:   make(map[string]bool, len(r.dupeChecker)),
+	}
+	for k, v := range r.contexts {
+		c.contexts[k] = v
+	}
+	for k, v := range r.allProperties {
+		c.allProperties[k] = v
+	}
+	for k, v := range r.dupeChecker {
+		c.dupeChecker[k] = v
+	}
+	for category, items := range r.allItems {
+		cloned := make([]*Item, len(items))
+		for i, item := range items {
+			cloned[i] = item.Clone()
+		}
+		c.allItems[category] = cloned
+	}
+	return c
+}

@@ -46,7 +46,9 @@ func NewContext(r Registry, name string, nights, tmin, tmax int, properties []st
 		}
 	}
 
-	r.RegisterContext(*c)
+	if err := r.RegisterContext(*c); err != nil {
+		return nil, err
+	}
 	return c, nil
 }
 
@@ -79,8 +81,11 @@ func (c *Context) addProperty(prop string) error {
 	return nil
 }
 
-// removeProperty removes the property with the given name to the context, or
-// returns error if it's not found. Empty strings are ignored.
+// removeProperty removes the property with the given name from the context,
+// or returns error if it's not registered. Empty strings are ignored. Uses
+// delete() rather than setting the value to false so the Properties map
+// accurately reflects membership and serialization is lossless across
+// add/remove sequences (HARD-03; Pitfall 9).
 func (c *Context) removeProperty(prop string) error {
 	if prop == "" {
 		return nil
@@ -88,11 +93,34 @@ func (c *Context) removeProperty(prop string) error {
 	if !c.registry.HasProperty(Property(prop)) {
 		return fmt.Errorf("didn't find property, is it registered?: %s", prop)
 	}
-	c.Properties[Property(prop)] = false
+	delete(c.Properties, Property(prop))
 	return nil
 }
 
 // hasProperty returns true if the context has this property.
 func (c *Context) hasProperty(prop Property) bool {
 	return c.Properties[prop]
+}
+
+// clone returns a deep copy of the context. The Properties map is copied
+// into fresh backing storage so mutations on the clone do not affect the
+// source. The registry reference is rebound to newRegistry so that Trip
+// and Context share the same cloned registry instance (see D-03 / ISOL-04).
+// Unexported: only NewTripFromCustomContext calls this. External callers
+// should go through trip construction, which clones both registry and
+// context consistently.
+func (c *Context) clone(newRegistry Registry) *Context {
+	cloned := *c // scalar fields: Name, Nights, TemperatureMin, TemperatureMax
+	cloned.registry = newRegistry
+
+	if c.Properties != nil {
+		cloned.Properties = make(PropertySet, len(c.Properties))
+		for k, v := range c.Properties {
+			cloned.Properties[k] = v
+		}
+	} else {
+		cloned.Properties = make(PropertySet)
+	}
+
+	return &cloned
 }

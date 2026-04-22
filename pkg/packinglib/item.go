@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"reflect"
-	"sort"
 )
 
 // Item
@@ -82,8 +81,11 @@ func (i *Item) Satisfies(c *Context) bool {
 	return found
 }
 
-// AdjustCount tells the item to calculate how much of itself is needed given the
-// context and returns the item. Mutators multiply together I guess???
+// AdjustCount tells the item to calculate how much of itself is needed given
+// the context. Mutators are pre-sorted at registration time (see
+// StructRegistry.RegisterItems); this function must iterate them in order and
+// must not reorder them. Sorting here would reintroduce the data race on the
+// shared mutators backing array.
 func (i *Item) AdjustCount(c *Context) {
 	i.count = 1.0
 	// First check is always Satisfies
@@ -91,9 +93,6 @@ func (i *Item) AdjustCount(c *Context) {
 		i.count = 0.0
 		return
 	}
-	sort.Slice(i.mutators, func(x, y int) bool {
-		return i.mutators[y].Priority() < i.mutators[x].Priority()
-	})
 	for _, t := range i.mutators {
 		// this makes it feel like satisfies should be a mutator. how do we deal with
 		// iterating through... maybe any time something returns zero we stop
@@ -157,6 +156,29 @@ func (i *Item) Packed() bool {
 // Prerequisites returns the PropertySet of prereqs for this item
 func (i *Item) Prerequisites() PropertySet {
 	return i.prerequisites
+}
+
+// Clone returns a deep copy of the item. The prerequisites map and mutators
+// slice are allocated fresh so the clone can be mutated without affecting
+// the original. Mutator values are shared (they are immutable after
+// construction) but the backing array is new. Count and packed are copied
+// as-is; callers needing a pristine state should construct a new trip.
+func (i *Item) Clone() *Item {
+	clone := *i // value-typed fields: name, units, count, packed
+
+	if i.prerequisites != nil {
+		clone.prerequisites = make(PropertySet, len(i.prerequisites))
+		for k, v := range i.prerequisites {
+			clone.prerequisites[k] = v
+		}
+	}
+
+	if i.mutators != nil {
+		clone.mutators = make([]packMutator, len(i.mutators))
+		copy(clone.mutators, i.mutators)
+	}
+
+	return &clone
 }
 
 type packMutator interface {

@@ -29,7 +29,10 @@ func FromTrip(t *Trip) *YamlTrip {
 		TempMax: t.C.TemperatureMax,
 	}
 
-	for p := range t.C.Properties {
+	for p, val := range t.C.Properties {
+		if !val {
+			continue
+		}
 		yt.Properties = append(yt.Properties, string(p))
 	}
 	sort.Slice(yt.Properties, func(i, j int) bool {
@@ -46,9 +49,26 @@ func FromTrip(t *Trip) *YamlTrip {
 }
 
 func (yt *YamlTrip) AsTrip(r Registry) (*Trip, error) {
-	c, err := NewContext(r, yt.Name, yt.Nights, yt.TempMin, yt.TempMax, yt.Properties)
+	// Try to reuse a previously registered context with the YAML's overrides.
+	// Fall back to creating a fresh one (and registering it) if unknown.
+	c, err := r.GetConcreteContext(yt.Name, yt.Nights, yt.TempMin, yt.TempMax)
 	if err != nil {
-		return nil, err
+		c, err = NewContext(r, yt.Name, yt.Nights, yt.TempMin, yt.TempMax, yt.Properties)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// GetConcreteContext returns a copy without the registry reference; wire
+		// it up and attach any YAML-declared properties.
+		c.registry = r
+		if c.Properties == nil {
+			c.Properties = make(PropertySet)
+		}
+		for _, p := range yt.Properties {
+			if err := c.addProperty(p); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	t, err := NewTripFromCustomContext(r, c)
@@ -126,10 +146,13 @@ type YamlItem struct {
 }
 
 // PackItem returns an extremely minimal version of YamlItem that only
-// records the name, and whether the item is packed.
+// records the name, and whether the item is packed. The packed bool is
+// copied into a local before taking its address so the returned snapshot
+// is independent of any subsequent mutation on the source Item (HARD-01).
 func PackItem(i *Item) *YamlItem {
+	packed := i.packed
 	return &YamlItem{
 		Name:   i.name,
-		Packed: &i.packed,
+		Packed: &packed,
 	}
 }
